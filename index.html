@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOODLINE — Syndicate Command</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // ══════════════════════════════════════════
+  // PASTE YOUR FIREBASE CONFIG BELOW
+  // ══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyBRGl7v5orE19cIJZha478cRN6WmGy65m8",
+  authDomain: "bloodline-mainframe.firebaseapp.com",
+  projectId: "bloodline-mainframe",
+  storageBucket: "bloodline-mainframe.firebasestorage.app",
+  messagingSenderId: "71863265301",
+  appId: "1:71863265301:web:a4f7c594b01592ad76061c"
+};
+  // ══════════════════════════════════════════
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  window._db = db;
+  window._auth = auth;
+  window._fs = { collection, addDoc, getDocs, deleteDoc, doc };
+  window._signIn = signInWithEmailAndPassword;
+  window._signOut = signOut;
+  window._onAuthStateChanged = onAuthStateChanged;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    window._onAuthStateChanged(window._auth, (user) => {
+      if (user) { showDashboard(); loadAllData(); }
+      else { showLogin(); }
+    });
+  });
+</script>
+
+<style>
+:root {
+  --black: #050507;
+  --deep: #0a0a0f;
+  --panel: #0f0f18;
+  --border: rgba(220,0,120,0.2);
+  --pink: #ff0090;
+  --pink-soft: #ff50b8;
+  --pink-glow: rgba(255,0,144,0.4);
+  --pink-dim: rgba(255,0,144,0.08);
+  --white: #f0e6f0;
+  --muted: rgba(240,230,240,0.45);
+  --gold: #c9a84c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:16px;min-height:100vh;overflow-x:hidden;}
+
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 40% at 15% 20%,rgba(255,0,144,0.12) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 60% at 85% 80%,rgba(180,0,100,0.10) 0%,transparent 60%),
+  radial-gradient(ellipse 80% 30% at 50% 50%,rgba(255,0,144,0.04) 0%,transparent 70%);
+  pointer-events:none;z-index:0;animation:smokeDrift 12s ease-in-out infinite alternate;}
+
+@keyframes smokeDrift{0%{transform:scale(1) translate(0,0);}100%{transform:scale(1.08) translate(2%,1%);}}
+
+/* ── LOGIN ── */
+#loginPage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--black);flex-direction:column;}
+.login-box{position:relative;width:420px;padding:56px 48px;background:var(--panel);border:1px solid var(--border);box-shadow:0 0 80px rgba(255,0,144,0.15),inset 0 0 40px rgba(255,0,144,0.03);text-align:center;}
+.login-box::before,.login-box::after{content:'';position:absolute;left:50%;transform:translateX(-50%);width:60%;height:1px;background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.login-box::before{top:0;}.login-box::after{bottom:0;}
+.skull-icon{font-size:72px;display:block;margin-bottom:16px;filter:drop-shadow(0 0 20px var(--pink-glow));animation:skullPulse 3s ease-in-out infinite;}
+@keyframes skullPulse{0%,100%{filter:drop-shadow(0 0 20px var(--pink-glow));transform:scale(1);}50%{filter:drop-shadow(0 0 40px rgba(255,0,144,0.7));transform:scale(1.05);}}
+.login-title{font-family:'Cinzel Decorative',serif;font-size:28px;font-weight:900;letter-spacing:6px;color:var(--pink);text-shadow:0 0 30px var(--pink-glow);margin-bottom:6px;}
+.login-sub{font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;color:var(--muted);margin-bottom:40px;text-transform:uppercase;}
+.login-box input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,0,144,0.25);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:15px;letter-spacing:1px;padding:14px 18px;margin-bottom:14px;outline:none;transition:border-color 0.3s,box-shadow 0.3s;}
+.login-box input:focus{border-color:var(--pink);box-shadow:0 0 20px rgba(255,0,144,0.2);}
+.login-box input::placeholder{color:var(--muted);}
+.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,#cc0075,var(--pink));border:none;color:#fff;font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;box-shadow:0 0 30px rgba(255,0,144,0.3);margin-top:8px;}
+.btn-primary:hover{box-shadow:0 0 50px rgba(255,0,144,0.6);transform:translateY(-1px);}
+.login-error{color:var(--pink);font-size:13px;margin-top:14px;min-height:20px;letter-spacing:1px;}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;position:relative;z-index:1;min-height:100vh;}
+header{position:sticky;top:0;z-index:50;background:rgba(5,5,7,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:70px;}
+.logo{display:flex;align-items:center;gap:16px;}
+.logo-skull{font-size:28px;filter:drop-shadow(0 0 10px var(--pink-glow));}
+.logo-text{font-family:'Cinzel Decorative',serif;font-size:20px;font-weight:900;letter-spacing:6px;color:var(--pink);text-shadow:0 0 20px var(--pink-glow);}
+.logo-sub{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:var(--muted);display:block;text-transform:uppercase;}
+nav{display:flex;gap:4px;}
+.nav-btn{background:none;border:none;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:8px 18px;cursor:pointer;transition:all 0.3s;position:relative;}
+.nav-btn::after{content:'';position:absolute;bottom:0;left:50%;right:50%;height:1px;background:var(--pink);transition:all 0.3s;}
+.nav-btn:hover,.nav-btn.active{color:var(--pink);}
+.nav-btn.active::after,.nav-btn:hover::after{left:0;right:0;}
+.header-right{display:flex;align-items:center;gap:20px;}
+.user-badge{font-size:12px;letter-spacing:2px;color:var(--muted);}
+.btn-logout{background:none;border:1px solid rgba(255,0,144,0.3);color:var(--pink);font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;padding:7px 16px;cursor:pointer;transition:all 0.3s;text-transform:uppercase;}
+.btn-logout:hover{background:rgba(255,0,144,0.1);border-color:var(--pink);box-shadow:0 0 20px rgba(255,0,144,0.2);}
+main{padding:48px 40px;max-width:1400px;margin:0 auto;}
+.section{display:none;}.section.active{display:block;}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.section-title{font-family:'Cinzel Decorative',serif;font-size:22px;font-weight:700;color:var(--white);letter-spacing:3px;}
+.section-skull{color:var(--pink);margin-right:12px;filter:drop-shadow(0 0 8px var(--pink-glow));}
+.section-subtitle{font-size:12px;letter-spacing:3px;color:var(--muted);margin-top:4px;font-family:'Cinzel',serif;text-transform:uppercase;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:32px;}
+.stat-card{background:var(--panel);border:1px solid var(--border);padding:28px 24px;position:relative;overflow:hidden;transition:all 0.3s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.stat-card:hover{border-color:rgba(255,0,144,0.4);box-shadow:0 0 30px rgba(255,0,144,0.1);transform:translateY(-2px);}
+.stat-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;}
+.stat-value{font-family:'Cinzel Decorative',serif;font-size:28px;color:var(--pink);text-shadow:0 0 20px var(--pink-glow);word-break:break-all;}
+.stat-icon{position:absolute;top:20px;right:20px;font-size:28px;opacity:0.15;}
+.data-panel{background:var(--panel);border:1px solid var(--border);overflow:hidden;}
+.data-panel-header{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:rgba(255,0,144,0.03);}
+.data-panel-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--pink);text-transform:uppercase;}
+.btn-add{background:rgba(255,0,144,0.1);border:1px solid rgba(255,0,144,0.4);color:var(--pink);font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;padding:9px 20px;cursor:pointer;transition:all 0.3s;text-transform:uppercase;}
+.btn-add:hover{background:rgba(255,0,144,0.2);box-shadow:0 0 20px rgba(255,0,144,0.2);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:rgba(255,0,144,0.05);}
+th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;padding:14px 20px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:16px 20px;font-size:15px;letter-spacing:0.5px;border-bottom:1px solid rgba(255,0,144,0.06);color:var(--white);transition:background 0.2s;}
+tr:hover td{background:rgba(255,0,144,0.04);}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:3px 12px;font-size:10px;letter-spacing:2px;font-family:'Cinzel',serif;text-transform:uppercase;border:1px solid;}
+.badge-pink{color:var(--pink);border-color:rgba(255,0,144,0.4);background:rgba(255,0,144,0.08);}
+.badge-gold{color:var(--gold);border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.08);}
+.badge-white{color:var(--muted);border-color:rgba(240,230,240,0.2);background:rgba(240,230,240,0.04);}
+.btn-del{background:none;border:1px solid rgba(255,0,144,0.2);color:rgba(255,0,144,0.5);font-size:11px;width:28px;height:28px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;}
+.btn-del:hover{border-color:var(--pink);color:var(--pink);box-shadow:0 0 10px rgba(255,0,144,0.3);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--panel);border:1px solid var(--border);box-shadow:0 0 80px rgba(255,0,144,0.2);width:480px;max-width:90vw;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.modal-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;color:var(--pink);text-transform:uppercase;}
+.btn-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;transition:color 0.2s;}
+.btn-close:hover{color:var(--pink);}
+.modal-body{padding:28px;}
+.form-group{margin-bottom:20px;}
+.form-label{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.form-input,.form-select,.form-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,0,144,0.2);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:15px;padding:12px 16px;outline:none;transition:border-color 0.3s,box-shadow 0.3s;letter-spacing:0.5px;}
+.form-textarea{min-height:100px;resize:vertical;}
+.form-select{cursor:pointer;}.form-select option{background:var(--panel);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--pink);box-shadow:0 0 15px rgba(255,0,144,0.15);}
+.modal-footer{padding:20px 28px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;}
+.btn-cancel{background:none;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;padding:10px 22px;cursor:pointer;transition:all 0.3s;text-transform:uppercase;}
+.btn-cancel:hover{border-color:var(--muted);color:var(--white);}
+.empty-state{text-align:center;padding:60px;color:var(--muted);}
+.empty-state-skull{font-size:48px;display:block;margin-bottom:16px;opacity:0.3;}
+.empty-state-text{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;}
+.heist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;}
+.heist-card{background:var(--panel);border:1px solid var(--border);padding:28px;position:relative;overflow:hidden;transition:all 0.3s;}
+.heist-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.heist-card:hover{border-color:rgba(255,0,144,0.4);box-shadow:0 0 30px rgba(255,0,144,0.1);transform:translateY(-2px);}
+.heist-name{font-family:'Cinzel Decorative',serif;font-size:16px;color:var(--white);margin-bottom:10px;}
+.heist-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.heist-notes{font-size:14px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+.heist-actions{margin-top:16px;display:flex;justify-content:flex-end;}
+#toast{position:fixed;bottom:30px;right:30px;background:var(--panel);border:1px solid var(--pink);box-shadow:0 0 30px rgba(255,0,144,0.3);padding:16px 24px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--pink);text-transform:uppercase;z-index:999;opacity:0;transform:translateY(20px);transition:all 0.3s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:rgba(255,0,144,0.3);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:rgba(255,0,144,0.6);}
+.bg-skull{position:fixed;font-size:200px;opacity:0.015;pointer-events:none;user-select:none;z-index:0;}
+.bg-skull-1{bottom:-40px;right:-40px;transform:rotate(15deg);}
+.bg-skull-2{top:100px;left:-60px;transform:rotate(-10deg);font-size:140px;}
+.amount-positive{color:#00e87a;}.amount-negative{color:var(--pink);}
+</style>
+</head>
+<body>
+
+<div class="bg-skull bg-skull-1">💀</div>
+<div class="bg-skull bg-skull-2">💀</div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <span class="skull-icon">💀</span>
+    <div class="login-title">BLOODLINE</div>
+    <div class="login-sub">Syndicate Command · Access Restricted</div>
+    <input type="email" id="loginEmail" placeholder="EMAIL ADDRESS" autocomplete="email">
+    <input type="password" id="loginPass" placeholder="PASSWORD" autocomplete="current-password">
+    <button class="btn-primary" onclick="doLogin()">Enter The Bloodline</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="logo">
+      <span class="logo-skull">💀</span>
+      <div>
+        <span class="logo-text">BLOODLINE</span>
+        <span class="logo-sub">Syndicate Command</span>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active" onclick="showSection('treasury',this)">Treasury</button>
+      <button class="nav-btn" onclick="showSection('inventory',this)">Inventory</button>
+      <button class="nav-btn" onclick="showSection('locations',this)">Locations</button>
+      <button class="nav-btn" onclick="showSection('pricelist',this)">Price List</button>
+      <button class="nav-btn" onclick="showSection('heists',this)">Heists</button>
+    </nav>
+    <div class="header-right">
+      <span class="user-badge" id="userBadge">—</span>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TREASURY -->
+    <section id="treasury" class="section active">
+      <div class="section-header">
+        <div>
+          <div class="section-title"><span class="section-skull">💀</span>Treasury</div>
+          <div class="section-subtitle">Financial Dominion</div>
+        </div>
+        <button class="btn-add" onclick="openModal('treasury')">+ Add Entry</button>
+      </div>
+      <div class="cards-grid">
+        <div class="stat-card"><div class="stat-label">Total Cash</div><div class="stat-value" id="statCash">$0</div><span class="stat-icon">💵</span></div>
+        <div class="stat-card"><div class="stat-label">Crypto Holdings</div><div class="stat-value" id="statCrypto">$0</div><span class="stat-icon">₿</span></div>
+        <div class="stat-card"><div class="stat-label">Total Net Worth</div><div class="stat-value" id="statTotal">$0</div><span class="stat-icon">👑</span></div>
+      </div>
+      <div class="data-panel">
+        <div class="data-panel-header"><span class="data-panel-title">💀 Transaction Ledger</span></div>
+        <table><thead><tr><th>Type</th><th>Description</th><th>Amount</th><th>Category</th><th>Date</th><th></th></tr></thead>
+        <tbody id="treasuryBody"><tr><td colspan="6"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No entries yet</div></div></td></tr></tbody></table>
+      </div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section id="inventory" class="section">
+      <div class="section-header">
+        <div><div class="section-title"><span class="section-skull">💀</span>Inventory</div><div class="section-subtitle">Arsenal & Resources</div></div>
+        <button class="btn-add" onclick="openModal('inventory')">+ Add Item</button>
+      </div>
+      <div class="data-panel">
+        <div class="data-panel-header"><span class="data-panel-title">💀 Stock Registry</span></div>
+        <table><thead><tr><th>Item</th><th>Category</th><th>Qty</th><th>Condition</th><th>Location</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="inventoryBody"><tr><td colspan="7"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No items yet</div></div></td></tr></tbody></table>
+      </div>
+    </section>
+
+    <!-- LOCATIONS -->
+    <section id="locations" class="section">
+      <div class="section-header">
+        <div><div class="section-title"><span class="section-skull">💀</span>Locations</div><div class="section-subtitle">Territories & Safehouses</div></div>
+        <button class="btn-add" onclick="openModal('locations')">+ Add Location</button>
+      </div>
+      <div class="data-panel">
+        <div class="data-panel-header"><span class="data-panel-title">💀 Territory Map</span></div>
+        <table><thead><tr><th>Name</th><th>Type</th><th>Address</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="locationsBody"><tr><td colspan="6"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No locations yet</div></div></td></tr></tbody></table>
+      </div>
+    </section>
+
+    <!-- PRICE LIST -->
+    <section id="pricelist" class="section">
+      <div class="section-header">
+        <div><div class="section-title"><span class="section-skull">💀</span>Price List</div><div class="section-subtitle">Buy · Sell · Trade</div></div>
+        <button class="btn-add" onclick="openModal('pricelist')">+ Add Item</button>
+      </div>
+      <div class="data-panel">
+        <div class="data-panel-header"><span class="data-panel-title">💀 Market Rates</span></div>
+        <table><thead><tr><th>Item / Service</th><th>Category</th><th>Buy Price</th><th>Sell Price</th><th>Stock</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="pricelistBody"><tr><td colspan="7"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No items yet</div></div></td></tr></tbody></table>
+      </div>
+    </section>
+
+    <!-- HEISTS -->
+    <section id="heists" class="section">
+      <div class="section-header">
+        <div><div class="section-title"><span class="section-skull">💀</span>Heists</div><div class="section-subtitle">Operations & Intelligence</div></div>
+        <button class="btn-add" onclick="openModal('heists')">+ Add Operation</button>
+      </div>
+      <div class="heist-grid" id="heistsGrid">
+        <div class="empty-state" style="grid-column:1/-1"><span class="empty-state-skull">💀</span><div class="empty-state-text">No operations planned</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Add Entry</span>
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" style="width:auto;padding:10px 28px;" onclick="saveModal()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let currentModal = null;
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function showLogin() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  const user = window._auth.currentUser;
+  if (user) document.getElementById('userBadge').textContent = user.email;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  try {
+    await window._signIn(window._auth, email, pass);
+  } catch(e) {
+    errEl.textContent = 'Access denied. Check credentials.';
+  }
+}
+
+async function doLogout() {
+  await window._signOut(window._auth);
+  showLogin();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
+  if (e.key === 'Escape') closeModal();
+});
+
+const modalForms = {
+  treasury: {
+    title: '💀 Add Treasury Entry',
+    fields: `
+      <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="f_desc" placeholder="e.g. Pacific Bank heist payout"></div>
+      <div class="form-group"><label class="form-label">Amount ($)</label><input class="form-input" type="number" id="f_amount" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="f_type"><option>Cash</option><option>Crypto</option></select></div>
+      <div class="form-group"><label class="form-label">Direction</label><select class="form-select" id="f_dir"><option value="in">Incoming (+)</option><option value="out">Outgoing (−)</option></select></div>`
+  },
+  inventory: {
+    title: '💀 Add Inventory Item',
+    fields: `
+      <div class="form-group"><label class="form-label">Item Name</label><input class="form-input" id="f_name" placeholder="e.g. Carbine Rifle"></div>
+      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="f_cat"><option>Weapons</option><option>Ammunition</option><option>Vehicles</option><option>Drugs</option><option>Equipment</option><option>Misc</option></select></div>
+      <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" type="number" id="f_qty" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Condition</label><select class="form-select" id="f_cond"><option>Mint</option><option>Good</option><option>Worn</option><option>Damaged</option></select></div>
+      <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="f_loc" placeholder="e.g. Safehouse A"></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="f_notes" placeholder="Additional info..."></textarea></div>`
+  },
+  locations: {
+    title: '💀 Add Location',
+    fields: `
+      <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="f_name" placeholder="e.g. Downtown Safehouse"></div>
+      <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="f_type"><option>Safehouse</option><option>Drop Point</option><option>Stash</option><option>Meeting Point</option><option>Territory</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Address / Coordinates</label><input class="form-input" id="f_addr" placeholder="e.g. Vinewood Hills, near blaine"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="f_status"><option>Active</option><option>Compromised</option><option>Abandoned</option><option>Secured</option></select></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="f_notes" placeholder="Access codes, guards, contacts..."></textarea></div>`
+  },
+  pricelist: {
+    title: '💀 Add Price List Item',
+    fields: `
+      <div class="form-group"><label class="form-label">Item / Service</label><input class="form-input" id="f_item" placeholder="e.g. RPG"></div>
+      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="f_cat"><option>Weapons</option><option>Drugs</option><option>Vehicles</option><option>Services</option><option>Contraband</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Buy Price ($)</label><input class="form-input" type="number" id="f_buy" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Sell Price ($)</label><input class="form-input" type="number" id="f_sell" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Stock Status</label><select class="form-select" id="f_stock"><option>In Stock</option><option>Low Stock</option><option>Out of Stock</option><option>On Order</option></select></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="f_notes" placeholder="Supplier, quality, notes..."></textarea></div>`
+  },
+  heists: {
+    title: '💀 Add Operation',
+    fields: `
+      <div class="form-group"><label class="form-label">Operation Name</label><input class="form-input" id="f_name" placeholder="e.g. Operation Crimson Dawn"></div>
+      <div class="form-group"><label class="form-label">Target</label><input class="form-input" id="f_target" placeholder="e.g. Fleeca Bank — Vinewood Blvd"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="f_status"><option>Planning</option><option>Ready</option><option>Active</option><option>Complete</option><option>Aborted</option></select></div>
+      <div class="form-group"><label class="form-label">Expected Take ($)</label><input class="form-input" type="number" id="f_take" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Required Crew Size</label><input class="form-input" type="number" id="f_crew" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Intel / Notes</label><textarea class="form-textarea" id="f_notes" placeholder="Security, timing, approach, escape route..."></textarea></div>`
+  }
+};
+
+function openModal(type) {
+  currentModal = type;
+  const form = modalForms[type];
+  document.getElementById('modalTitle').textContent = form.title;
+  document.getElementById('modalBody').innerHTML = form.fields;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  currentModal = null;
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+async function saveModal() {
+  if (!currentModal) return;
+  const { collection, addDoc } = window._fs;
+  let data = { created: new Date().toISOString() };
+  const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+  if (currentModal === 'treasury') data = { ...data, desc: g('f_desc'), amount: parseFloat(g('f_amount'))||0, type: g('f_type'), dir: g('f_dir') };
+  else if (currentModal === 'inventory') data = { ...data, name: g('f_name'), category: g('f_cat'), qty: parseInt(g('f_qty'))||0, condition: g('f_cond'), location: g('f_loc'), notes: g('f_notes') };
+  else if (currentModal === 'locations') data = { ...data, name: g('f_name'), type: g('f_type'), address: g('f_addr'), status: g('f_status'), notes: g('f_notes') };
+  else if (currentModal === 'pricelist') data = { ...data, item: g('f_item'), category: g('f_cat'), buyPrice: parseFloat(g('f_buy'))||0, sellPrice: parseFloat(g('f_sell'))||0, stock: g('f_stock'), notes: g('f_notes') };
+  else if (currentModal === 'heists') data = { ...data, name: g('f_name'), target: g('f_target'), status: g('f_status'), take: parseFloat(g('f_take'))||0, crew: parseInt(g('f_crew'))||0, notes: g('f_notes') };
+
+  try {
+    await addDoc(collection(window._db, currentModal), data);
+    toast('Entry saved ✓');
+    closeModal();
+    loadAllData();
+  } catch(e) {
+    toast('Error — check Firebase config');
+    console.error(e);
+  }
+}
+
+async function deleteEntry(col, id) {
+  const { doc, deleteDoc } = window._fs;
+  try {
+    await deleteDoc(doc(window._db, col, id));
+    toast('Deleted ✓');
+    loadAllData();
+  } catch(e) { toast('Error deleting'); }
+}
+
+function fmt$(n) { return '$' + Number(n).toLocaleString(); }
+function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); }
+
+function statusBadge(s) {
+  const map = { Active:'pink', Secured:'gold', Ready:'gold', Complete:'gold', 'In Stock':'gold', Compromised:'pink', Aborted:'pink', 'Out of Stock':'pink' };
+  return `<span class="badge badge-${map[s]||'white'}">${s}</span>`;
+}
+
+async function loadAllData() {
+  const { collection, getDocs } = window._fs;
+  const db = window._db;
+
+  // Treasury
+  const tSnap = await getDocs(collection(db, 'treasury'));
+  const tDocs = []; tSnap.forEach(d => tDocs.push({ id: d.id, ...d.data() }));
+  let cash = 0, crypto = 0;
+  tDocs.forEach(d => { const amt = d.dir === 'out' ? -d.amount : d.amount; if (d.type === 'Crypto') crypto += amt; else cash += amt; });
+  document.getElementById('statCash').textContent = fmt$(cash);
+  document.getElementById('statCrypto').textContent = fmt$(crypto);
+  document.getElementById('statTotal').textContent = fmt$(cash + crypto);
+  const tBody = document.getElementById('treasuryBody');
+  tBody.innerHTML = tDocs.length === 0
+    ? '<tr><td colspan="6"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No entries yet</div></div></td></tr>'
+    : tDocs.sort((a,b) => b.created > a.created ? 1 : -1).map(d => `<tr>
+        <td>${d.dir==='in'?'<span class="badge badge-gold">IN</span>':'<span class="badge badge-pink">OUT</span>'}</td>
+        <td>${d.desc||'—'}</td>
+        <td class="${d.dir==='in'?'amount-positive':'amount-negative'}">${d.dir==='in'?'+':'−'}${fmt$(d.amount)}</td>
+        <td><span class="badge badge-white">${d.type}</span></td>
+        <td>${fmtDate(d.created)}</td>
+        <td><button class="btn-del" onclick="deleteEntry('treasury','${d.id}')">✕</button></td></tr>`).join('');
+
+  // Inventory
+  const iSnap = await getDocs(collection(db, 'inventory'));
+  const iDocs = []; iSnap.forEach(d => iDocs.push({ id: d.id, ...d.data() }));
+  const iBody = document.getElementById('inventoryBody');
+  iBody.innerHTML = iDocs.length === 0
+    ? '<tr><td colspan="7"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No items yet</div></div></td></tr>'
+    : iDocs.map(d => `<tr><td><strong>${d.name}</strong></td><td><span class="badge badge-white">${d.category}</span></td><td><strong style="color:var(--pink)">${d.qty}</strong></td><td>${statusBadge(d.condition)}</td><td>${d.location||'—'}</td><td style="color:var(--muted);font-size:13px">${d.notes||'—'}</td><td><button class="btn-del" onclick="deleteEntry('inventory','${d.id}')">✕</button></td></tr>`).join('');
+
+  // Locations
+  const lSnap = await getDocs(collection(db, 'locations'));
+  const lDocs = []; lSnap.forEach(d => lDocs.push({ id: d.id, ...d.data() }));
+  const lBody = document.getElementById('locationsBody');
+  lBody.innerHTML = lDocs.length === 0
+    ? '<tr><td colspan="6"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No locations yet</div></div></td></tr>'
+    : lDocs.map(d => `<tr><td><strong>${d.name}</strong></td><td><span class="badge badge-white">${d.type}</span></td><td style="color:var(--muted)">${d.address||'—'}</td><td>${statusBadge(d.status)}</td><td style="color:var(--muted);font-size:13px">${d.notes||'—'}</td><td><button class="btn-del" onclick="deleteEntry('locations','${d.id}')">✕</button></td></tr>`).join('');
+
+  // Price List
+  const pSnap = await getDocs(collection(db, 'pricelist'));
+  const pDocs = []; pSnap.forEach(d => pDocs.push({ id: d.id, ...d.data() }));
+  const pBody = document.getElementById('pricelistBody');
+  pBody.innerHTML = pDocs.length === 0
+    ? '<tr><td colspan="7"><div class="empty-state"><span class="empty-state-skull">💀</span><div class="empty-state-text">No items yet</div></div></td></tr>'
+    : pDocs.map(d => `<tr><td><strong>${d.item}</strong></td><td><span class="badge badge-white">${d.category}</span></td><td class="amount-positive">${fmt$(d.buyPrice)}</td><td class="amount-negative">${fmt$(d.sellPrice)}</td><td>${statusBadge(d.stock)}</td><td style="color:var(--muted);font-size:13px">${d.notes||'—'}</td><td><button class="btn-del" onclick="deleteEntry('pricelist','${d.id}')">✕</button></td></tr>`).join('');
+
+  // Heists
+  const hSnap = await getDocs(collection(db, 'heists'));
+  const hDocs = []; hSnap.forEach(d => hDocs.push({ id: d.id, ...d.data() }));
+  const hGrid = document.getElementById('heistsGrid');
+  hGrid.innerHTML = hDocs.length === 0
+    ? '<div class="empty-state" style="grid-column:1/-1"><span class="empty-state-skull">💀</span><div class="empty-state-text">No operations planned</div></div>'
+    : hDocs.map(d => `<div class="heist-card"><div class="heist-name">${d.name||'Unnamed Op'}</div><div class="heist-meta">${statusBadge(d.status)}<span class="badge badge-white">Crew: ${d.crew||'?'}</span><span class="badge badge-gold">Est. ${fmt$(d.take)}</span></div><div style="font-size:13px;color:var(--muted);letter-spacing:1px">🎯 ${d.target||'No target'}</div>${d.notes?`<div class="heist-notes">${d.notes}</div>`:''}<div class="heist-actions"><button class="btn-del" onclick="deleteEntry('heists','${d.id}')">✕</button></div></div>`).join('');
+}
+</script>
+</body>
+</html>
