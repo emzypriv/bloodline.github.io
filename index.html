@@ -33,7 +33,7 @@
   #loginScreen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--black);}
   .login-box{position:relative;z-index:2;text-align:center;padding:48px 44px;background:linear-gradient(135deg,rgba(26,16,26,0.97),rgba(10,6,10,0.99));border:1px solid var(--border);box-shadow:0 0 80px var(--pink-glow),inset 0 0 60px rgba(0,0,0,0.5);max-width:380px;width:90%;}
   .login-box::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,var(--pink),transparent,var(--pink-dark));z-index:-1;opacity:0.3;}
-  .skull-icon{font-size:60px;display:block;margin:0 auto 18px;animation:skullPulse 3s ease-in-out infinite;filter:drop-shadow(0 0 20px var(--pink));}
+  .kappa-logo{width:70px;height:70px;display:block;margin:0 auto 18px;animation:skullPulse 3s ease-in-out infinite;filter:drop-shadow(0 0 20px var(--pink));}
   @keyframes skullPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px var(--pink));}50%{transform:scale(1.05);filter:drop-shadow(0 0 35px var(--pink));}}
   .login-title{font-family:'Cinzel Decorative',serif;font-size:26px;font-weight:900;letter-spacing:6px;text-shadow:0 0 30px var(--pink);margin-bottom:5px;}
   .login-subtitle{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--muted);margin-bottom:30px;text-transform:uppercase;}
@@ -152,6 +152,41 @@
   .toast{position:fixed;bottom:30px;right:30px;background:linear-gradient(135deg,var(--dark2),var(--dark3));border:1px solid var(--pink);box-shadow:0 0 30px var(--pink-glow);padding:16px 24px;font-size:13px;letter-spacing:2px;z-index:9999;transform:translateY(100px);opacity:0;transition:all 0.4s;max-width:320px;}
   .toast.show{transform:translateY(0);opacity:1;}
 
+
+  /* CALENDAR */
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;background:linear-gradient(135deg,var(--dark2),var(--dark3));border:1px solid var(--border);padding:16px 24px;}
+  .cal-arrow{background:transparent;border:1px solid var(--border);color:var(--muted);width:36px;height:36px;cursor:pointer;font-size:16px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+  .cal-arrow:hover{border-color:var(--pink);color:var(--pink);box-shadow:0 0 10px var(--pink-glow);}
+  .cal-month-label{font-family:'Cinzel Decorative',serif;font-size:18px;letter-spacing:4px;color:var(--pink);text-shadow:0 0 15px var(--pink-glow);}
+  .cal-grid-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+  .cal-grid-header div{text-align:center;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--muted);padding:8px 0;text-transform:uppercase;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:24px;}
+  .cal-day{background:linear-gradient(135deg,var(--dark2),var(--dark3));border:1px solid var(--border);min-height:70px;padding:8px;cursor:pointer;transition:all 0.2s;position:relative;}
+  .cal-day:hover{border-color:rgba(255,45,120,0.4);box-shadow:0 0 15px rgba(255,45,120,0.1);}
+  .cal-day.today{border-color:var(--pink);box-shadow:0 0 15px var(--pink-glow);}
+  .cal-day.other-month{opacity:0.3;}
+  .cal-day.has-events::after{content:'';position:absolute;bottom:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--pink);box-shadow:0 0 6px var(--pink);}
+  .cal-day-num{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--white);margin-bottom:4px;}
+  .cal-day.today .cal-day-num{color:var(--pink);}
+  .cal-event-pill{font-size:9px;letter-spacing:1px;background:rgba(255,45,120,0.2);border:1px solid var(--border);color:var(--pink);padding:2px 6px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+  .cal-event-list{background:linear-gradient(135deg,var(--dark2),var(--dark3));border:1px solid var(--border);padding:24px;}
+  .cal-event-list-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--pink);text-transform:uppercase;margin-bottom:16px;}
+  .cal-event-item{display:flex;align-items:flex-start;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,45,120,0.08);}
+  .cal-event-item:last-child{border-bottom:none;}
+  .cal-event-date-col{min-width:60px;text-align:center;font-family:'Cinzel',serif;}
+  .cal-event-date-num{font-size:22px;color:var(--pink);line-height:1;}
+  .cal-event-date-mo{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+  .cal-event-info{flex:1;}
+  .cal-event-title{font-size:15px;letter-spacing:1px;margin-bottom:4px;}
+  .cal-event-meta{font-size:11px;color:var(--muted);letter-spacing:1px;}
+  .cal-event-notes{font-size:12px;color:var(--muted);margin-top:6px;opacity:0.7;}
+  .cal-del-btn{background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+  .cal-del-btn:hover{border-color:#ff4444;color:#ff4444;}
+
+  /* ACCESS CONTROL - locked tab */
+  .nav-tab.locked{opacity:0.3;cursor:not-allowed;pointer-events:none;}
+  .nav-tab.locked::after{content:' 🔒';font-size:9px;}
+
   ::-webkit-scrollbar{width:6px;height:6px;}
   ::-webkit-scrollbar-track{background:var(--dark);}
   ::-webkit-scrollbar-thumb{background:var(--pink-dark);}
@@ -175,7 +210,11 @@
     <div class="smoke-orb"></div><div class="smoke-orb"></div><div class="smoke-orb"></div>
   </div>
   <div class="login-box">
-    <span class="skull-icon">💀</span>
+    <svg class="kappa-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="kg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ff2d78"/><stop offset="100%" style="stop-color:#c0004f"/></linearGradient></defs>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="url(#kg)" stroke-width="3" opacity="0.6"/>
+      <text x="50" y="68" font-family="Georgia,serif" font-size="62" font-weight="bold" fill="url(#kg)" text-anchor="middle">Κ</text>
+    </svg>
     <div class="login-title">BLOODLINE</div>
     <div class="login-subtitle">Syndicate Command Center</div>
 
@@ -218,7 +257,7 @@
 <div id="app">
   <header>
     <div class="brand">
-      <span class="brand-skull">💀</span>
+      <svg class="brand-skull" width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 10px var(--pink));animation:skullPulse 4s ease-in-out infinite;flex-shrink:0"><defs><linearGradient id="kg2" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" style="stop-color:#ff2d78"/><stop offset="100%25" style="stop-color:#c0004f"/></linearGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="url(#kg2)" stroke-width="4" opacity="0.5"/><text x="50" y="68" font-family="Georgia,serif" font-size="62" font-weight="bold" fill="url(#kg2)" text-anchor="middle">Κ</text></svg>
       <div>
         <div class="brand-name">BLOODLINE</div>
         <div class="brand-tag">Syndicate Command</div>
@@ -236,7 +275,7 @@
     <button class="nav-tab" onclick="showSection('inventory',this)">⚔️ Inventory</button>
     <button class="nav-tab" onclick="showSection('locations',this)">📍 Locations</button>
     <button class="nav-tab" onclick="showSection('prices',this)">💹 Price List</button>
-    <button class="nav-tab" onclick="showSection('heists',this)">🎯 Heists</button>
+    <button class="nav-tab" onclick="showSection('calendar',this)">📅 Calendar</button>
   </nav>
 
   <main>
@@ -297,13 +336,41 @@
       </div>
     </div>
 
-    <!-- HEISTS -->
-    <div id="heists" class="section">
+    <!-- CALENDAR -->
+    <div id="calendar" class="section">
       <div class="section-header">
-        <div><div class="section-title">☠ <span>Heists</span></div><div class="section-subtitle">Operations & Mission Intel</div></div>
-        <button class="add-btn" onclick="openModal('heists')">+ Plan Heist</button>
+        <div><div class="section-title">☠ <span>Calendar</span></div><div class="section-subtitle">Operations Schedule</div></div>
+        <button class="add-btn" onclick="openCalendarModal()">+ Add Event</button>
       </div>
-      <div class="cards-grid" id="heistsGrid"><div style="grid-column:1/-1"><div class="empty-state"><div class="e-skull">💀</div><p>No heists planned</p></div></div></div>
+      <div class="cal-nav">
+        <button class="cal-arrow" onclick="changeMonth(-1)">◀</button>
+        <div class="cal-month-label" id="calMonthLabel"></div>
+        <button class="cal-arrow" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="cal-grid-header">
+        <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div id="calEventList" class="cal-event-list"></div>
+    </div>
+
+    <!-- CALENDAR MODAL -->
+    <div class="modal-overlay" id="calModalOverlay">
+      <div class="modal">
+        <button class="modal-close" onclick="closeCalendarModal()">✕</button>
+        <div class="modal-title">📅 Schedule Event</div>
+        <div>
+          <div class="form-row"><label>Event Title</label><input id="ce_title" placeholder="e.g. Strategy Meeting"></div>
+          <div class="form-row"><label>Date</label><input id="ce_date" type="date"></div>
+          <div class="form-row"><label>Time</label><input id="ce_time" type="time" value="20:00"></div>
+          <div class="form-row"><label>Type</label><select id="ce_type"><option>Meeting</option><option>Operation</option><option>Drop</option><option>Deadline</option><option>Other</option></select></div>
+          <div class="form-row"><label>Notes</label><textarea id="ce_notes" placeholder="Details..."></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeCalendarModal()">Cancel</button>
+          <button class="btn-save" onclick="saveCalEvent()">☠ Save</button>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -362,6 +429,17 @@
     // "yourname": "0000"
   };
   // ============================================================
+  // 🔴 STEP 3: RESTRICT ACCESS TO SECTIONS PER MEMBER
+  // List section IDs each member is ALLOWED to see.
+  // Available sections: "treasury", "inventory", "locations", "prices", "calendar"
+  // If a member is NOT listed here, they get full access.
+  // ============================================================
+  window.ACCESS = {
+    "blade":  ["treasury", "calendar"],          // blade can only see Treasury & Calendar
+    "raven":  ["inventory", "locations", "calendar"], // raven sees Inventory, Locations & Calendar
+    // "venom": ["treasury","inventory","locations","prices","calendar"] // full access (same as unlisted)
+  };
+  // ============================================================
 </script>
 
 <script>
@@ -407,12 +485,46 @@
     }
   }
 
+  function applyAccessControl(member) {
+    const access = window.ACCESS || {};
+    const allSections = ['treasury','inventory','locations','prices','calendar'];
+    const allowed = access[member] || allSections; // no restriction = full access
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.classList.remove('locked');
+    });
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      // figure out which section this tab controls
+      const match = tab.getAttribute('onclick') && tab.getAttribute('onclick').match(/showSection\('(\w+)'/);
+      if (match) {
+        const sectionId = match[1];
+        if (!allowed.includes(sectionId)) {
+          tab.classList.add('locked');
+        }
+      }
+    });
+    // Show first allowed section
+    const firstAllowed = allowed[0] || 'treasury';
+    const activeTab = document.querySelector(`.nav-tab:not(.locked)`);
+    if (activeTab) {
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+      const matchSection = activeTab.getAttribute('onclick').match(/showSection\('(\w+)'/);
+      if (matchSection) {
+        const sid = matchSection[1];
+        const sec = document.getElementById(sid);
+        if (sec) sec.classList.add('active');
+      }
+      activeTab.classList.add('active');
+    }
+  }
+
   function checkPin() {
     const m = window.MEMBERS || {};
     if (m[currentMember] && currentPin === m[currentMember]) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       document.getElementById('operativeName').textContent = currentMember.toUpperCase();
+      applyAccessControl(currentMember);
       loadAll();
     } else {
       for(let i=0;i<4;i++) document.getElementById('d'+i).classList.add('error');
@@ -470,14 +582,7 @@
       <div class="form-row"><label>Category</label><select id="f_pcat"><option>Weapons</option><option>Drugs</option><option>Vehicles</option><option>Services</option><option>Other</option></select></div>
       <div class="form-row"><label>Item</label><input id="f_pitem" placeholder="Item name"></div>
       <div class="form-row"><label>Buy Price ($)</label><input id="f_buy" type="number" placeholder="0"></div>
-      <div class="form-row"><label>Sell Price ($)</label><input id="f_sell" type="number" placeholder="0"></div>`},
-    heists:{title:'🎯 Plan a Heist',html:`
-      <div class="form-row"><label>Operation Name</label><input id="f_hname" placeholder="e.g. Diamond Casino Job"></div>
-      <div class="form-row"><label>Status</label><select id="f_hstatus"><option>Planning</option><option>Ready</option><option>In Progress</option><option>Complete</option><option>Blown</option></select></div>
-      <div class="form-row"><label>Target</label><input id="f_htarget" placeholder="Target location or entity"></div>
-      <div class="form-row"><label>Estimated Take ($)</label><input id="f_htake" type="number" placeholder="0"></div>
-      <div class="form-row"><label>Crew Needed</label><input id="f_hcrew" placeholder="e.g. 4 members, driver + gunner"></div>
-      <div class="form-row"><label>Intel / Notes</label><textarea id="f_hnotes" placeholder="Plan, risks, details..."></textarea></div>`}
+      <div class="form-row"><label>Sell Price ($)</label><input id="f_sell" type="number" placeholder="0"></div>`}
   };
 
   function openModal(type) {
@@ -500,7 +605,7 @@
     else if (currentModal==='inventory') data={category:v('f_cat'),item:v('f_item'),qty:parseInt(v('f_qty'))||1,condition:v('f_cond'),location:v('f_loc'),notes:v('f_notes'),created:Date.now()};
     else if (currentModal==='locations') data={name:v('f_name'),type:v('f_ltype'),coords:v('f_coords'),status:v('f_status'),notes:v('f_lnotes'),created:Date.now()};
     else if (currentModal==='prices'){const b=parseFloat(v('f_buy'))||0,s=parseFloat(v('f_sell'))||0;data={category:v('f_pcat'),item:v('f_pitem'),buy:b,sell:s,margin:s-b,created:Date.now()};}
-    else if (currentModal==='heists') data={name:v('f_hname'),status:v('f_hstatus'),target:v('f_htarget'),take:parseFloat(v('f_htake'))||0,crew:v('f_hcrew'),notes:v('f_hnotes'),created:Date.now()};
+
     try { await window._addDoc(window._col(db,currentModal),data); showToast('☠ Saved'); closeModal(); loadAll(); }
     catch(e){ showToast('Error: '+e.message); }
   }
@@ -519,7 +624,138 @@
   function statusBadge(s){return badge(s,{Active:'badge-green',Ready:'badge-green',Complete:'badge-green',Planning:'badge-yellow','In Progress':'badge-pink',Compromised:'badge-red',Blown:'badge-red',Abandoned:'badge-red'}[s]||'badge-pink');}
   function emptyRow(cols,msg){return `<tr><td colspan="${cols}"><div class="empty-state"><div class="e-skull">💀</div><p>${msg}</p></div></td></tr>`;}
 
-  async function loadAll(){loadTreasury();loadInventory();loadLocations();loadPrices();loadHeists();}
+
+  // ============================================================
+  // CALENDAR
+  // ============================================================
+  let calYear = new Date().getFullYear();
+  let calMonth = new Date().getMonth();
+  let calEvents = [];
+
+  const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const CAL_TYPES_COLOR = {Meeting:'badge-yellow',Operation:'badge-pink',Drop:'badge-green',Deadline:'badge-red',Other:'badge-pink'};
+
+  function changeMonth(dir) {
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  }
+  window.changeMonth = changeMonth;
+
+  function openCalendarModal() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('ce_date').value = today;
+    document.getElementById('ce_title').value = '';
+    document.getElementById('ce_notes').value = '';
+    document.getElementById('calModalOverlay').classList.add('open');
+  }
+  window.openCalendarModal = openCalendarModal;
+
+  function closeCalendarModal() {
+    document.getElementById('calModalOverlay').classList.remove('open');
+  }
+  window.closeCalendarModal = closeCalendarModal;
+
+  async function saveCalEvent() {
+    const db = window._db;
+    const data = {
+      title: document.getElementById('ce_title').value || 'Untitled',
+      date: document.getElementById('ce_date').value,
+      time: document.getElementById('ce_time').value,
+      type: document.getElementById('ce_type').value,
+      notes: document.getElementById('ce_notes').value,
+      created: Date.now()
+    };
+    try {
+      await window._addDoc(window._col(db, 'calendar'), data);
+      showToast('📅 Event Saved');
+      closeCalendarModal();
+      await loadCalendar();
+    } catch(e) { showToast('Error: ' + e.message); }
+  }
+  window.saveCalEvent = saveCalEvent;
+
+  async function deleteCalEvent(id) {
+    if (!confirm('Remove this event?')) return;
+    await window._deleteDoc(window._docRef(window._db, 'calendar', id));
+    showToast('☠ Removed');
+    await loadCalendar();
+  }
+  window.deleteCalEvent = deleteCalEvent;
+
+  async function loadCalendar() {
+    const snap = await window._getDocs(window._col(window._db, 'calendar'));
+    calEvents = [];
+    snap.forEach(d => calEvents.push({id: d.id, ...d.data()}));
+    renderCalendar();
+    renderEventList();
+  }
+
+  function renderCalendar() {
+    const label = document.getElementById('calMonthLabel');
+    if (!label) return;
+    label.textContent = CAL_MONTHS[calMonth] + ' ' + calYear;
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+    const today = new Date();
+
+    // prev month padding
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const d = daysInPrev - i;
+      grid.innerHTML += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = calYear + '-' + String(calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const dayEvents = calEvents.filter(e => e.date === dateStr);
+      const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
+      const pillsHtml = dayEvents.slice(0,2).map(e => `<div class="cal-event-pill" title="${e.title}">${e.title}</div>`).join('');
+      grid.innerHTML += `<div class="cal-day${isToday?' today':''}${dayEvents.length?' has-events':''}">
+        <div class="cal-day-num">${d}</div>${pillsHtml}
+      </div>`;
+    }
+
+    // fill remaining cells
+    const total = firstDay + daysInMonth;
+    const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let d = 1; d <= remaining; d++) {
+      grid.innerHTML += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+    }
+  }
+
+  function renderEventList() {
+    const container = document.getElementById('calEventList');
+    if (!container) return;
+    const sorted = [...calEvents].sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+    if (!sorted.length) {
+      container.innerHTML = `<div class="empty-state"><div class="e-skull">💀</div><p>No events scheduled</p></div>`;
+      return;
+    }
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    container.innerHTML = `<div class="cal-event-list-title">Upcoming Events</div>` + sorted.map(e => {
+      const parts = e.date ? e.date.split('-') : ['','',''];
+      const mo = parts[1] ? months[parseInt(parts[1])-1] : '';
+      const day = parts[2] || '';
+      const col = CAL_TYPES_COLOR[e.type] || 'badge-pink';
+      return `<div class="cal-event-item">
+        <div class="cal-event-date-col"><div class="cal-event-date-num">${day}</div><div class="cal-event-date-mo">${mo} ${parts[0]||''}</div></div>
+        <div class="cal-event-info">
+          <div class="cal-event-title">${e.title} <span class="badge ${col}" style="font-size:9px;margin-left:8px">${e.type}</span></div>
+          <div class="cal-event-meta">${e.time || ''}</div>
+          ${e.notes ? `<div class="cal-event-notes">${e.notes}</div>` : ''}
+        </div>
+        <button class="cal-del-btn" onclick="deleteCalEvent('${e.id}')">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  async function loadAll(){loadTreasury();loadInventory();loadLocations();loadPrices();loadCalendar();}
   window.loadAll=loadAll;
 
   async function loadTreasury(){
@@ -557,14 +793,6 @@
     document.getElementById('pricesBody').innerHTML=rows.length
       ?rows.map(r=>`<tr><td>${badge(r.category,'badge-pink')}</td><td>${r.item}</td><td style="color:#00ff88">${fmt(r.buy)}</td><td style="color:var(--pink)">${fmt(r.sell)}</td><td style="color:${r.margin>=0?'#00ff88':'#ff4444'}">${fmt(r.margin)}</td><td><button class="btn-icon del" onclick="deleteEntry('prices','${r.id}')">✕</button></td></tr>`).join('')
       :emptyRow(6,'Price list empty');
-  }
-
-  async function loadHeists(){
-    const snap=await window._getDocs(window._col(window._db,'heists'));
-    const items=[];snap.forEach(d=>items.push({id:d.id,...d.data()}));
-    document.getElementById('heistsGrid').innerHTML=items.length
-      ?items.map(r=>`<div class="card"><span class="card-skull">🎯</span><div class="card-label">Operation</div><div class="card-value" style="font-size:18px;margin-bottom:6px">${r.name}</div><div style="margin-bottom:12px">${statusBadge(r.status)}</div><div class="card-sub">🎯 <strong>Target:</strong> ${r.target||'-'}</div><div class="card-sub" style="color:var(--pink);margin-top:4px">💰 Est. Take: ${fmt(r.take)}</div><div class="card-sub" style="margin-top:4px">👥 Crew: ${r.crew||'-'}</div>${r.notes?`<div class="card-sub" style="margin-top:8px;opacity:0.7">${r.notes}</div>`:''}<div style="margin-top:16px"><button class="btn-icon del" onclick="deleteEntry('heists','${r.id}')">✕ Abort</button></div></div>`).join('')
-      :`<div style="grid-column:1/-1"><div class="empty-state"><div class="e-skull">💀</div><p>No heists planned</p></div></div>`;
   }
 </script>
 </body>
