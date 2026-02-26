@@ -548,6 +548,10 @@ const firebaseConfig = {
     "raven":  ["inventory", "locations", "calendar"],
   };
   // ============================================================
+
+  // Signal that Firebase is ready
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
 </script>
 
 <script>
@@ -618,7 +622,11 @@ const firebaseConfig = {
       document.getElementById('app').style.display = 'block';
       document.getElementById('operativeName').textContent = currentMember.toUpperCase();
       applyAccessControl(currentMember);
-      loadAll();
+      if (window._firebaseReady) {
+        loadAll();
+      } else {
+        window.addEventListener('firebaseReady', loadAll, { once: true });
+      }
     } else {
       for(let i=0;i<4;i++) document.getElementById('d'+i).classList.add('error');
       document.getElementById('loginError').textContent = '☠ Access denied';
