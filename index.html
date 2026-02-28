@@ -29,8 +29,9 @@
   const db  = getFirestore(app);
   const auth = getAuth(app);
 
-  // Sign in anonymously so Firestore rules can require auth
-  await signInAnonymously(auth);
+  // Try anonymous auth (requires it enabled in Firebase Console → Authentication)
+  // If not enabled yet, we still continue — Firestore open rules will still work
+  try { await signInAnonymously(auth); } catch(e) { console.warn('Anonymous auth skipped:', e.code); }
 
   window._db      = db;
   window._fs      = { collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot };
