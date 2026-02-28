@@ -16,14 +16,14 @@
   import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey:            "PASTE_YOUR_apiKey_HERE",
-    authDomain:        "PASTE_YOUR_authDomain_HERE",
-    projectId:         "PASTE_YOUR_projectId_HERE",
-    storageBucket:     "PASTE_YOUR_storageBucket_HERE",
-    messagingSenderId: "PASTE_YOUR_messagingSenderId_HERE",
-    appId:             "PASTE_YOUR_appId_HERE"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBRGl7v5orE19cIJZha478cRN6WmGy65m8",
+  authDomain: "bloodline-mainframe.firebaseapp.com",
+  projectId: "bloodline-mainframe",
+  storageBucket: "bloodline-mainframe.firebasestorage.app",
+  messagingSenderId: "71863265301",
+  appId: "1:71863265301:web:a4f7c594b01592ad76061c"
+};
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
