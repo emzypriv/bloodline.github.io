@@ -315,6 +315,7 @@ function onDbReady(cb){
 // ── STATE ──────────────────────────────────────────────────────
 let currentUser=null, calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let selectedRecipes={};
+let collapsedRecipes={}; // track which recipes are collapsed (true = hidden ingredients)
 let allEvents={}, allTx=[], allInv=[], allRecipes=[], allUsers=[];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -458,7 +459,18 @@ async function addInvItem(){
   ['invName','invQty','invLoc'].forEach(id=>document.getElementById(id).value='');
 }
 async function deleteInvItem(id){await fsDel('inventory',id);}
-async function editInvQty(id,delta){const item=allInv.find(i=>i.id===id);if(item)await fsUpd('inventory',id,{qty:Math.max(0,item.qty+delta)});}
+async function editInvQty(id,delta){
+// delta is positive or negative number to increment/decrement quantity
+  const item=allInv.find(i=>i.id===id);
+  if(item)await fsUpd('inventory',id,{qty:Math.max(0,item.qty+delta)});
+}
+
+// called when user types a value directly in the qty input
+async function updateInvQty(id,val){
+  const qty = parseInt(val,10);
+  if(isNaN(qty)) return;
+  await fsUpd('inventory',id,{qty:Math.max(0,qty)});
+}
 function renderInv(){
   let inv=[...allInv];
   const search=document.getElementById('invSearch').value.toLowerCase();
@@ -478,7 +490,7 @@ function renderInv(){
       <td style="color:var(--muted);font-size:13px">${i.cat}</td>
       <td><div style="display:flex;align-items:center;gap:6px">
         <button onclick="editInvQty('${i.id}',-1)" style="background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);width:24px;height:24px;cursor:pointer;font-size:14px">-</button>
-        <span style="font-family:'Share Tech Mono',monospace;font-size:15px;min-width:28px;text-align:center">${i.qty}</span>
+        <input type="number" value="${i.qty}" min="0" style="width:48px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:15px" onchange="updateInvQty('${i.id}',this.value)">
         <button onclick="editInvQty('${i.id}',1)" style="background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);width:24px;height:24px;cursor:pointer;font-size:14px">+</button>
       </div></td>
       <td style="color:var(--muted);font-size:14px">📍 ${i.loc}</td>
@@ -508,14 +520,25 @@ async function deleteRecipe(id){
   if(selectedRecipes[id]){delete selectedRecipes[id];renderCalc();}
 }
 function renderRecipes(){
-  document.getElementById('recipeList').innerHTML=allRecipes.map(r=>`
+  document.getElementById('recipeList').innerHTML=allRecipes.map(r=>{
+    const collapsed = collapsedRecipes[r.id];
+    return `
     <div class="recipe-card ${selectedRecipes[r.id]?'selected':''}" onclick="toggleSelectRecipe('${r.id}')">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="recipe-name">${r.name}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onclick="event.stopPropagation();toggleRecipeDetails('${r.id}')" class="btn-ghost" style="padding:3px 6px;font-size:11px">${collapsed?'▶':'▼'}</button>
+          <div class="recipe-name">${r.name}</div>
+        </div>
         <button onclick="event.stopPropagation();deleteRecipe('${r.id}')" class="btn-ghost" style="padding:3px 8px;font-size:11px">DEL</button>
       </div>
-      ${r.ingredients.map(i=>`<div class="ingredient-row"><span>${i.mat}</span><span class="qty-badge">×${i.qty}</span></div>`).join('')}
-    </div>`).join('')||'<p style="color:var(--muted);font-size:14px">No recipes yet.</p>';
+      ${collapsed?'': r.ingredients.map(i=>`<div class="ingredient-row"><span>${i.mat}</span><span class="qty-badge">×${i.qty}</span></div>`).join('')}
+    </div>`;
+  }).join('')||'<p style="color:var(--muted);font-size:14px">No recipes yet.</p>';
+}
+
+function toggleRecipeDetails(id){
+  collapsedRecipes[id] = !collapsedRecipes[id];
+  renderRecipes();
 }
 function toggleSelectRecipe(id){if(selectedRecipes[id]){delete selectedRecipes[id];}else{selectedRecipes[id]=1;}renderRecipes();renderCalc();}
 function updateRecipeQty(id,delta){selectedRecipes[id]=Math.max(1,selectedRecipes[id]+delta);renderCalc();}
