@@ -208,23 +208,21 @@ footer{text-align:center;padding:40px 20px 32px;border-top:1px solid var(--borde
     <div class="page-header"><div class="page-title">Inventory</div><div class="page-subtitle">// ASSET TRACKER</div></div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-title">Add Item</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
         <div class="field" style="margin:0"><label>Item Name</label><input type="text" id="invName" placeholder="AK-47..."></div>
-        <div class="field" style="margin:0"><label>Category</label><select id="invCat"><option>Weapons</option><option>Ammo</option><option>Drugs</option><option>Vehicles</option><option>Equipment</option><option>Clothing</option><option>Medical</option><option>Other</option></select></div>
         <div class="field" style="margin:0"><label>Quantity</label><input type="number" id="invQty" placeholder="1" min="0"></div>
-        <div class="field" style="margin:0"><label>Location</label><input type="text" id="invLoc" placeholder="Stash House A..."></div>
-        <div class="field" style="margin:0;display:flex;align-items:flex-end"><button class="btn-sm" style="width:100%" onclick="addInvItem()">ADD</button></div>
+        <div class="field" style="margin:0;display:flex;align-items:flex-end"><button class="btn-sm" style="width:100%" onclick="addInvItem()">ADD ITEM</button></div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">Inventory</div>
       <div class="filter-row">
         <input type="text" id="invSearch" placeholder="Search items..." oninput="renderInv()">
-        <select id="invFilterCat" onchange="renderInv()"><option value="">All Categories</option><option>Weapons</option><option>Ammo</option><option>Drugs</option><option>Vehicles</option><option>Equipment</option><option>Clothing</option><option>Medical</option><option>Other</option></select>
-        <select id="invFilterLoc" onchange="renderInv()"><option value="">All Locations</option></select>
-        <select id="invSort" onchange="renderInv()"><option value="name">Sort: Name</option><option value="loc">Sort: Location</option><option value="cat">Sort: Category</option><option value="qty">Sort: Quantity</option></select>
+        
+        
+        <select id="invSort" onchange="renderInv()"><option value="name">Sort: Name</option><option value="qty">Sort: Quantity</option></select>
       </div>
-      <div style="overflow-x:auto"><table><thead><tr><th>Item</th><th>Category</th><th>Qty</th><th>Location</th><th></th></tr></thead><tbody id="invTable"></tbody></table></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Item</th><th>Qty</th><th></th></tr></thead><tbody id="invTable"></tbody></table></div>
     </div>
   </div>
 
@@ -240,7 +238,16 @@ footer{text-align:center;padding:40px 20px 32px;border-top:1px solid var(--borde
         <button class="btn-ghost" onclick="addIngRow()" style="margin-bottom:14px">+ Add Material</button><br>
         <button class="btn-sm" onclick="saveRecipe()">SAVE RECIPE</button>
       </div>
-      <div class="card"><div class="card-title">Saved Recipes</div><div id="recipeList"></div></div>
+      <div class="card">
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+    Saved Recipes
+    <span>
+      <button class="btn-ghost" style="padding:3px 6px;font-size:11px" onclick="collapseAllRecipes()">Collapse All</button>
+      <button class="btn-ghost" style="padding:3px 6px;font-size:11px" onclick="expandAllRecipes()">Expand All</button>
+    </span>
+  </div>
+  <div id="recipeList"></div>
+</div>
     </div>
   </div>
 
@@ -455,8 +462,8 @@ document.getElementById('calModal').addEventListener('click',e=>{if(e.target===e
 // ── INVENTORY ──────────────────────────────────────────────────
 async function addInvItem(){
   const name=document.getElementById('invName').value.trim();if(!name)return;
-  await fsAdd('inventory',{name,cat:document.getElementById('invCat').value,qty:parseInt(document.getElementById('invQty').value)||1,loc:document.getElementById('invLoc').value.trim()||'Unassigned'});
-  ['invName','invQty','invLoc'].forEach(id=>document.getElementById(id).value='');
+  await fsAdd('inventory',{name,qty:parseInt(document.getElementById('invQty').value)||1});
+  ['invName','invQty'].forEach(id=>document.getElementById(id).value='');
 }
 async function deleteInvItem(id){await fsDel('inventory',id);}
 async function editInvQty(id,delta){
@@ -474,28 +481,23 @@ async function updateInvQty(id,val){
 function renderInv(){
   let inv=[...allInv];
   const search=document.getElementById('invSearch').value.toLowerCase();
-  const fc=document.getElementById('invFilterCat').value;
-  const fl=document.getElementById('invFilterLoc').value;
+  
   const sort=document.getElementById('invSort').value;
-  const locs=[...new Set(inv.map(i=>i.loc))].sort();
-  const fls=document.getElementById('invFilterLoc'); const curL=fls.value;
-  fls.innerHTML='<option value="">All Locations</option>'+locs.map(l=>`<option ${l===curL?'selected':''}>${l}</option>`).join('');
-  if(search)inv=inv.filter(i=>i.name.toLowerCase().includes(search)||i.loc.toLowerCase().includes(search));
-  if(fc)inv=inv.filter(i=>i.cat===fc);
-  if(fl)inv=inv.filter(i=>i.loc===fl);
+  
+  if(search)inv=inv.filter(i=>i.name.toLowerCase().includes(search));
+
   inv.sort((a,b)=>sort==='qty'?b.qty-a.qty:(a[sort]||'').localeCompare(b[sort]||''));
   document.getElementById('invTable').innerHTML=inv.map(i=>`
     <tr>
       <td style="font-weight:700">${i.name}</td>
-      <td style="color:var(--muted);font-size:13px">${i.cat}</td>
       <td><div style="display:flex;align-items:center;gap:6px">
         <button onclick="editInvQty('${i.id}',-1)" style="background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);width:24px;height:24px;cursor:pointer;font-size:14px">-</button>
         <input type="number" value="${i.qty}" min="0" style="width:48px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:15px" onchange="updateInvQty('${i.id}',this.value)">
         <button onclick="editInvQty('${i.id}',1)" style="background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);width:24px;height:24px;cursor:pointer;font-size:14px">+</button>
       </div></td>
-      <td style="color:var(--muted);font-size:14px">📍 ${i.loc}</td>
+      
       <td><button onclick="deleteInvItem('${i.id}')" class="btn-ghost" style="padding:3px 8px;font-size:11px">DEL</button></td>
-    </tr>`).join('')||'<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">No items found.</td></tr>';
+    </tr>`).join('')||'<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:24px">No items found.</td></tr>';
 }
 
 // ── CRAFTING ───────────────────────────────────────────────────
@@ -537,11 +539,30 @@ function renderRecipes(){
 }
 
 function toggleRecipeDetails(id){
-  collapsedRecipes[id] = !collapsedRecipes[id];
+  const currentlyCollapsed = collapsedRecipes[id] !== false;
+  collapsedRecipes[id] = !currentlyCollapsed;
+  renderRecipes();
+}
+
+function collapseAllRecipes(){
+  allRecipes.forEach(r=>{collapsedRecipes[r.id]=true;});
+  renderRecipes();
+}
+
+function expandAllRecipes(){
+  allRecipes.forEach(r=>{collapsedRecipes[r.id]=false;});
   renderRecipes();
 }
 function toggleSelectRecipe(id){if(selectedRecipes[id]){delete selectedRecipes[id];}else{selectedRecipes[id]=1;}renderRecipes();renderCalc();}
 function updateRecipeQty(id,delta){selectedRecipes[id]=Math.max(1,selectedRecipes[id]+delta);renderCalc();}
+
+// called when typing a quantity directly in calculator
+function setRecipeQty(id,val){
+  const q = parseInt(val,10);
+  if(isNaN(q)||q<1) return;
+  selectedRecipes[id]=q;
+  renderCalc();
+}
 function removeFromCalc(id){delete selectedRecipes[id];renderRecipes();renderCalc();}
 function renderCalc(){
   const selected=Object.entries(selectedRecipes);
@@ -551,7 +572,7 @@ function renderCalc(){
   const allOk=Object.entries(materialsMap).every(([k,v])=>{const h=allInv.filter(x=>x.name.toLowerCase()===k).reduce((s,x)=>s+x.qty,0);return h>=v.needed;});
   document.getElementById('calcArea').innerHTML=`
     <div class="card-title" style="font-size:15px;margin-bottom:10px">Selected Recipes</div>
-    ${selected.map(([id,qty])=>{const rec=allRecipes.find(r=>r.id===id);return rec?`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--card2);border:1px solid var(--border);border-radius:3px;margin-bottom:8px"><div><div style="font-weight:600">${rec.name}</div><div style="font-size:12px;color:var(--muted)">×${qty}</div></div><div style="display:flex;gap:6px"><button onclick="updateRecipeQty('${id}',-1)" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:14px">-</button><button onclick="updateRecipeQty('${id}',1)" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:14px">+</button><button onclick="removeFromCalc('${id}')" class="btn-ghost" style="padding:4px 8px;font-size:11px">REMOVE</button></div></div>`:''}).join('')}
+    ${selected.map(([id,qty])=>{const rec=allRecipes.find(r=>r.id===id);return rec?`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--card2);border:1px solid var(--border);border-radius:3px;margin-bottom:8px"><div><div style="font-weight:600">${rec.name}</div><div style="font-size:12px;color:var(--muted)">×<input type="number" value="${qty}" min="1" style="width:48px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:12px" onchange="setRecipeQty('${id}',this.value)"></div></div><div style="display:flex;gap:6px"><button onclick="updateRecipeQty('${id}',-1)" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:14px">-</button><button onclick="updateRecipeQty('${id}',1)" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:14px">+</button><button onclick="removeFromCalc('${id}')" class="btn-ghost" style="padding:4px 8px;font-size:11px">REMOVE</button></div></div>`:''}).join('')}
     <div style="margin:12px 0;padding:12px;border-radius:3px;background:var(--card2);border:1px solid var(--border)">
       <div class="card-title" style="font-size:13px;margin:0 0 10px;color:var(--muted)">TOTAL MATERIALS NEEDED</div>
       ${Object.entries(materialsMap).map(([k,v])=>{const h=allInv.filter(x=>x.name.toLowerCase()===k).reduce((s,x)=>s+x.qty,0);const ok=h>=v.needed;return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px"><span style="font-weight:600">${v.name}</span><div style="display:flex;align-items:center;gap:12px"><span style="color:var(--muted);font-size:13px">Have: <b style="color:${ok?'var(--green)':'var(--red)'}">${h}</b></span><span class="qty-badge" style="color:${ok?'var(--green)':'var(--red)'}">Need: ×${v.needed}</span></div></div>`;}).join('')}
