@@ -1,0 +1,5 @@
+body{background:#0a0a0a;color:white;font-family:Arial}
+.sidebar{width:200px;position:fixed;height:100%;background:#050505;padding:20px}
+.card{margin-left:220px;padding:20px;background:#111;border:1px solid #ff2da3}
+input,select,button{margin:5px 0;padding:10px;width:100%}
+button{background:#ff2da3;color:white;border:none}

@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="css/style.css">
+<div class="sidebar"><h1>🩸 Bloodline</h1></div>
+<div class="card">
+<h2>Wash</h2>
+<select id="user"></select>
+<input id="amount" type="number">
+<input id="cost" type="number">
+<input id="percent" type="number">
+<button onclick="calculate()">Calc</button>
+<p id="result"></p>
+<button onclick="saveWash()">Save</button>
+
+<input id="searchWash" oninput="filterWash()">
+<table id="washTable"><tbody></tbody></table>
+</div>
+<script type="module" src="js/wash.js"></script>
