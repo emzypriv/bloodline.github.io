@@ -73,7 +73,7 @@
       <div class="page-header"><h1 class="page-title">OVERVIEW</h1><span class="page-sub">GANG FINANCES AT A GLANCE</span></div>
 
       <!-- Boss edit bar -->
-      <div class="boss-only" style="margin-bottom:1.5rem">
+      <div class="boss-only" style="display:none;margin-bottom:1.5rem">
         <div class="panel" style="padding:1rem 1.5rem">
           <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
             <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-right:auto">BOSS — UPDATE BALANCES</span>
@@ -124,7 +124,7 @@
       </div>
 
       <!-- Personal Accounts (boss only) -->
-      <div class="panel boss-only">
+      <div class="panel boss-only" style="display:none">
         <div class="panel-title">👤 Personal Accounts</div>
         <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Only visible to Boss.</p>
         <div id="ovPersonalDisplay"></div>
@@ -182,7 +182,7 @@
     <!-- ══ CONSTITUTION ══ -->
     <section class="page-section" id="sec-constitution">
       <div class="page-header"><h1 class="page-title">CONSTITUTION</h1><span class="page-sub">CODE OF CONDUCT</span></div>
-      <div class="panel boss-only" style="margin-bottom:1rem;padding:1rem 1.5rem">
+      <div class="panel boss-only" style="display:none;margin-bottom:1rem;padding:1rem 1.5rem">
         <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap">
           <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-right:auto">BOSS EDIT MODE</span>
           <span id="saveIndicator" style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);opacity:0;transition:opacity 0.3s;letter-spacing:0.15em">SAVED</span>
@@ -383,7 +383,7 @@
       </div>
 
       <!-- Cut Settings -->
-      <div class="panel settings-section boss-strictly">
+      <div class="panel settings-section boss-strictly" style="display:none">
         <div class="settings-section-title">Cut Structure — Default</div>
         <div class="form-grid">
           <div class="form-group">
@@ -507,8 +507,8 @@ const isCrew        = role === "crew";
 const isBossOrCap   = isBoss || isCaptain;
 
 document.getElementById("displayUser").textContent = (display||user||"UNKNOWN").toUpperCase();
-document.getElementById("roleTag").textContent = isBoss ? "BOSS" : "CREW";
-document.getElementById("roleTag").style.background = isBoss ? "var(--blood)" : "var(--gold-dim)";
+document.getElementById("roleTag").textContent = isBoss ? "BOSS" : isCaptain ? "CAPTAIN" : "CREW";
+document.getElementById("roleTag").style.background = isBoss ? "var(--blood)" : isCaptain ? "var(--gold-dim)" : "#2a2a2a";
 
 
 document.querySelectorAll(".boss-only").forEach(el => el.style.display = isBossOrCap ? "" : "none");
