@@ -140,16 +140,7 @@
       </div>
     </section>
 
-    <!-- ══ MY CUTS (crew) ══ -->
-    <section class="page-section" id="sec-my-cuts">
-      <div class="page-header"><h1 class="page-title">MY CUTS</h1><span class="page-sub" id="crewSubtitle">YOUR EARNINGS</span></div>
-      <div class="grid-3" style="margin-bottom:1.5rem">
-        <div class="stat-card"><div class="stat-label">JOBS DONE</div><div class="stat-value" id="myStatJobs">—</div></div>
-        <div class="stat-card"><div class="stat-label">TOTAL EARNED</div><div class="stat-value green" id="myStatTotal">—</div></div>
-        <div class="stat-card"><div class="stat-label">THIS MONTH</div><div class="stat-value gold" id="myStatMonth">—</div></div>
-      </div>
-      <div class="panel"><div class="panel-title">Earnings Breakdown</div><div id="myCutsBreakdown"></div></div>
-    </section>
+
 
     <!-- ══ CALENDAR ══ -->
     <section class="page-section" id="sec-calendar">
@@ -159,11 +150,11 @@
           <button class="cal-nav-btn" onclick="calPrev()">‹</button>
           <div class="cal-nav-title" id="calTitle">—</div>
           <button class="cal-nav-btn" onclick="calNext()">›</button>
-          <button class="btn btn-danger boss-only" style="margin-left:auto;display:none" onclick="openEventModal()">+ Add Event</button>
+          <button class="btn btn-danger" style="margin-left:auto" onclick="openEventModal()">+ Add Event</button>
         </div>
         <div class="calendar-grid" id="calGrid"></div>
       </div>
-      <div class="panel crew-only" style="margin-top:1rem;display:none">
+      <div class="panel" style="margin-top:1rem">
         <div class="panel-title">Upcoming</div>
         <div id="upcomingList"></div>
       </div>
@@ -172,7 +163,7 @@
     <!-- ══ RECIPES ══ -->
     <section class="page-section" id="sec-recipes">
       <div class="page-header"><h1 class="page-title">RECIPES</h1><span class="page-sub">CRAFTING LAB</span></div>
-      <div class="panel boss-only" style="display:none">
+      <div class="panel">
         <div class="panel-title">Add New Recipe</div>
         <div class="form-grid">
           <div class="form-group"><label class="form-label">ITEM NAME</label><input class="form-control" id="recName" placeholder="e.g. Sticky Bomb"/></div>
@@ -308,7 +299,7 @@
 
     <!-- ══ MONEY CLEANING (boss) ══ -->
     <section class="page-section" id="sec-money-clean">
-      <div class="page-header"><h1 class="page-title">MONEY CLEANING</h1><span class="page-sub">BUYING DIRTY MONEY</span></div>
+      <div class="page-header"><h1 class="page-title">WASHITDADDY</h1><span class="page-sub">MONEY CLEANING</span></div>
       <div class="panel">
         <div class="panel-title">New Cleaning Deal</div>
         <div class="form-grid">
@@ -391,7 +382,7 @@
       </div>
 
       <!-- Cut Settings -->
-      <div class="panel settings-section">
+      <div class="panel settings-section boss-strictly" style="display:none">
         <div class="settings-section-title">Cut Structure</div>
         <div class="form-grid">
           <div class="form-group">
@@ -518,6 +509,7 @@ document.getElementById("roleTag").style.background = isBoss ? "var(--blood)" : 
 if (isCrew) document.getElementById("crewSubtitle").textContent = (display||user).toUpperCase() + "'S EARNINGS";
 
 document.querySelectorAll(".boss-only").forEach(el => el.style.display = isBoss ? "" : "none");
+  document.querySelectorAll(".boss-strictly").forEach(el => el.style.display = isBoss ? "" : "none");
 document.querySelectorAll(".crew-only").forEach(el => el.style.display = isCrew ? "" : "none");
 
 window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
@@ -532,17 +524,26 @@ const BOSS_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
-  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"Money Cleaning"},{id:"payouts",icon:"💰",label:"Payouts"},
+  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},{id:"payouts",icon:"💰",label:"Payouts"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
-const CREW_NAV = [
-  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"my-cuts",icon:"💰",label:"My Cuts"},{id:"calendar",icon:"📅",label:"Calendar"},
+const CAPTAIN_NAV = [
+  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},
-  {section:"OPERATIONS"},{id:"my-jobs",icon:"📋",label:"My Jobs"},
+  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
+  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},
+  {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
+];
+
+const CREW_NAV = [
+  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
+  {id:"recipes",icon:"🧪",label:"Bench Wench"},
+  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"my-jobs",icon:"📋",label:"My Jobs"},
+  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},
 ];
 
 const sidebar = document.getElementById("sidebar");
-(isBoss ? BOSS_NAV : CREW_NAV).forEach(item => {
+(isBoss ? BOSS_NAV : isCaptain ? CAPTAIN_NAV : CREW_NAV).forEach(item => {
   if (item.section) {
     const d = document.createElement("div"); d.className="nav-section"; d.textContent=item.section; sidebar.appendChild(d);
   } else {
@@ -560,7 +561,6 @@ function showSection(id, btn) {
   if(btn) btn.classList.add("active");
 
   if(id==="overview")      loadOverview();
-  if(id==="my-cuts")       loadMyCuts();
   if(id==="calendar")      renderCalendar();
   if(id==="recipes")       loadRecipes();
   if(id==="constitution")  loadConstitution();
@@ -909,11 +909,10 @@ window.renderCalendar=async function(){
   for(let d=1;d<=inMonth;d++){
     const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dayEv=calEvents.filter(e=>e.date===ds);
-    const click=isBoss?`onclick="openEventModal('${ds}')"`:'';
-    html+=`<div class="cal-day${ds===today?' today':''}" ${click}><div class="cal-day-num">${d}</div>${dayEv.map(e=>`<div class="cal-event${e.type==='meeting'?' meeting':''}">${e.title}</div>`).join("")}</div>`;
+    html+=`<div class="cal-day${ds===today?' today':''}" onclick="openEventModal('${ds}')"><div class="cal-day-num">${d}</div>${dayEv.map(e=>`<div class="cal-event${e.type==='meeting'?' meeting':''}">${e.title}</div>`).join("")}</div>`;
   }
   document.getElementById("calGrid").innerHTML=html;
-  if(isCrew){
+  {
     const todayStr=new Date().toISOString().slice(0,10);
     const upcoming=calEvents.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,10);
     document.getElementById("upcomingList").innerHTML=upcoming.length
@@ -956,7 +955,7 @@ window.loadRecipes=async function(){
           <div class="recipe-card-name">${r.name}</div>
           <ul class="recipe-ingredients">${ings.map(i=>`<li>${i}</li>`).join("")}</ul>
 
-          ${isBoss?`<button class="recipe-del" onclick="deleteRecipe('${d.id}')">🗑</button>`:''}
+          <button class="recipe-del" onclick="deleteRecipe('${d.id}')">🗑</button>
         </div>`;
       }).join("");
 };
@@ -1379,7 +1378,7 @@ async function loadSettings(){
       document.getElementById("settingGangName").value=d.gangName||"";
       document.getElementById("settingMotto").value=d.motto||"";
       document.getElementById("settingFounded").value=d.founded||"";
-      document.getElementById("settingGangCut").value=d.gangCut||10;
+      if(document.getElementById("settingGangCut")) document.getElementById("settingGangCut").value=d.gangCut||10;
       if(d.logoUrl){document.getElementById("logoUrl").value=d.logoUrl;previewLogo();}
     }
   }catch(e){}

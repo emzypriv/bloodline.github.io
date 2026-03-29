@@ -36,14 +36,7 @@
         <input type="password" id="loginPass" class="field-input" placeholder="••••••••"/>
       </div>
 
-      <div class="role-select">
-        <button class="role-btn active" id="roleBoss" onclick="selectRole('boss')">
-          <span class="role-icon">👑</span> BOSS
-        </button>
-        <button class="role-btn" id="roleCrew" onclick="selectRole('crew')">
-          <span class="role-icon">🔫</span> CREW
-        </button>
-      </div>
+
 
       <button class="btn-primary" onclick="doLogin()">ENTER THE BLOODLINE</button>
 
@@ -75,24 +68,16 @@
     firebase.initializeApp(FIREBASE_CONFIG);
     const db = firebase.firestore();
 
-    let selectedRole = "boss";
-
     function debug(msg) {
       document.getElementById("debugLine").textContent = msg;
     }
 
-    function selectRole(role) {
-      selectedRole = role;
-      document.getElementById("roleBoss").classList.toggle("active", role === "boss");
-      document.getElementById("roleCrew").classList.toggle("active", role === "crew");
-    }
-
-    async function doLogin() {
+async function doLogin() {
       const handle = document.getElementById("loginName").value.trim().toLowerCase();
       const pass   = document.getElementById("loginPass").value;
       const err    = document.getElementById("loginError");
       err.textContent = "";
-      debug("Attempting: " + handle + " as " + selectedRole);
+      debug("Attempting login for: " + handle);
 
       if (!handle || !pass) {
         err.textContent = "⚠ Fill in all fields, soldier.";
@@ -111,17 +96,11 @@
         }
 
         const data = userDoc.data();
-        debug("DB role: " + data.role + " | Chosen: " + selectedRole);
+        debug("User found. Checking PIN...");
 
         if (data.pin !== pass) {
           err.textContent = "⚠ Wrong code.";
           debug("PIN mismatch.");
-          return;
-        }
-
-        if (data.role !== selectedRole) {
-          err.textContent = "⚠ Wrong access level selected.";
-          debug("Role mismatch. Pick " + data.role + " on the buttons above.");
           return;
         }
 
