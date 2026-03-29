@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BLOODLINE — Dashboard</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     .week-strip { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
     .week-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text-dim); font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.1em; padding:0.4rem 0.8rem; cursor:pointer; transition:all 0.15s; }
@@ -139,7 +139,10 @@
           </div>
         </div>
         <div id="preambleDisplay" style="background:var(--bg3);border:1px solid var(--border);border-left:4px solid var(--blood);padding:1.2rem 1.5rem;margin-bottom:2rem;font-family:var(--font-body);font-size:0.95rem;line-height:1.7;color:var(--text-dim);font-style:italic">
-          We, the members of <strong style="color:var(--text-bright);font-style:normal">Bloodline</strong>, bind ourselves to this constitution as the foundation of our family. Every member who takes the oath accepts these rules without exception. Loyalty is not given freely — it is earned through action, silence, and sacrifice.
+          <strong style="color:var(--text-bright);font-style:normal">Bloodline</strong> is a collective of like-minded people, all pulling in the same direction. Our intent is not to cause detriment to counterparts, civilians, or government bodies in the first instance. Being a part of Bloodline is understanding the basic ethos of being approachable, accommodating, and understanding.<br><br>
+          Our aim is to make our way in this life by sticking it to the man — corporate entities overcome by greed that benefit off the common person. Bloodline will not target individually owned businesses or rob individuals of their hard-earned possessions.<br><br>
+          Members of Bloodline buy into the concept of <em>One in, all in</em>. Any member must consider their motives before embarking on any extracurricular activity. One must put selfish wants to one side and consider the bigger picture as a priority.<br><br>
+          Bloodline will not be a pushover. Any injustice done to a member will be discussed as a collective, debated, and voted on democratically. Only then will a resolution be implemented.
         </div>
         <textarea id="preambleEdit" style="display:none;width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text-bright);font-family:var(--font-body);font-size:0.95rem;padding:0.8rem;min-height:100px;resize:vertical;outline:none" oninput="autoSavePreamble()"></textarea>
         <div id="constitutionSections"></div>
@@ -161,9 +164,6 @@
           <div class="form-group"><label class="form-label">JOB TYPE</label>
             <select class="form-control" id="jobType">
               <option value="">— Select —</option>
-              <option>Bank Heist</option><option>Store Robbery</option><option>Drug Deal</option>
-              <option>Vehicle Theft</option><option>Contract Kill</option><option>Smuggling Run</option>
-              <option>Kidnapping</option><option>Protection Racket</option><option>Arms Deal</option><option>Other</option>
             </select>
           </div>
           <div class="form-group"><label class="form-label">LOCATION</label><input class="form-control" id="jobLocation" placeholder="e.g. Downtown"/></div>
@@ -191,8 +191,7 @@
           <div class="total-item"><div class="total-label">EXPENSES</div><div class="total-val blood" id="prevExp">£0</div></div>
           <div class="total-item"><div class="total-label">NET</div><div class="total-val" id="prevNet">£0</div></div>
           <div class="total-item"><div class="total-label">GANG CUT</div><div class="total-val gold" id="prevGangCut">£0</div></div>
-          <div class="total-item"><div class="total-label">BOSS CUT</div><div class="total-val gold" id="prevBossCut">£0</div></div>
-          <div class="total-item"><div class="total-label">CREW POT</div><div class="total-val green" id="prevCrewPot">£0</div></div>
+          <div class="total-item"><div class="total-label">CREW SHARE</div><div class="total-val green" id="prevCrewPot">£0</div></div>
           <div class="total-item"><div class="total-label">PER HEAD</div><div class="total-val green" id="prevPerHead">£0</div></div>
         </div>
         <div id="crewCutsList" style="margin-top:0.8rem"></div>
@@ -271,7 +270,7 @@
       <div class="panel">
         <div class="panel-title">Cleaning Records</div>
         <table class="data-table">
-          <thead><tr><th>DATE</th><th>GANG</th><th>DIRTY £</th><th>WE PAID</th><th>PROFIT</th><th>BREAKDOWN</th></tr></thead>
+          <thead><tr><th>DATE</th><th>GANG</th><th>FACE VALUE</th><th>WE PAID</th><th>PROFIT</th><th>ITEMS</th></tr></thead>
           <tbody id="cleanTable"></tbody>
         </table>
       </div>
@@ -333,20 +332,14 @@
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">GANG CUT (%)</label>
-            <input class="form-control" type="number" id="settingGangCut" value="10" min="0" max="100" oninput="updateCutPreview()"/>
-            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem">Goes to gang funds first</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">BOSS CUT (%)</label>
-            <input class="form-control" type="number" id="settingBossCut" value="20" min="0" max="100" oninput="updateCutPreview()"/>
-            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem">Boss takes from remainder</div>
+            <input class="form-control" type="number" id="settingGangCut" value="10" min="0" max="100" style="max-width:180px" oninput="updateCutPreview()"/>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem">Taken from net first. Remainder split equally between crew.</div>
           </div>
         </div>
         <div class="total-bar" id="cutPreviewBar" style="margin-top:1rem">
-          <div class="total-item"><div class="total-label">EXAMPLE ON £10,000</div><div class="total-val" style="font-size:1rem;color:var(--text-dim)">NET £10,000</div></div>
+          <div class="total-item"><div class="total-label">EXAMPLE ON £10,000 NET</div><div class="total-val" style="font-size:1rem;color:var(--text-dim)">£10,000</div></div>
           <div class="total-item"><div class="total-label">GANG CUT</div><div class="total-val gold" id="prevGangPct">£1,000</div></div>
-          <div class="total-item"><div class="total-label">BOSS CUT</div><div class="total-val gold" id="prevBossPct">£1,800</div></div>
-          <div class="total-item"><div class="total-label">CREW SHARE</div><div class="total-val green" id="prevCrewPct">£7,200</div></div>
+          <div class="total-item"><div class="total-label">CREW SHARE</div><div class="total-val green" id="prevCrewPct">£9,000</div></div>
         </div>
         <div class="form-actions"><button class="btn btn-danger" onclick="saveCuts()">Save Cut Structure</button></div>
         <div id="cutsAlert" class="alert hidden"></div>
@@ -369,10 +362,20 @@
         <div id="membersList"></div>
       </div>
 
+      <!-- Job Types -->
+      <div class="panel settings-section">
+        <div class="settings-section-title">Job Types</div>
+        <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">These appear in the Job Type dropdown when logging a job.</p>
+        <div id="jobTypeRows" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem"></div>
+        <button class="btn btn-ghost" style="font-size:0.8rem" onclick="addJobTypeRow()">+ Add Job Type</button>
+        <div class="form-actions" style="margin-top:1rem"><button class="btn btn-danger" onclick="saveJobTypes()">Save Job Types</button></div>
+        <div id="jobTypesAlert" class="alert hidden"></div>
+      </div>
+
       <!-- Money Cleaning Price List -->
       <div class="panel settings-section">
         <div class="settings-section-title">Money Cleaning — Price List</div>
-        <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Set the value of each item type and the buy rate (% of face value you pay). These are used in the cleaning form.</p>
+        <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Set the face value and the flat amount you pay per unit. Used to auto-calculate deals in the cleaning form.</p>
         <div id="priceListRows"></div>
         <button class="btn btn-ghost" style="margin-top:0.6rem;font-size:0.8rem" onclick="addPriceRow()">+ Add Item Type</button>
         <div class="form-actions" style="margin-top:1rem"><button class="btn btn-danger" onclick="savePriceList()">Save Price List</button></div>
@@ -446,21 +449,21 @@ document.querySelectorAll(".crew-only").forEach(el => el.style.display = isCrew 
 window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
 
 // Cached data
-let gangSettings = { gangCut: 10, bossCut: 20 };
+let gangSettings = { gangCut: 10 };
 let membersList  = [];
 let priceList    = [];
 
 // ── Sidebar ──
 const BOSS_NAV = [
-  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"calendar",icon:"📅",label:"Calendar"},
-  {id:"recipes",icon:"🧪",label:"Recipes"},{id:"constitution",icon:"📜",label:"Constitution"},
+  {section:"INTEL"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
+  {id:"recipes",icon:"🧪",label:"Recipes"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
   {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"Money Cleaning"},{id:"payouts",icon:"💰",label:"Payouts"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 const CREW_NAV = [
-  {section:"INTEL"},{id:"my-cuts",icon:"💰",label:"My Cuts"},{id:"calendar",icon:"📅",label:"Calendar"},
-  {id:"recipes",icon:"🧪",label:"Recipes"},{id:"constitution",icon:"📜",label:"Constitution"},
+  {section:"INTEL"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"my-cuts",icon:"💰",label:"My Cuts"},{id:"calendar",icon:"📅",label:"Calendar"},
+  {id:"recipes",icon:"🧪",label:"Recipes"},
   {section:"OPERATIONS"},{id:"my-jobs",icon:"📋",label:"My Jobs"},
 ];
 
@@ -481,12 +484,12 @@ function showSection(id, btn) {
   const sec=document.getElementById("sec-"+id);
   if(sec) sec.classList.add("active");
   if(btn) btn.classList.add("active");
-  if(id==="overview")      loadOverview();
+
   if(id==="my-cuts")       loadMyCuts();
   if(id==="calendar")      renderCalendar();
   if(id==="recipes")       loadRecipes();
   if(id==="constitution")  loadConstitution();
-  if(id==="job-form")      { initCrewSlots(); }
+  if(id==="job-form")      { populateJobTypes(); initCrewSlots(); }
   if(id==="job-dashboard") loadJobs();
   if(id==="money-clean")   { document.getElementById("cleanDate").valueAsDate=new Date(); initCleanRows(); loadCleans(); }
   if(id==="payouts")       initPayoutWeek();
@@ -494,23 +497,29 @@ function showSection(id, btn) {
 }
 
 // ── Load gang settings on boot ──
+let jobTypes = [
+  "Bank Heist","Store Robbery","Drug Deal","Vehicle Theft",
+  "Contract Kill","Smuggling Run","Kidnapping","Protection Racket","Arms Deal","Other"
+];
+
 async function bootLoad() {
   try {
     const snap = await db.collection("settings").doc("gang").get();
     if (snap.exists) {
       const d = snap.data();
       gangSettings.gangCut = d.gangCut || 10;
-      gangSettings.bossCut = d.bossCut || 20;
       if (d.logoUrl) applyLogo(d.logoUrl);
     }
     const mSnap = await db.collection("users").get();
     membersList = mSnap.docs.map(d=>({id:d.id,...d.data()}));
     const pSnap = await db.collection("settings").doc("prices").get();
     if (pSnap.exists) priceList = pSnap.data().items || [];
+    const jtSnap = await db.collection("settings").doc("jobtypes").get();
+    if (jtSnap.exists && jtSnap.data().types?.length) jobTypes = jtSnap.data().types;
     if (!priceList.length) priceList = [
-      {name:"Bands",    faceValue:1000, buyRate:70},
-      {name:"Marked Bills", faceValue:500, buyRate:60},
-      {name:"Cash",     faceValue:100,  buyRate:80},
+      {name:"Bands",     faceValue:1000, buyRate:700},
+      {name:"Marked Bills", faceValue:500,  buyRate:300},
+      {name:"Cash",      faceValue:100,  buyRate:80},
       {name:"Dirty Money",  faceValue:100,  buyRate:65},
     ];
   } catch(e) { console.error("Boot load error:", e); }
@@ -677,6 +686,14 @@ window.deleteRecipe=async function(id){if(!confirm("Delete?"))return;await db.co
 // ══════════════════════════════════════════════
 // JOB FORM — Crew Slots from members list
 // ══════════════════════════════════════════════
+function populateJobTypes() {
+  const sel = document.getElementById("jobType");
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select —</option>' + jobTypes.map(t=>`<option>${t}</option>`).join("");
+  sel.value = current;
+}
+
 function initCrewSlots() {
   const container = document.getElementById("crewSlots");
   container.innerHTML = "";
@@ -699,18 +716,14 @@ window.updateJobPreview=function(){
   const expenses=+document.getElementById("jobExpenses").value||0;
   const net=gross-expenses;
   const gangPct=gangSettings.gangCut||0;
-  const bossPct=gangSettings.bossCut||0;
   const gangCut=Math.round(net*gangPct/100);
-  const afterGang=net-gangCut;
-  const bossCut=Math.round(afterGang*bossPct/100);
-  const crewPot=afterGang-bossCut;
+  const crewPot=net-gangCut;
   const crew=Array.from({length:6},(_,i)=>document.getElementById(`crew${i+1}`)?.value).filter(Boolean);
   const perHead=crew.length?Math.round(crewPot/crew.length):0;
   document.getElementById("prevGross").textContent="£"+gross.toLocaleString();
   document.getElementById("prevExp").textContent="£"+expenses.toLocaleString();
   document.getElementById("prevNet").textContent="£"+net.toLocaleString();
   document.getElementById("prevGangCut").textContent="£"+gangCut.toLocaleString();
-  document.getElementById("prevBossCut").textContent="£"+bossCut.toLocaleString();
   document.getElementById("prevCrewPot").textContent="£"+crewPot.toLocaleString();
   document.getElementById("prevPerHead").textContent="£"+perHead.toLocaleString();
   const listEl=document.getElementById("crewCutsList");
@@ -737,16 +750,14 @@ window.saveJob=async function(){
   const gross=cash+bands+dirty+other;
   const net=gross-expenses;
   const gangCut=Math.round(net*gangSettings.gangCut/100);
-  const afterGang=net-gangCut;
-  const bossCut=Math.round(afterGang*gangSettings.bossCut/100);
-  const crewPot=afterGang-bossCut;
+  const crewPot=net-gangCut;
   const crew=Array.from({length:6},(_,i)=>document.getElementById(`crew${i+1}`)?.value).filter(Boolean);
   const perHead=crew.length?Math.round(crewPot/crew.length):0;
   await db.collection("jobs").add({
     date,type,location:document.getElementById("jobLocation").value.trim(),
     status:document.getElementById("jobStatus").value,
-    cash,bands,dirty,other,expenses,gross,net,gangCut,bossCut,crewPot,perHead,crew,
-    gangPct:gangSettings.gangCut,bossPct:gangSettings.bossCut,
+    cash,bands,dirty,other,expenses,gross,net,gangCut,crewPot,perHead,crew,
+    gangPct:gangSettings.gangCut,
     loggedBy:user,loggedAt:new Date().toISOString()
   });
   showAlert("jobAlert","success","Job logged.");
@@ -824,7 +835,7 @@ function initCleanRows() {
 window.addCleanRow=function(){
   const container=document.getElementById("cleanItemRows");
   const idx=container.children.length;
-  const options=priceList.map((p,i)=>`<option value="${i}">${p.name} (Face: £${p.faceValue}/unit, Buy: ${p.buyRate}%)</option>`).join("");
+  const options=priceList.map((p,i)=>`<option value="${i}">${p.name} — Face: £${p.faceValue} | We Pay: £${p.buyRate}</option>`).join("");
   const row=document.createElement("div");row.className="clean-item-row";row.dataset.idx=idx;
   row.innerHTML=`
     <div class="form-group"><label class="form-label">ITEM TYPE</label>
@@ -852,7 +863,7 @@ window.updateCleanCalc=function(){
     const p=priceList[typeIdx];
     if(!p)return;
     const faceVal=p.faceValue*qty;
-    const wePay=Math.round(faceVal*p.buyRate/100);
+    const wePay=p.buyRate*qty;
     row.querySelector(".clean-face").value="£"+faceVal.toLocaleString();
     totalDirty+=faceVal;totalPay+=wePay;
   });
@@ -871,8 +882,8 @@ window.saveClean=async function(){
     const typeIdx=+row.querySelector(".clean-type").value;
     const qty=+row.querySelector(".clean-qty").value||0;
     const p=priceList[typeIdx];if(!p)return;
-    const faceVal=p.faceValue*qty;const wePay=Math.round(faceVal*p.buyRate/100);
-    items.push({type:p.name,qty,faceVal,wePay,buyRate:p.buyRate});
+    const faceVal=p.faceValue*qty;const wePay=p.buyRate*qty;
+    items.push({type:p.name,qty,faceVal,wePay,payPerUnit:p.buyRate});
     totalDirty+=faceVal;totalPay+=wePay;
   });
   if(!items.length){showAlert("cleanAlert","error","Add at least one item.");return;}
@@ -929,12 +940,10 @@ window.calcPayouts=async function(){
     crewTotals[c].jobs++;crewTotals[c].total+=j.perHead||0;
   }));
   const gangCutTotal=jobs.reduce((s,j)=>s+(j.gangCut||0),0);
-  const bossCutTotal=jobs.reduce((s,j)=>s+(j.bossCut||0),0);
   const list=document.getElementById("payoutList");
   list.innerHTML=`<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em">${from} → ${to} (${jobs.length} JOB${jobs.length!==1?'S':''})</div>
     <div class="grid-2" style="margin-bottom:1.5rem">
       <div class="stat-card"><div class="stat-label">GANG FUND</div><div class="stat-value gold">£${gangCutTotal.toLocaleString()}</div></div>
-      <div class="stat-card"><div class="stat-label">BOSS EARNINGS</div><div class="stat-value gold">£${bossCutTotal.toLocaleString()}</div></div>
     </div>`+
     (Object.keys(crewTotals).length===0
       ? `<p style="color:var(--text-dim);font-family:var(--font-mono)">No jobs in this period.</p>`
@@ -952,6 +961,35 @@ window.calcPayouts=async function(){
 // ══════════════════════════════════════════════
 // SETTINGS
 // ══════════════════════════════════════════════
+function loadJobTypesUI() {
+  const container = document.getElementById("jobTypeRows");
+  if (!container) return;
+  container.innerHTML = jobTypes.map((t,i) => `
+    <div style="display:flex;gap:0.6rem;align-items:center">
+      <input class="form-control jobtype-input" value="${t}" style="flex:1"/>
+      <button onclick="this.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 0.6rem;cursor:pointer;height:42px;font-size:0.9rem">✕</button>
+    </div>`).join("");
+}
+
+window.addJobTypeRow = function() {
+  const container = document.getElementById("jobTypeRows");
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;gap:0.6rem;align-items:center";
+  row.innerHTML = `<input class="form-control jobtype-input" placeholder="New job type" style="flex:1"/>
+    <button onclick="this.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 0.6rem;cursor:pointer;height:42px;font-size:0.9rem">✕</button>`;
+  container.appendChild(row);
+};
+
+window.saveJobTypes = async function() {
+  const inputs = document.querySelectorAll(".jobtype-input");
+  const types = Array.from(inputs).map(i=>i.value.trim()).filter(Boolean);
+  if (!types.length) { showAlert("jobTypesAlert","error","Add at least one job type."); return; }
+  jobTypes = types;
+  await db.collection("settings").doc("jobtypes").set({ types, updatedBy: user });
+  showAlert("jobTypesAlert","success","Job types saved.");
+  populateJobTypes();
+};
+
 async function loadSettings(){
   try{
     const snap=await db.collection("settings").doc("gang").get();
@@ -961,12 +999,12 @@ async function loadSettings(){
       document.getElementById("settingMotto").value=d.motto||"";
       document.getElementById("settingFounded").value=d.founded||"";
       document.getElementById("settingGangCut").value=d.gangCut||10;
-      document.getElementById("settingBossCut").value=d.bossCut||20;
       if(d.logoUrl){document.getElementById("logoUrl").value=d.logoUrl;previewLogo();}
     }
   }catch(e){}
   await loadMembers();
   loadPriceListUI();
+  loadJobTypesUI();
   updateCutPreview();
 }
 
@@ -1006,16 +1044,14 @@ window.saveGangProfile=async function(){
 // Cut settings
 window.updateCutPreview=function(){
   const g=+document.getElementById("settingGangCut")?.value||0;
-  const b=+document.getElementById("settingBossCut")?.value||0;
-  const net=10000,gangAmt=Math.round(net*g/100),after=net-gangAmt,bossAmt=Math.round(after*b/100),crew=after-bossAmt;
-  const el1=document.getElementById("prevGangPct"),el2=document.getElementById("prevBossPct"),el3=document.getElementById("prevCrewPct");
-  if(el1){el1.textContent="£"+gangAmt.toLocaleString();el2.textContent="£"+bossAmt.toLocaleString();el3.textContent="£"+crew.toLocaleString();}
+  const net=10000,gangAmt=Math.round(net*g/100),crew=net-gangAmt;
+  const el1=document.getElementById("prevGangPct"),el3=document.getElementById("prevCrewPct");
+  if(el1){el1.textContent="£"+gangAmt.toLocaleString();el3.textContent="£"+crew.toLocaleString();}
 };
 window.saveCuts=async function(){
   const g=+document.getElementById("settingGangCut").value||0;
-  const b=+document.getElementById("settingBossCut").value||0;
-  await db.collection("settings").doc("gang").set({gangCut:g,bossCut:b},{merge:true});
-  gangSettings.gangCut=g;gangSettings.bossCut=b;
+  await db.collection("settings").doc("gang").set({gangCut:g},{merge:true});
+  gangSettings.gangCut=g;
   showAlert("cutsAlert","success","Cut structure saved.");
 };
 
@@ -1057,7 +1093,7 @@ function loadPriceListUI(){
     row.innerHTML=`
       <div class="form-group"><label class="form-label">ITEM NAME</label><input class="form-control price-name" value="${p.name}" placeholder="e.g. Bands"/></div>
       <div class="form-group"><label class="form-label">FACE VALUE PER UNIT (£)</label><input class="form-control price-face" type="number" value="${p.faceValue}" min="0"/></div>
-      <div class="form-group"><label class="form-label">BUY RATE (%)</label><input class="form-control price-rate" type="number" value="${p.buyRate}" min="0" max="100"/></div>
+      <div class="form-group"><label class="form-label">WE PAY PER UNIT (£)</label><input class="form-control price-rate" type="number" value="${p.buyRate}" min="0"/></div>
       <button onclick="removePriceRow(this)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 0.6rem;cursor:pointer;margin-top:auto;height:42px">✕</button>`;
     container.appendChild(row);
   });
@@ -1087,16 +1123,43 @@ window.savePriceList=async function(){
 // ══════════════════════════════════════════════
 // CONSTITUTION
 // ══════════════════════════════════════════════
-const DEFAULT_SECTIONS=[{id:"rules",title:"Gang Rules & Code of Conduct",rules:[
-  {title:"Loyalty Above All",desc:"No member shall betray the family to law enforcement, rival gangs, or any outside party.",severity:"mandatory"},
-  {title:"Silence is Survival",desc:"What happens within the family stays within the family. Never discuss operations with outsiders.",severity:"mandatory"},
-  {title:"Respect the Hierarchy",desc:"All orders from the Boss are final. Disagreements raised privately — never publicly undermined.",severity:"mandatory"},
-  {title:"No Freelancing",desc:"Members do not run independent jobs or deals without Boss approval.",severity:"mandatory"},
-  {title:"Cover Your Brothers",desc:"If a crew member is in danger, you do not abandon them. We move together.",severity:"important"},
-  {title:"Settle Disputes Internally",desc:"Conflicts resolved within the family. No member acts against another without Boss knowledge.",severity:"important"},
-  {title:"Be Ready When Called",desc:"When a job is called, members are expected to be available and prepared.",severity:"important"},
-  {title:"Respect Earns Rank",desc:"Rank is earned through performance, loyalty, and time served — not requested.",severity:"guideline"},
-]}];
+const DEFAULT_SECTIONS=[
+  {id:"membership",title:"Article I — Membership",rules:[
+    {title:"Eligibility",desc:"Members must have a good reputation and complete a trial period before full membership is considered.",severity:"mandatory"},
+    {title:"Initiation",desc:"All prospective members must complete 2 x Fun Initiations and 1 x Test of Loyalty before being admitted.",severity:"mandatory"},
+    {title:"Boss & Underboss",desc:"At the helm. All major decisions are made with discussion, but if a collective decision cannot be reached, the Captains have final say. They are the figureheads — attending meetings and acting as mouthpieces at meetings and deals.",severity:"mandatory"},
+    {title:"Captains",desc:"Second in command. Captains lean on Members to support them in what they need. They run operations and report upward.",severity:"mandatory"},
+    {title:"Members",desc:"Full members of the crew. Permitted to wear full colours. Have earned their place in the collective.",severity:"important"},
+    {title:"Recruits",desc:"Full members of the crew and permitted to wear full colours, but still on probation within the gang.",severity:"important"},
+    {title:"Hangaround",desc:"Not full members. Can only act as instructed. No access to the bank account, keys, or compound.",severity:"guideline"},
+  ]},
+  {id:"conduct",title:"Article II — Code of Conduct",rules:[
+    {title:"Behaviour",desc:"Members will strive to produce a conducive environment for all. Consider the repercussions of your actions before acting. When possible, discuss with other Bloodline members before any action that may bring the collective into disrepute. Respect will be shown to all members regardless of rank or position.",severity:"mandatory"},
+    {title:"Conflict Resolution",desc:"Conversation over violence, always. Unhappy about something? Then speak. Discussion first and foremost. Bloodline asks for a certain level of constraint subject to situation. Members should be contacted and support given internally before any act of retribution.",severity:"mandatory"},
+    {title:"George Lane Loyalty Clause",desc:"Loyalty to the crew will be rewarded. Betrayal warrants the ultimate sacrifice if it puts the crew in danger. This includes not going by the Bloodline code. Disloyalty to the collective is the highest offence.",severity:"mandatory"},
+  ]},
+  {id:"activities",title:"Article III — Gang Activities",rules:[
+    {title:"Legal Work",desc:"Legal work is encouraged. Get out in the city, network, and make legitimate money — for the benefit of both the individual and Bloodline. Good relations with third parties is key.",severity:"important"},
+    {title:"Illegal Operations",desc:"Illegal activity should be constrained to corporate entities — banks, shops, pharmacies, etc. Illegal activities that victimise civilian-run businesses is considered a betrayal of the Bloodline code of ethics.",severity:"mandatory"},
+    {title:"Job Protocol",desc:"Crime is only to be done when you have sufficient crew to complete the job. There is no rush. When completing a group heist or criminal activity, you must switch to the Job Radio.",severity:"mandatory"},
+    {title:"Territory — Vespucci Beach",desc:"Bloodline's claim is the Vespucci Beach area: from Vitus Street to the Lifeguard Tower and the sea to Tap Street. Local businesses are not to be affected. Protection can be offered.",severity:"important"},
+    {title:"Don't Shit on Your Own Doorstep",desc:"3 postcode radius around the block is a crime no-go zone. We do not create problems on our own doorstep.",severity:"mandatory"},
+  ]},
+  {id:"finance",title:"Article IV — Financial Management",rules:[
+    {title:"Buy-In",desc:"$10,000 buy-in required for gang registration upon joining.",severity:"mandatory"},
+    {title:"Weekly Subs / Rent",desc:"Pay what you can. Minimum $5,000 per week to keep your standing in the crew.",severity:"mandatory"},
+    {title:"50/50 Split",desc:"All activities are split 50/50. 50% goes to the gang, 50% is split equally between the members who did the job.",severity:"mandatory"},
+    {title:"Gang Funding — 3 Jobs Rule",desc:"3 jobs per week: all finances from these go 100% to the gang to continue funding operations.",severity:"important"},
+    {title:"Dirty Money — Cleaning Rates",desc:"When taking gang-specific dirty money to clean: put aside or bank $70 per Marked Bill and $550 per Band. Either give to the Treasurer or deposit into the Bank Account.",severity:"important"},
+  ]},
+  {id:"amendments",title:"Article VI — Amendments & Meetings",rules:[
+    {title:"Amendments",desc:"Anyone from the rank of Pirate or above can suggest changes to the code. All members must vote and agree with a majority vote.",severity:"important"},
+    {title:"Meetings",desc:"To be called regularly when needed and in emergencies. Led by Captains to discuss matters of importance as well as general catch-ups.",severity:"important"},
+  ]},
+  {id:"dissolution",title:"Article VII — Dissolution",rules:[
+    {title:"Conditions for Disbandment",desc:"The decision for dissolution will not be taken lightly. All Captains must unanimously agree before Bloodline is dissolved.",severity:"mandatory"},
+  ]},
+];
 let editMode=false,sectionsData=[];
 window.loadConstitution=async function(){
   try{
