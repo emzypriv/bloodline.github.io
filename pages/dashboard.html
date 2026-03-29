@@ -313,7 +313,6 @@
         <div class="panel-title">New Cleaning Deal</div>
         <div class="form-grid">
           <div class="form-group"><label class="form-label">DATE</label><input class="form-control" type="date" id="cleanDate"/></div>
-          <div class="form-group"><label class="form-label">SELLER GANG</label><input class="form-control" id="cleanGang" placeholder="Gang name"/></div>
         </div>
 
         <div class="panel-title" style="margin-top:1.2rem">Items Being Cleaned</div>
@@ -335,7 +334,7 @@
       <div class="panel">
         <div class="panel-title">Cleaning Records</div>
         <table class="data-table">
-          <thead><tr><th>DATE</th><th>GANG</th><th>FACE VALUE</th><th>WE PAID</th><th>PROFIT</th><th>ITEMS</th></tr></thead>
+          <thead><tr><th>DATE</th><th>FACE VALUE</th><th>WE PAID</th><th>PROFIT</th><th>ITEMS</th></tr></thead>
           <tbody id="cleanTable"></tbody>
         </table>
       </div>
@@ -1169,8 +1168,8 @@ window.updateCleanCalc=function(){
 };
 
 window.saveClean=async function(){
-  const date=document.getElementById("cleanDate").value,gang=document.getElementById("cleanGang").value.trim();
-  if(!date||!gang){showAlert("cleanAlert","error","Date and gang name required.");return;}
+  const date=document.getElementById("cleanDate").value;
+  if(!date){showAlert("cleanAlert","error","Date required.");return;}
   const rows=document.querySelectorAll("#cleanItemRows .clean-item-row");
   const items=[];let totalDirty=0,totalPay=0;
   rows.forEach(row=>{
@@ -1182,10 +1181,9 @@ window.saveClean=async function(){
     totalDirty+=faceVal;totalPay+=wePay;
   });
   if(!items.length){showAlert("cleanAlert","error","Add at least one item.");return;}
-  await db.collection("cleans").add({date,gang,items,totalDirty,totalPay,profit:totalDirty-totalPay,loggedBy:user,loggedAt:new Date().toISOString()});
+  await db.collection("cleans").add({date,items,totalDirty,totalPay,profit:totalDirty-totalPay,loggedBy:user,loggedAt:new Date().toISOString()});
   showAlert("cleanAlert","success","Deal logged.");
   document.getElementById("cleanItemRows").innerHTML="";
-  document.getElementById("cleanGang").value="";
   if(priceList.length) addCleanRow(); loadCleans();
 };
 
@@ -1195,7 +1193,7 @@ async function loadCleans(){
     ? `<tr><td colspan="6" style="color:var(--text-dim);text-align:center;padding:2rem;font-family:var(--font-mono)">No deals yet.</td></tr>`
     : snap.docs.map(d=>{const c=d.data();
         const breakdown=(c.items||[]).map(i=>`${i.qty}x ${i.type}`).join(", ");
-        return`<tr><td class="mono">${c.date}</td><td>${c.gang}</td>
+        return`<tr><td class="mono">${c.date}</td>
           <td class="mono" style="color:var(--blood)">£${(c.totalDirty||0).toLocaleString()}</td>
           <td class="mono" style="color:var(--amber)">£${(c.totalPay||0).toLocaleString()}</td>
           <td class="mono" style="color:var(--green)">£${(c.profit||0).toLocaleString()}</td>
