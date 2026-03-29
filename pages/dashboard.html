@@ -175,12 +175,11 @@
         </div>
 
         <div class="panel-title" style="margin-top:1.5rem">What We Got</div>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">CASH (£)</label><input class="form-control" type="number" id="jobCash" value="0" min="0" oninput="updateJobPreview()"/></div>
-          <div class="form-group"><label class="form-label">BANDS (£)</label><input class="form-control" type="number" id="jobBands" value="0" min="0" oninput="updateJobPreview()"/></div>
-          <div class="form-group"><label class="form-label">DIRTY MONEY (£)</label><input class="form-control" type="number" id="jobDirty" value="0" min="0" oninput="updateJobPreview()"/></div>
-          <div class="form-group"><label class="form-label">OTHER (£)</label><input class="form-control" type="number" id="jobOther" value="0" min="0" oninput="updateJobPreview()"/></div>
-          <div class="form-group"><label class="form-label">EXPENSES (£)</label><input class="form-control" type="number" id="jobExpenses" value="0" min="0" oninput="updateJobPreview()"/></div>
+        <div id="jobItemRows" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.6rem"></div>
+        <button class="btn btn-ghost" style="font-size:0.8rem;margin-bottom:1rem" onclick="addJobItemRow()">+ Add Item</button>
+        <div class="form-group" style="max-width:220px">
+          <label class="form-label">EXPENSES (£)</label>
+          <input class="form-control" type="number" id="jobExpenses" value="0" min="0" oninput="updateJobPreview()"/>
         </div>
 
         <div class="panel-title" style="margin-top:1.5rem">Crew on the Job</div>
@@ -372,6 +371,16 @@
         <div id="jobTypesAlert" class="alert hidden"></div>
       </div>
 
+      <!-- Job Items Price List -->
+      <div class="panel settings-section">
+        <div class="settings-section-title">Job Items — Price List</div>
+        <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Set item types and their value per unit. These appear in the job form — select an item, enter quantity, and the value auto-fills.</p>
+        <div id="jobItemPriceRows" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.6rem"></div>
+        <button class="btn btn-ghost" style="font-size:0.8rem" onclick="addJobItemPriceRow()">+ Add Item</button>
+        <div class="form-actions" style="margin-top:1rem"><button class="btn btn-danger" onclick="saveJobItems()">Save Job Items</button></div>
+        <div id="jobItemsAlert" class="alert hidden"></div>
+      </div>
+
       <!-- Money Cleaning Price List -->
       <div class="panel settings-section">
         <div class="settings-section-title">Money Cleaning — Price List</div>
@@ -489,14 +498,24 @@ function showSection(id, btn) {
   if(id==="calendar")      renderCalendar();
   if(id==="recipes")       loadRecipes();
   if(id==="constitution")  loadConstitution();
-  if(id==="job-form")      { populateJobTypes(); initCrewSlots(); }
+  if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); }
   if(id==="job-dashboard") loadJobs();
-  if(id==="money-clean")   { document.getElementById("cleanDate").valueAsDate=new Date(); initCleanRows(); loadCleans(); }
+  if(id==="money-clean")   {
+    document.getElementById("cleanDate").valueAsDate=new Date();
+    document.getElementById("cleanItemRows").innerHTML="";
+    if(priceList.length) { addCleanRow(); } else {
+      document.getElementById("cleanItemRows").innerHTML=
+        '<p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--amber)">No item types set. Go to Settings → Money Cleaning Price List to add items.</p>';
+    }
+    loadCleans();
+  }
   if(id==="payouts")       initPayoutWeek();
   if(id==="settings")      loadSettings();
 }
 
 // ── Load gang settings on boot ──
+let jobItems = []; // {name, valuePerUnit} — set in Settings
+
 let jobTypes = [
   "Bank Heist","Store Robbery","Drug Deal","Vehicle Theft",
   "Contract Kill","Smuggling Run","Kidnapping","Protection Racket","Arms Deal","Other"
@@ -516,6 +535,8 @@ async function bootLoad() {
     if (pSnap.exists) priceList = pSnap.data().items || [];
     const jtSnap = await db.collection("settings").doc("jobtypes").get();
     if (jtSnap.exists && jtSnap.data().types?.length) jobTypes = jtSnap.data().types;
+    const jiSnap = await db.collection("settings").doc("jobitems").get();
+    if (jiSnap.exists && jiSnap.data().items?.length) jobItems = jiSnap.data().items;
     if (!priceList.length) priceList = [
       {name:"Bands",     faceValue:1000, buyRate:700},
       {name:"Marked Bills", faceValue:500,  buyRate:300},
@@ -711,8 +732,16 @@ function initCrewSlots() {
     .forEach(el=>el.addEventListener("change",updateJobPreview));
 }
 
+function calcJobGross() {
+  let total = 0;
+  document.querySelectorAll("#jobItemRows .job-item-row").forEach(row => {
+    total += +row.querySelector(".job-item-total").dataset.val || 0;
+  });
+  return total;
+}
+
 window.updateJobPreview=function(){
-  const gross=(+document.getElementById("jobCash").value||0)+(+document.getElementById("jobBands").value||0)+(+document.getElementById("jobDirty").value||0)+(+document.getElementById("jobOther").value||0);
+  const gross = calcJobGross();
   const expenses=+document.getElementById("jobExpenses").value||0;
   const net=gross-expenses;
   const gangPct=gangSettings.gangCut||0;
@@ -742,12 +771,15 @@ window.updateJobPreview=function(){
 window.saveJob=async function(){
   const date=document.getElementById("jobDate").value,type=document.getElementById("jobType").value;
   if(!date||!type){showAlert("jobAlert","error","Date and job type required.");return;}
-  const cash=+document.getElementById("jobCash").value||0;
-  const bands=+document.getElementById("jobBands").value||0;
-  const dirty=+document.getElementById("jobDirty").value||0;
-  const other=+document.getElementById("jobOther").value||0;
+  const jobItemData = [];
+  let gross = 0;
+  document.querySelectorAll("#jobItemRows .job-item-row").forEach(row => {
+    const name = row.querySelector(".job-item-type").options[row.querySelector(".job-item-type").selectedIndex]?.text.split(" —")[0] || "";
+    const qty  = +row.querySelector(".job-item-qty").value || 0;
+    const val  = +row.querySelector(".job-item-total").dataset.val || 0;
+    if (name && qty) { jobItemData.push({name, qty, val}); gross += val; }
+  });
   const expenses=+document.getElementById("jobExpenses").value||0;
-  const gross=cash+bands+dirty+other;
   const net=gross-expenses;
   const gangCut=Math.round(net*gangSettings.gangCut/100);
   const crewPot=net-gangCut;
@@ -756,7 +788,7 @@ window.saveJob=async function(){
   await db.collection("jobs").add({
     date,type,location:document.getElementById("jobLocation").value.trim(),
     status:document.getElementById("jobStatus").value,
-    cash,bands,dirty,other,expenses,gross,net,gangCut,crewPot,perHead,crew,
+    items:jobItemData,expenses,gross,net,gangCut,crewPot,perHead,crew,
     gangPct:gangSettings.gangCut,
     loggedBy:user,loggedAt:new Date().toISOString()
   });
@@ -766,7 +798,9 @@ window.saveJob=async function(){
 
 window.resetJobForm=function(){
   ["jobLocation"].forEach(id=>document.getElementById(id).value="");
-  ["jobCash","jobBands","jobDirty","jobOther","jobExpenses"].forEach(id=>document.getElementById(id).value=0);
+  document.getElementById("jobExpenses").value=0;
+  document.getElementById("jobItemRows").innerHTML="";
+  if(jobItems.length) addJobItemRow();
   document.getElementById("jobDate").valueAsDate=new Date();
   document.getElementById("jobType").value="";
   for(let i=1;i<=6;i++){const el=document.getElementById(`crew${i}`);if(el)el.value="";}
@@ -811,8 +845,13 @@ window.showJobDetail=async function(id){
       <div class="stat-card"><div class="stat-label">NET</div><div class="stat-value green" style="font-size:1.2rem">£${(j.net||0).toLocaleString()}</div></div>
       <div class="stat-card"><div class="stat-label">PER HEAD</div><div class="stat-value blood" style="font-size:1.2rem">£${(j.perHead||0).toLocaleString()}</div></div>
     </div>
-    <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">
-      CASH: £${j.cash||0} | BANDS: £${j.bands||0} | DIRTY: £${j.dirty||0} | OTHER: £${j.other||0}
+    <div style="margin-bottom:1rem">
+      <div class="stat-label" style="margin-bottom:0.4rem">ITEMS TAKEN</div>
+      ${(j.items||[]).length ? (j.items||[]).map(i=>`
+        <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:0.8rem">
+          <span style="color:var(--text-dim)">${i.qty}x ${i.name}</span>
+          <span style="color:var(--gold)">£${(i.val||0).toLocaleString()}</span>
+        </div>`).join("") : '<p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-dim)">No items logged.</p>'}
     </div>
     <div><div class="stat-label" style="margin-bottom:0.5rem">CREW CUTS</div>
     ${(j.crew||[]).map(c=>{const m=membersList.find(x=>x.id===c);const name=m?.displayName||c;
@@ -826,12 +865,6 @@ window.clearFilter=function(){document.getElementById("filterMonth").value="";do
 // ══════════════════════════════════════════════
 // MONEY CLEANING — item rows
 // ══════════════════════════════════════════════
-function initCleanRows() {
-  const container = document.getElementById("cleanItemRows");
-  if(container.children.length>0) return;
-  addCleanRow();
-}
-
 window.addCleanRow=function(){
   const container=document.getElementById("cleanItemRows");
   const idx=container.children.length;
@@ -839,7 +872,7 @@ window.addCleanRow=function(){
   const row=document.createElement("div");row.className="clean-item-row";row.dataset.idx=idx;
   row.innerHTML=`
     <div class="form-group"><label class="form-label">ITEM TYPE</label>
-      <select class="form-control clean-type" onchange="updateCleanCalc()">${options}</select>
+      <select class="form-control clean-type" onchange="updateCleanCalc()">${options.length ? options : '<option>No items — set in Settings</option>'}</select>
     </div>
     <div class="form-group"><label class="form-label">QUANTITY / UNITS</label>
       <input class="form-control clean-qty" type="number" value="1" min="0" oninput="updateCleanCalc()"/>
@@ -891,7 +924,7 @@ window.saveClean=async function(){
   showAlert("cleanAlert","success","Deal logged.");
   document.getElementById("cleanItemRows").innerHTML="";
   document.getElementById("cleanGang").value="";
-  initCleanRows();loadCleans();
+  if(priceList.length) addCleanRow(); loadCleans();
 };
 
 async function loadCleans(){
@@ -961,6 +994,94 @@ window.calcPayouts=async function(){
 // ══════════════════════════════════════════════
 // SETTINGS
 // ══════════════════════════════════════════════
+// Job item row in the job form
+window.addJobItemRow = function() {
+  const container = document.getElementById("jobItemRows");
+  if (!container) return;
+  if (!jobItems.length) {
+    container.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--amber)">No job items set. Go to Settings → Job Items to add some.</p>';
+    return;
+  }
+  const row = document.createElement("div");
+  row.className = "job-item-row";
+  row.style.cssText = "display:grid;grid-template-columns:1fr 100px 120px auto;gap:0.6rem;align-items:end";
+  const options = jobItems.map((p,i) => `<option value="${i}">${p.name} — £${p.valuePerUnit}/unit</option>`).join("");
+  row.innerHTML = `
+    <div class="form-group">
+      <label class="form-label">ITEM TYPE</label>
+      <select class="form-control job-item-type" onchange="onJobItemChange(this)">${options}</select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">QTY</label>
+      <input class="form-control job-item-qty" type="number" value="1" min="0" oninput="onJobItemChange(this)"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">VALUE (£)</label>
+      <input class="form-control job-item-total" readonly style="color:var(--gold)" data-val="0"/>
+    </div>
+    <button onclick="this.parentElement.remove();updateJobPreview();" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 0.6rem;cursor:pointer;margin-top:auto;height:42px;font-size:0.9rem">✕</button>`;
+  container.appendChild(row);
+  onJobItemChange(row.querySelector(".job-item-type"));
+};
+
+window.onJobItemChange = function(el) {
+  const row = el.closest(".job-item-row");
+  const idx = +row.querySelector(".job-item-type").value;
+  const qty = +row.querySelector(".job-item-qty").value || 0;
+  const item = jobItems[idx];
+  const val = item ? item.valuePerUnit * qty : 0;
+  const totalEl = row.querySelector(".job-item-total");
+  totalEl.value = "£" + val.toLocaleString();
+  totalEl.dataset.val = val;
+  updateJobPreview();
+};
+
+function initJobItemRows() {
+  const container = document.getElementById("jobItemRows");
+  if (!container || container.children.length > 0) return;
+  addJobItemRow();
+}
+
+// Job items settings
+function loadJobItemsUI() {
+  const container = document.getElementById("jobItemPriceRows");
+  if (!container) return;
+  container.innerHTML = jobItems.map((p,i) => `
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.6rem;align-items:end">
+      <div class="form-group"><label class="form-label">ITEM NAME</label><input class="form-control ji-name" value="${p.name}" placeholder="e.g. Gold Watch"/></div>
+      <div class="form-group"><label class="form-label">VALUE PER UNIT (£)</label><input class="form-control ji-val" type="number" value="${p.valuePerUnit}" min="0"/></div>
+      <button onclick="this.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 0.6rem;cursor:pointer;margin-top:auto;height:42px;font-size:0.9rem">✕</button>
+    </div>`).join("");
+}
+
+window.addJobItemPriceRow = function() {
+  const container = document.getElementById("jobItemPriceRows");
+  const row = document.createElement("div");
+  row.style.cssText = "display:grid;grid-template-columns:1fr 1fr auto;gap:0.6rem;align-items:end";
+  row.innerHTML = `
+    <div class="form-group"><label class="form-label">ITEM NAME</label><input class="form-control ji-name" placeholder="e.g. Gold Watch"/></div>
+    <div class="form-group"><label class="form-label">VALUE PER UNIT (£)</label><input class="form-control ji-val" type="number" value="0" min="0"/></div>
+    <button onclick="this.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 0.6rem;cursor:pointer;margin-top:auto;height:42px;font-size:0.9rem">✕</button>`;
+  container.appendChild(row);
+};
+
+window.saveJobItems = async function() {
+  const names = document.querySelectorAll(".ji-name");
+  const vals  = document.querySelectorAll(".ji-val");
+  const items = [];
+  names.forEach((n,i) => {
+    const name = n.value.trim();
+    const valuePerUnit = +vals[i].value || 0;
+    if (name) items.push({name, valuePerUnit});
+  });
+  jobItems = items;
+  await db.collection("settings").doc("jobitems").set({items, updatedBy: user});
+  showAlert("jobItemsAlert","success","Job items saved.");
+  // Refresh open job form rows
+  const jRows = document.getElementById("jobItemRows");
+  if (jRows && jRows.children.length > 0) { jRows.innerHTML=""; addJobItemRow(); }
+};
+
 function loadJobTypesUI() {
   const container = document.getElementById("jobTypeRows");
   if (!container) return;
@@ -1005,6 +1126,7 @@ async function loadSettings(){
   await loadMembers();
   loadPriceListUI();
   loadJobTypesUI();
+  loadJobItemsUI();
   updateCutPreview();
 }
 
@@ -1118,6 +1240,9 @@ window.savePriceList=async function(){
   priceList=items;
   await db.collection("settings").doc("prices").set({items,updatedBy:user,updatedAt:new Date().toISOString()});
   showAlert("priceAlert","success","Price list saved.");
+  // Refresh cleaning form dropdowns if open
+  const cleanRows = document.getElementById("cleanItemRows");
+  if(cleanRows && cleanRows.children.length > 0) { cleanRows.innerHTML=""; addCleanRow(); }
 };
 
 // ══════════════════════════════════════════════
