@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLOODLINE — Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="noise"></div>
+
+<div class="app-shell">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">🩸 BLOODLINE</div>
+    <div class="topbar-badge" id="roleTag">—</div>
+    <div class="topbar-right">
+      <div class="topbar-user">OPERATIVE: <span id="displayUser">—</span></div>
+      <button class="btn-logout" onclick="logout()">LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <!-- Populated by JS based on role -->
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- OVERVIEW (boss only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-overview">
+      <div class="page-header">
+        <h1 class="page-title">OVERVIEW</h1>
+        <span class="page-sub">BLOODLINE COMMAND CENTER</span>
+      </div>
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-label">TOTAL JOBS</div>
+          <div class="stat-value" id="statJobs">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">GROSS TAKE</div>
+          <div class="stat-value gold" id="statGross">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">CLEAN MONEY</div>
+          <div class="stat-value green" id="statClean">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">DIRTY BOUGHT</div>
+          <div class="stat-value blood" id="statDirty">—</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:1.5rem">
+        <div class="panel">
+          <div class="panel-title">📋 RECENT JOBS</div>
+          <table class="data-table">
+            <thead><tr><th>DATE</th><th>TYPE</th><th>TAKE</th><th>CREW</th></tr></thead>
+            <tbody id="overviewJobsBody"></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🗓 UPCOMING EVENTS</div>
+          <div id="overviewEvents"><p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.8rem">No upcoming events.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MY CUTS (crew only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-my-cuts">
+      <div class="page-header">
+        <h1 class="page-title">MY CUTS</h1>
+        <span class="page-sub" id="crewSubtitle">YOUR EARNINGS</span>
+      </div>
+      <div class="grid-3" style="margin-bottom:1.5rem">
+        <div class="stat-card">
+          <div class="stat-label">TOTAL JOBS</div>
+          <div class="stat-value" id="myStatJobs">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">TOTAL EARNED</div>
+          <div class="stat-value green" id="myStatTotal">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">THIS MONTH</div>
+          <div class="stat-value gold" id="myStatMonth">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">💸 EARNINGS BREAKDOWN</div>
+        <div id="myCutsBreakdown"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- CALENDAR (both) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-calendar">
+      <div class="page-header">
+        <h1 class="page-title">CALENDAR</h1>
+        <span class="page-sub">EVENTS & MEETINGS</span>
+      </div>
+      <div class="panel">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+          <div class="cal-nav-title" id="calTitle">—</div>
+          <button class="cal-nav-btn" onclick="calNext()">›</button>
+          <button class="btn btn-danger boss-only" style="margin-left:auto;display:none" onclick="openEventModal()">+ ADD EVENT</button>
+        </div>
+        <div class="calendar-grid" id="calGrid"></div>
+      </div>
+      <!-- Crew: upcoming list -->
+      <div class="panel crew-only" style="margin-top:1rem;display:none">
+        <div class="panel-title">🗓 UPCOMING</div>
+        <div id="upcomingList"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- RECIPES (both) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-recipes">
+      <div class="page-header">
+        <h1 class="page-title">RECIPES</h1>
+        <span class="page-sub">CRAFTING CATALOGUE</span>
+      </div>
+      <!-- Boss: add form -->
+      <div class="panel boss-only" style="display:none">
+        <div class="panel-title">➕ NEW RECIPE</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ITEM NAME</label>
+            <input class="form-control" id="recName" placeholder="e.g. Sticky Bomb"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">CATEGORY</label>
+            <select class="form-control" id="recCat">
+              <option value="weapon">⚔ Weapon</option>
+              <option value="drug">💊 Drug</option>
+              <option value="gear">🔧 Gear</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">INGREDIENTS (one per line)</label>
+            <textarea class="form-control" id="recIngredients" placeholder="2× Gunpowder&#10;1× Metal Pipe"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">YIELD / OUTPUT</label>
+            <input class="form-control" id="recYield" placeholder="e.g. 5 units"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">STREET VALUE (£)</label>
+            <input class="form-control" id="recValue" type="number" placeholder="0"/>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-danger" onclick="saveRecipe()">SAVE RECIPE</button>
+        </div>
+        <div id="recipeAlert" class="alert hidden"></div>
+      </div>
+      <div class="recipe-grid" id="recipeGrid"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- CONSTITUTION (both) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-constitution">
+      <div class="page-header">
+        <h1 class="page-title">CONSTITUTION</h1>
+        <span class="page-sub">CODE OF CONDUCT</span>
+      </div>
+      <!-- Boss edit bar -->
+      <div class="panel boss-only" style="display:none;margin-bottom:1rem;padding:1rem 1.5rem">
+        <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap">
+          <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-right:auto">👑 BOSS EDIT MODE</span>
+          <span class="save-indicator" id="saveIndicator" style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);opacity:0;transition:opacity 0.3s;letter-spacing:0.15em">✓ SAVED</span>
+          <button class="btn btn-ghost" onclick="togglePreambleEdit()">EDIT PREAMBLE</button>
+          <button class="btn btn-danger" onclick="toggleEditMode()" id="editModeBtn">ENABLE EDITING</button>
+        </div>
+      </div>
+
+      <div style="max-width:860px;margin:0 auto">
+        <div style="text-align:center;padding:2rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem">
+          <div style="font-family:var(--font-display);font-size:3rem;letter-spacing:0.3em;color:var(--blood);text-shadow:0 0 30px var(--blood-glow)">BLOODLINE</div>
+          <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.35em;color:var(--text-dim);margin-top:0.4rem">GANG CONSTITUTION & CODE OF CONDUCT</div>
+          <div style="font-family:var(--font-body);font-size:1rem;font-style:italic;color:var(--gold);margin-top:0.6rem;font-weight:600">"Blood makes you related, Loyalty makes you Family."</div>
+          <div style="display:flex;justify-content:center;gap:2rem;margin-top:1rem">
+            <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim)">VERSION: <b style="color:var(--text-bright)">1.0</b></span>
+            <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim)">AMENDED: <b style="color:var(--text-bright)" id="metaAmended">—</b></span>
+          </div>
+        </div>
+
+        <div id="preambleDisplay" style="background:var(--bg3);border:1px solid var(--border);border-left:4px solid var(--blood);padding:1.2rem 1.5rem;margin-bottom:2rem;font-family:var(--font-body);font-size:0.95rem;line-height:1.7;color:var(--text-dim);font-style:italic">
+          We, the members of <strong style="color:var(--text-bright);font-style:normal">Bloodline</strong>, bind ourselves to this constitution as the foundation of our family. Every member who takes the oath accepts these rules without exception. Loyalty is not given freely — it is earned through action, silence, and sacrifice. This document governs how we operate, how we treat one another, and what we stand for. To break these rules is to break the family.
+        </div>
+        <textarea id="preambleEdit" style="display:none;width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text-bright);font-family:var(--font-body);font-size:0.95rem;padding:0.8rem;min-height:100px;resize:vertical;outline:none" oninput="autoSavePreamble()"></textarea>
+
+        <div id="constitutionSections"></div>
+
+        <div style="text-align:center;padding:2rem 0;border-top:1px solid var(--border);margin-top:2rem">
+          <div style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.3em;color:var(--text-dim)">SWORN & SEALED</div>
+          <div style="width:200px;height:1px;background:var(--border);margin:1rem auto"></div>
+          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--blood);letter-spacing:0.2em">🩸 BLOODLINE — BY BLOOD, BY BOND 🩸</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- JOB FORM (boss only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-job-form">
+      <div class="page-header">
+        <h1 class="page-title">LOG A JOB</h1>
+        <span class="page-sub">RECORD WHAT WENT DOWN</span>
+      </div>
+      <div class="panel">
+        <div class="panel-title">📋 JOB DETAILS</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">DATE OF JOB</label>
+            <input class="form-control" type="date" id="jobDate"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">JOB TYPE</label>
+            <select class="form-control" id="jobType">
+              <option value="">— Select Type —</option>
+              <option>Bank Heist</option>
+              <option>Store Robbery</option>
+              <option>Drug Deal</option>
+              <option>Vehicle Theft</option>
+              <option>Contract Kill</option>
+              <option>Smuggling Run</option>
+              <option>Kidnapping</option>
+              <option>Protection Racket</option>
+              <option>Arms Deal</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">LOCATION</label>
+            <input class="form-control" id="jobLocation" placeholder="e.g. Downtown, The Docks"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">STATUS</label>
+            <select class="form-control" id="jobStatus">
+              <option value="success">✅ Success</option>
+              <option value="partial">⚠ Partial</option>
+              <option value="failed">❌ Failed</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-title" style="margin-top:1.5rem">💰 TAKE</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">CASH (£)</label><input class="form-control" type="number" id="jobCash" value="0" min="0"/></div>
+          <div class="form-group"><label class="form-label">DRUGS VALUE (£)</label><input class="form-control" type="number" id="jobDrugs" value="0" min="0"/></div>
+          <div class="form-group"><label class="form-label">WEAPONS VALUE (£)</label><input class="form-control" type="number" id="jobWeapons" value="0" min="0"/></div>
+          <div class="form-group"><label class="form-label">VEHICLES VALUE (£)</label><input class="form-control" type="number" id="jobVehicles" value="0" min="0"/></div>
+          <div class="form-group"><label class="form-label">OTHER VALUE (£)</label><input class="form-control" type="number" id="jobOther" value="0" min="0"/></div>
+          <div class="form-group"><label class="form-label">EXPENSES / HEAT (£)</label><input class="form-control" type="number" id="jobExpenses" value="0" min="0"/></div>
+        </div>
+        <div class="panel-title" style="margin-top:1.5rem">👥 CREW ON THE JOB (up to 6)</div>
+        <div class="form-grid-3" id="crewSlots"></div>
+        <div class="form-group" style="margin-top:1rem;max-width:200px">
+          <label class="form-label">BOSS CUT (%)</label>
+          <input class="form-control" type="number" id="jobBossCut" value="30" min="0" max="100"/>
+        </div>
+        <div class="form-group" style="margin-top:1rem">
+          <label class="form-label">NOTES</label>
+          <textarea class="form-control" id="jobNotes" placeholder="What happened? Any heat? Casualties?"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-danger" onclick="saveJob()">SUBMIT JOB REPORT</button>
+          <button class="btn btn-ghost" onclick="resetJobForm()">CLEAR</button>
+        </div>
+        <div id="jobAlert" class="alert hidden"></div>
+        <div class="panel" style="margin-top:1.5rem;background:var(--bg3)">
+          <div class="panel-title">💸 LIVE PAYOUT PREVIEW</div>
+          <div id="payoutPreview" style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-dim)">Fill in the job details to see cuts...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- JOB RECORDS (boss only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-job-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">JOB RECORDS</h1>
+        <span class="page-sub">ALL OPERATIONS</span>
+      </div>
+      <div class="panel">
+        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+          <div class="form-group" style="min-width:150px">
+            <label class="form-label">FILTER BY DATE</label>
+            <input class="form-control" type="month" id="filterMonth"/>
+          </div>
+          <div class="form-group" style="min-width:150px">
+            <label class="form-label">FILTER BY PERSON</label>
+            <input class="form-control" type="text" id="filterPerson" placeholder="handle..."/>
+          </div>
+          <button class="btn btn-ghost" style="margin-top:auto" onclick="loadJobs()">FILTER</button>
+          <button class="btn btn-ghost" style="margin-top:auto" onclick="clearFilter()">CLEAR</button>
+        </div>
+        <div class="grid-3" style="margin-bottom:1.5rem">
+          <div class="stat-card"><div class="stat-label">FILTERED JOBS</div><div class="stat-value" id="filtStatJobs">0</div></div>
+          <div class="stat-card"><div class="stat-label">FILTERED GROSS</div><div class="stat-value gold" id="filtStatGross">£0</div></div>
+          <div class="stat-card"><div class="stat-label">FILTERED NET</div><div class="stat-value green" id="filtStatNet">£0</div></div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>DATE</th><th>TYPE</th><th>LOCATION</th><th>GROSS</th><th>NET</th><th>STATUS</th><th>CREW</th><th>ACTIONS</th></tr></thead>
+          <tbody id="jobsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MY JOBS (crew only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-my-jobs">
+      <div class="page-header">
+        <h1 class="page-title">MY JOBS</h1>
+        <span class="page-sub">OPERATIONS YOU WERE ON</span>
+      </div>
+      <div class="panel">
+        <div style="display:flex;gap:1rem;margin-bottom:1rem">
+          <div class="form-group">
+            <label class="form-label">FILTER BY MONTH</label>
+            <input class="form-control" type="month" id="myJobMonth"/>
+          </div>
+          <button class="btn btn-ghost" style="margin-top:auto" onclick="loadMyJobs()">FILTER</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>DATE</th><th>TYPE</th><th>LOCATION</th><th>STATUS</th><th>YOUR CUT</th></tr></thead>
+          <tbody id="myJobsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MONEY CLEANING (boss only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-money-clean">
+      <div class="page-header">
+        <h1 class="page-title">MONEY CLEANING</h1>
+        <span class="page-sub">BUYING DIRTY MONEY FROM OTHER GANGS</span>
+      </div>
+      <div class="panel">
+        <div class="panel-title">🏦 NEW CLEANING DEAL</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">DATE</label><input class="form-control" type="date" id="cleanDate"/></div>
+          <div class="form-group"><label class="form-label">SELLER GANG</label><input class="form-control" id="cleanGang" placeholder="e.g. Los Santos Cartel"/></div>
+          <div class="form-group"><label class="form-label">DIRTY AMOUNT (£)</label><input class="form-control" type="number" id="cleanDirty" value="0" oninput="updateCleanCalc()"/></div>
+          <div class="form-group"><label class="form-label">BUY RATE (%)</label><input class="form-control" type="number" id="cleanRate" value="70" min="1" max="100" oninput="updateCleanCalc()"/></div>
+          <div class="form-group"><label class="form-label">WE PAY THEM (£)</label><input class="form-control" id="cleanWePay" readonly style="color:var(--blood)"/></div>
+          <div class="form-group"><label class="form-label">OUR PROFIT (£)</label><input class="form-control" id="cleanProfit" readonly style="color:var(--green)"/></div>
+          <div class="form-group">
+            <label class="form-label">CLEANING METHOD</label>
+            <select class="form-control" id="cleanMethod">
+              <option>Fake Business</option><option>Casino</option><option>Property Deal</option>
+              <option>Crypto Exchange</option><option>Offshore Transfer</option><option>Smurfing</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">CONTACT / BROKER</label><input class="form-control" id="cleanContact" placeholder="Who brokered this?"/></div>
+          <div class="form-group form-full"><label class="form-label">NOTES</label><textarea class="form-control" id="cleanNotes" placeholder="Any conditions, risks, follow-up needed..."></textarea></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-gold" onclick="saveClean()">LOG CLEANING DEAL</button></div>
+        <div id="cleanAlert" class="alert hidden"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">📜 CLEANING RECORDS</div>
+        <table class="data-table">
+          <thead><tr><th>DATE</th><th>GANG</th><th>DIRTY £</th><th>RATE</th><th>WE PAID</th><th>PROFIT</th><th>METHOD</th></tr></thead>
+          <tbody id="cleanTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PAYOUTS (boss only) -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="page-section" id="sec-payouts">
+      <div class="page-header">
+        <h1 class="page-title">CREW PAYOUTS</h1>
+        <span class="page-sub">WHAT EVERYONE IS OWED</span>
+      </div>
+      <div class="panel">
+        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+          <div class="form-group">
+            <label class="form-label">PERIOD</label>
+            <input class="form-control" type="month" id="payoutMonth"/>
+          </div>
+          <button class="btn btn-danger" style="margin-top:auto" onclick="calcPayouts()">CALCULATE</button>
+        </div>
+        <div id="payoutList"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal-backdrop hidden" id="eventModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEventModal()">✕</button>
+    <div class="modal-title">ADD EVENT</div>
+    <div class="form-group" style="margin-bottom:0.8rem"><label class="form-label">TITLE</label><input class="form-control" id="evTitle" placeholder="Meeting / Op Name"/></div>
+    <div class="form-group" style="margin-bottom:0.8rem"><label class="form-label">DATE</label><input class="form-control" type="date" id="evDate"/></div>
+    <div class="form-group" style="margin-bottom:0.8rem">
+      <label class="form-label">TYPE</label>
+      <select class="form-control" id="evType">
+        <option value="event">📍 Operation / Event</option>
+        <option value="meeting">🤝 Meeting</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:1rem"><label class="form-label">NOTES</label><textarea class="form-control" id="evNotes" placeholder="Location, who to bring..."></textarea></div>
+    <button class="btn btn-danger" style="width:100%" onclick="saveEvent()">SAVE EVENT</button>
+  </div>
+</div>
+
+<!-- JOB DETAIL MODAL -->
+<div class="modal-backdrop hidden" id="jobDetailModal">
+  <div class="modal" style="max-width:600px">
+    <button class="modal-close" onclick="document.getElementById('jobDetailModal').classList.add('hidden')">✕</button>
+    <div class="modal-title">JOB DETAIL</div>
+    <div id="jobDetailContent"></div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // ============================================================
+  // PASTE YOUR FIREBASE CONFIG HERE
+  // ============================================================
+  const FIREBASE_CONFIG = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // ============================================================
+
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const db = firebase.firestore();
+
+  // ── Auth guard ──
+  const role    = sessionStorage.getItem("bl_role");
+  const user    = sessionStorage.getItem("bl_user");
+  const display = sessionStorage.getItem("bl_display");
+  if (!role || !user) { window.location.href = "../index.html"; }
+
+  const isBoss = role === "boss";
+  const isCrew = role === "crew";
+
+  // ── Set topbar ──
+  document.getElementById("displayUser").textContent = (display || user || "UNKNOWN").toUpperCase();
+  document.getElementById("roleTag").textContent = isBoss ? "BOSS" : "CREW";
+  document.getElementById("roleTag").style.background = isBoss ? "var(--blood)" : "var(--gold-dim)";
+  if (isCrew) document.getElementById("crewSubtitle").textContent = (display || user).toUpperCase() + "'S EARNINGS";
+
+  // ── Show/hide role-specific elements ──
+  document.querySelectorAll(".boss-only").forEach(el => el.style.display = isBoss ? "" : "none");
+  document.querySelectorAll(".crew-only").forEach(el => el.style.display = isCrew ? "" : "none");
+
+  // ── Build sidebar based on role ──
+  const BOSS_NAV = [
+    { section: "INTEL" },
+    { id: "overview",       icon: "📊", label: "Overview" },
+    { id: "calendar",       icon: "📅", label: "Calendar" },
+    { id: "recipes",        icon: "🧪", label: "Recipes" },
+    { id: "constitution",   icon: "📜", label: "Constitution" },
+    { section: "OPERATIONS" },
+    { id: "job-form",       icon: "💼", label: "Log a Job" },
+    { id: "job-dashboard",  icon: "📋", label: "Job Records" },
+    { section: "FINANCE" },
+    { id: "money-clean",    icon: "💵", label: "Money Cleaning" },
+    { id: "payouts",        icon: "💰", label: "Crew Payouts" },
+  ];
+
+  const CREW_NAV = [
+    { section: "INTEL" },
+    { id: "my-cuts",      icon: "💰", label: "My Cuts" },
+    { id: "calendar",     icon: "📅", label: "Calendar" },
+    { id: "recipes",      icon: "🧪", label: "Recipes" },
+    { id: "constitution", icon: "📜", label: "Constitution" },
+    { section: "OPERATIONS" },
+    { id: "my-jobs",      icon: "📋", label: "My Jobs" },
+  ];
+
+  const nav = isBoss ? BOSS_NAV : CREW_NAV;
+  const sidebar = document.getElementById("sidebar");
+  nav.forEach(item => {
+    if (item.section) {
+      const d = document.createElement("div");
+      d.className = "nav-section";
+      d.textContent = item.section;
+      sidebar.appendChild(d);
+    } else {
+      const btn = document.createElement("button");
+      btn.className = "nav-item";
+      btn.dataset.section = item.id;
+      btn.innerHTML = `<span class="nav-icon">${item.icon}</span> ${item.label}`;
+      btn.onclick = () => showSection(item.id, btn);
+      sidebar.appendChild(btn);
+    }
+  });
+
+  // ── Navigation ──
+  function showSection(id, btn) {
+    document.querySelectorAll(".page-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    const sec = document.getElementById("sec-" + id);
+    if (sec) sec.classList.add("active");
+    if (btn) btn.classList.add("active");
+
+    if (id === "overview")      loadOverview();
+    if (id === "my-cuts")       loadMyCuts();
+    if (id === "calendar")      renderCalendar();
+    if (id === "recipes")       loadRecipes();
+    if (id === "constitution")  loadConstitution();
+    if (id === "job-dashboard") loadJobs();
+    if (id === "money-clean")   { loadCleans(); document.getElementById("cleanDate").valueAsDate = new Date(); }
+    if (id === "payouts")       { const d = new Date(); document.getElementById("payoutMonth").value = d.toISOString().slice(0,7); }
+  }
+
+  // Auto-navigate to correct home section
+  window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
+
+  // Activate first nav item
+  const firstBtn = sidebar.querySelector(".nav-item");
+  if (firstBtn) firstBtn.click();
+
+  // ── Set default date fields ──
+  if (document.getElementById("jobDate")) document.getElementById("jobDate").valueAsDate = new Date();
+
+  // ══════════════════════════════════════════════
+  // CREW SLOTS (boss job form)
+  // ══════════════════════════════════════════════
+  if (isBoss) {
+    const crewSlots = document.getElementById("crewSlots");
+    for (let i = 1; i <= 6; i++) {
+      crewSlots.innerHTML += `<div class="form-group"><label class="form-label">CREW MEMBER ${i}</label><input class="form-control" id="crew${i}" placeholder="handle or leave blank"/></div>`;
+    }
+    ["jobCash","jobDrugs","jobWeapons","jobVehicles","jobOther","jobExpenses","jobBossCut",
+      ...Array.from({length:6},(_,i)=>`crew${i+1}`)
+    ].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", updatePayoutPreview);
+    });
+  }
+
+  function updatePayoutPreview() {
+    const gross = ["jobCash","jobDrugs","jobWeapons","jobVehicles","jobOther"].reduce((s,id)=>s+(+document.getElementById(id).value||0),0);
+    const expenses = +document.getElementById("jobExpenses").value||0;
+    const bossPct  = +document.getElementById("jobBossCut").value||0;
+    const net      = gross - expenses;
+    const bossCut  = net * bossPct / 100;
+    const remainder= net - bossCut;
+    const crew     = Array.from({length:6},(_,i)=>document.getElementById(`crew${i+1}`).value.trim()).filter(Boolean);
+    const perHead  = crew.length > 0 ? remainder / crew.length : 0;
+    let html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.8rem">
+      <div>GROSS: <span style="color:var(--gold)">£${gross.toLocaleString()}</span></div>
+      <div>EXPENSES: <span style="color:var(--blood)">-£${expenses.toLocaleString()}</span></div>
+      <div>NET: <span style="color:var(--text-bright)">£${net.toLocaleString()}</span></div>
+      <div>BOSS (${bossPct}%): <span style="color:var(--gold)">£${bossCut.toLocaleString()}</span></div>
+      <div>CREW POT: <span style="color:var(--green)">£${remainder.toLocaleString()}</span></div>
+      <div>PER HEAD: <span style="color:var(--green)">£${perHead.toLocaleString()}</span></div>
+    </div>`;
+    if (crew.length) {
+      html += `<div style="border-top:1px solid var(--border);padding-top:0.5rem">`;
+      crew.forEach(c => { html += `<div style="display:flex;justify-content:space-between;padding:0.2rem 0"><span>${c.toUpperCase()}</span><span style="color:var(--green)">£${Math.round(perHead).toLocaleString()}</span></div>`; });
+      html += `</div>`;
+    }
+    document.getElementById("payoutPreview").innerHTML = html;
+  }
+
+  // ══════════════════════════════════════════════
+  // OVERVIEW
+  // ══════════════════════════════════════════════
+  async function loadOverview() {
+    const [jobsSnap, cleansSnap, eventsSnap] = await Promise.all([
+      db.collection("jobs").orderBy("date","desc").get(),
+      db.collection("cleans").get(),
+      db.collection("events").orderBy("date").get()
+    ]);
+    const jobs   = jobsSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const cleans = cleansSnap.docs.map(d=>d.data());
+    let gross=0, clean=0, dirty=0;
+    jobs.forEach(j=>{gross+=j.gross||0;});
+    cleans.forEach(c=>{clean+=c.profit||0; dirty+=c.dirtyAmount||0;});
+    document.getElementById("statJobs").textContent  = jobs.length;
+    document.getElementById("statGross").textContent = "£"+gross.toLocaleString();
+    document.getElementById("statClean").textContent = "£"+clean.toLocaleString();
+    document.getElementById("statDirty").textContent = "£"+dirty.toLocaleString();
+    document.getElementById("overviewJobsBody").innerHTML = jobs.slice(0,5).map(j=>`
+      <tr><td class="mono">${j.date||"—"}</td><td>${j.type||"—"}</td>
+      <td class="mono" style="color:var(--gold)">£${(j.gross||0).toLocaleString()}</td>
+      <td><span class="badge">${(j.crew||[]).length} OPS</span></td></tr>`).join("");
+    const today = new Date().toISOString().slice(0,10);
+    const upcoming = eventsSnap.docs.map(d=>d.data()).filter(e=>e.date>=today).slice(0,5);
+    document.getElementById("overviewEvents").innerHTML = upcoming.length
+      ? upcoming.map(e=>`<div style="display:flex;gap:0.8rem;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+          <span class="badge ${e.type==='meeting'?'gold':''}">${e.type==='meeting'?'MEETING':'EVENT'}</span>
+          <span style="font-weight:700">${e.title}</span>
+          <span style="margin-left:auto;font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim)">${e.date}</span>
+        </div>`).join("")
+      : `<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.8rem">No upcoming events.</p>`;
+  }
+
+  // ══════════════════════════════════════════════
+  // MY CUTS (crew)
+  // ══════════════════════════════════════════════
+  async function loadMyCuts() {
+    const snap = await db.collection("jobs").orderBy("date","desc").get();
+    const myJobs = snap.docs.map(d=>d.data()).filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
+    const now    = new Date();
+    const month  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const thisMonth = myJobs.filter(j=>j.date&&j.date.startsWith(month));
+    const total     = myJobs.reduce((s,j)=>s+(j.perHead||0),0);
+    const monthTotal= thisMonth.reduce((s,j)=>s+(j.perHead||0),0);
+    document.getElementById("myStatJobs").textContent  = myJobs.length;
+    document.getElementById("myStatTotal").textContent = "£"+total.toLocaleString();
+    document.getElementById("myStatMonth").textContent = "£"+monthTotal.toLocaleString();
+    document.getElementById("myCutsBreakdown").innerHTML = myJobs.length
+      ? myJobs.map(j=>`<div style="display:flex;align-items:center;gap:1rem;padding:0.7rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+          <span class="mono" style="color:var(--text-dim);min-width:100px">${j.date}</span>
+          <span style="font-weight:700;flex:1">${j.type}</span>
+          <span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span>
+          <span style="font-family:var(--font-mono);color:var(--green)">£${(j.perHead||0).toLocaleString()}</span>
+        </div>`).join("")
+      : `<p style="color:var(--text-dim);font-family:var(--font-mono)">You haven't been on any jobs yet.</p>`;
+  }
+
+  // ══════════════════════════════════════════════
+  // MY JOBS (crew)
+  // ══════════════════════════════════════════════
+  window.loadMyJobs = async function() {
+    const snap = await db.collection("jobs").orderBy("date","desc").get();
+    let jobs = snap.docs.map(d=>d.data()).filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
+    const mf = document.getElementById("myJobMonth").value;
+    if (mf) jobs = jobs.filter(j=>j.date&&j.date.startsWith(mf));
+    const tbody = document.getElementById("myJobsBody");
+    tbody.innerHTML = jobs.length
+      ? jobs.map(j=>`<tr>
+          <td class="mono">${j.date}</td><td>${j.type}</td><td>${j.location||"—"}</td>
+          <td><span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span></td>
+          <td class="mono" style="color:var(--green)">£${(j.perHead||0).toLocaleString()}</td>
+        </tr>`).join("")
+      : `<tr><td colspan="5" style="text-align:center;color:var(--text-dim);font-family:var(--font-mono);padding:2rem">No jobs found.</td></tr>`;
+  };
+
+  // ══════════════════════════════════════════════
+  // CALENDAR
+  // ══════════════════════════════════════════════
+  let calDate = new Date(), calEvents = [];
+
+  async function fetchEvents() {
+    const snap = await db.collection("events").get();
+    calEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
+
+  window.renderCalendar = async function() {
+    await fetchEvents();
+    const y=calDate.getFullYear(), m=calDate.getMonth();
+    document.getElementById("calTitle").textContent = calDate.toLocaleString("en-GB",{month:"long",year:"numeric"}).toUpperCase();
+    const days=["MON","TUE","WED","THU","FRI","SAT","SUN"];
+    let html=days.map(d=>`<div class="cal-header">${d}</div>`).join("");
+    const first=new Date(y,m,1);
+    let startDay=first.getDay()-1; if(startDay<0)startDay=6;
+    const inMonth=new Date(y,m+1,0).getDate();
+    const today=new Date().toISOString().slice(0,10);
+    for(let i=0;i<startDay;i++){const d=new Date(y,m,-startDay+i+1).getDate();html+=`<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;}
+    for(let d=1;d<=inMonth;d++){
+      const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dayEv=calEvents.filter(e=>e.date===ds);
+      const click=isBoss?`onclick="openEventModal('${ds}')"`:'';
+      html+=`<div class="cal-day${ds===today?' today':''}" ${click}>
+        <div class="cal-day-num">${d}</div>
+        ${dayEv.map(e=>`<div class="cal-event${e.type==='meeting'?' meeting':''}">${e.title}</div>`).join("")}
+      </div>`;
+    }
+    document.getElementById("calGrid").innerHTML=html;
+    if (isCrew) {
+      const todayStr=new Date().toISOString().slice(0,10);
+      const upcoming=calEvents.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,10);
+      document.getElementById("upcomingList").innerHTML=upcoming.length
+        ? upcoming.map(e=>`<div style="display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--border)">
+            <span class="badge ${e.type==='meeting'?'gold':''}">${e.type==='meeting'?'MEETING':'EVENT'}</span>
+            <span style="font-weight:700">${e.title}</span>
+            ${e.notes?`<span style="color:var(--text-dim);font-size:0.8rem">${e.notes}</span>`:''}
+            <span style="margin-left:auto;font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim)">${e.date}</span>
+          </div>`).join("")
+        : `<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.8rem">Nothing scheduled.</p>`;
+    }
+  };
+
+  window.calPrev=()=>{calDate.setMonth(calDate.getMonth()-1);renderCalendar();};
+  window.calNext=()=>{calDate.setMonth(calDate.getMonth()+1);renderCalendar();};
+  window.openEventModal=function(date=""){
+    document.getElementById("evTitle").value="";
+    document.getElementById("evDate").value=date||new Date().toISOString().slice(0,10);
+    document.getElementById("evNotes").value="";
+    document.getElementById("eventModal").classList.remove("hidden");
+  };
+  window.closeEventModal=()=>document.getElementById("eventModal").classList.add("hidden");
+  window.saveEvent=async function(){
+    const title=document.getElementById("evTitle").value.trim();
+    const date=document.getElementById("evDate").value;
+    if(!title||!date)return;
+    await db.collection("events").add({title,date,type:document.getElementById("evType").value,notes:document.getElementById("evNotes").value.trim(),createdBy:user});
+    closeEventModal();renderCalendar();
+  };
+
+  // ══════════════════════════════════════════════
+  // RECIPES
+  // ══════════════════════════════════════════════
+  window.loadRecipes=async function(){
+    const snap=await db.collection("recipes").get();
+    const grid=document.getElementById("recipeGrid");
+    grid.innerHTML=snap.empty
+      ? `<p style="color:var(--text-dim);font-family:var(--font-mono)">No recipes yet.</p>`
+      : snap.docs.map(d=>{
+          const r=d.data();
+          const ings=(r.ingredients||"").split("\n").filter(Boolean);
+          const delBtn=isBoss?`<button class="recipe-del" onclick="deleteRecipe('${d.id}')">🗑</button>`:'';
+          return `<div class="recipe-card">
+            <div class="recipe-card-tag ${r.category==='weapon'?'weapon':''}">${r.category?.toUpperCase()||"ITEM"}</div>
+            <div class="recipe-card-name">${r.name}</div>
+            <ul class="recipe-ingredients">${ings.map(i=>`<li>${i}</li>`).join("")}</ul>
+            <div class="recipe-yield">YIELD: ${r.yield||"?"} &nbsp;|&nbsp; VALUE: £${(+r.value||0).toLocaleString()}</div>
+            ${delBtn}
+          </div>`;
+        }).join("");
+  };
+  window.saveRecipe=async function(){
+    const name=document.getElementById("recName").value.trim();
+    if(!name){showAlert("recipeAlert","error","Enter an item name.");return;}
+    await db.collection("recipes").add({name,category:document.getElementById("recCat").value,ingredients:document.getElementById("recIngredients").value.trim(),yield:document.getElementById("recYield").value.trim(),value:+document.getElementById("recValue").value||0,createdBy:user});
+    showAlert("recipeAlert","success","Recipe saved.");
+    ["recName","recIngredients","recYield"].forEach(id=>document.getElementById(id).value="");
+    document.getElementById("recValue").value=0;
+    loadRecipes();
+  };
+  window.deleteRecipe=async function(id){
+    if(!confirm("Delete this recipe?"))return;
+    await db.collection("recipes").doc(id).delete();
+    loadRecipes();
+  };
+
+  // ══════════════════════════════════════════════
+  // JOB FORM (boss)
+  // ══════════════════════════════════════════════
+  window.saveJob=async function(){
+    const date=document.getElementById("jobDate").value;
+    const type=document.getElementById("jobType").value;
+    if(!date||!type){showAlert("jobAlert","error","Date and job type required.");return;}
+    const cash=+document.getElementById("jobCash").value||0;
+    const drugs=+document.getElementById("jobDrugs").value||0;
+    const weapons=+document.getElementById("jobWeapons").value||0;
+    const vehicles=+document.getElementById("jobVehicles").value||0;
+    const other=+document.getElementById("jobOther").value||0;
+    const expenses=+document.getElementById("jobExpenses").value||0;
+    const bossPct=+document.getElementById("jobBossCut").value||0;
+    const gross=cash+drugs+weapons+vehicles+other;
+    const net=gross-expenses;
+    const bossCut=Math.round(net*bossPct/100);
+    const crewPot=net-bossCut;
+    const crew=Array.from({length:6},(_,i)=>document.getElementById(`crew${i+1}`).value.trim()).filter(Boolean);
+    const perHead=crew.length?Math.round(crewPot/crew.length):0;
+    await db.collection("jobs").add({date,type,location:document.getElementById("jobLocation").value.trim(),status:document.getElementById("jobStatus").value,cash,drugs,weapons,vehicles,other,expenses,gross,net,bossPct,bossCut,crewPot,perHead,crew,notes:document.getElementById("jobNotes").value.trim(),loggedBy:user,loggedAt:new Date().toISOString()});
+    showAlert("jobAlert","success","Job logged. Stay quiet.");
+    resetJobForm();
+  };
+  window.resetJobForm=function(){
+    ["jobLocation","jobNotes"].forEach(id=>document.getElementById(id).value="");
+    ["jobCash","jobDrugs","jobWeapons","jobVehicles","jobOther","jobExpenses"].forEach(id=>document.getElementById(id).value=0);
+    document.getElementById("jobBossCut").value=30;
+    document.getElementById("jobDate").valueAsDate=new Date();
+    document.getElementById("jobType").value="";
+    for(let i=1;i<=6;i++)document.getElementById(`crew${i}`).value="";
+    document.getElementById("payoutPreview").innerHTML="Fill in the job details to see cuts...";
+  };
+
+  // ══════════════════════════════════════════════
+  // JOB RECORDS (boss)
+  // ══════════════════════════════════════════════
+  window.loadJobs=async function(){
+    const snap=await db.collection("jobs").orderBy("date","desc").get();
+    let jobs=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const mf=document.getElementById("filterMonth").value;
+    const pf=document.getElementById("filterPerson").value.trim().toLowerCase();
+    if(mf)jobs=jobs.filter(j=>j.date&&j.date.startsWith(mf));
+    if(pf)jobs=jobs.filter(j=>(j.crew||[]).some(c=>c.toLowerCase().includes(pf)));
+    document.getElementById("filtStatJobs").textContent=jobs.length;
+    document.getElementById("filtStatGross").textContent="£"+jobs.reduce((s,j)=>s+(j.gross||0),0).toLocaleString();
+    document.getElementById("filtStatNet").textContent="£"+jobs.reduce((s,j)=>s+(j.net||0),0).toLocaleString();
+    const tbody=document.getElementById("jobsTableBody");
+    tbody.innerHTML=jobs.length
+      ? jobs.map(j=>`<tr>
+          <td class="mono">${j.date||"—"}</td><td>${j.type||"—"}</td><td>${j.location||"—"}</td>
+          <td class="mono" style="color:var(--gold)">£${(j.gross||0).toLocaleString()}</td>
+          <td class="mono" style="color:var(--green)">£${(j.net||0).toLocaleString()}</td>
+          <td><span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span></td>
+          <td>${(j.crew||[]).join(", ")||"—"}</td>
+          <td><button class="btn btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.6rem" onclick="showJobDetail('${j.id}')">VIEW</button></td>
+        </tr>`).join("")
+      : `<tr><td colspan="8" style="color:var(--text-dim);text-align:center;padding:2rem;font-family:var(--font-mono)">No jobs found.</td></tr>`;
+  };
+  window.showJobDetail=async function(id){
+    const snap=await db.collection("jobs").doc(id).get();
+    const j=snap.data(); if(!j)return;
+    document.getElementById("jobDetailContent").innerHTML=`
+      <div class="grid-2" style="margin-bottom:1rem">
+        <div><div class="stat-label">DATE</div><div style="font-weight:700">${j.date}</div></div>
+        <div><div class="stat-label">TYPE</div><div style="font-weight:700">${j.type}</div></div>
+        <div><div class="stat-label">LOCATION</div><div style="font-weight:700">${j.location||"—"}</div></div>
+        <div><div class="stat-label">STATUS</div><div style="font-weight:700">${j.status?.toUpperCase()}</div></div>
+      </div>
+      <div class="grid-3" style="margin-bottom:1rem">
+        <div class="stat-card"><div class="stat-label">GROSS</div><div class="stat-value gold" style="font-size:1.2rem">£${(j.gross||0).toLocaleString()}</div></div>
+        <div class="stat-card"><div class="stat-label">NET</div><div class="stat-value green" style="font-size:1.2rem">£${(j.net||0).toLocaleString()}</div></div>
+        <div class="stat-card"><div class="stat-label">BOSS CUT</div><div class="stat-value blood" style="font-size:1.2rem">£${(j.bossCut||0).toLocaleString()}</div></div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-dim);margin-bottom:1rem">
+        CASH: £${j.cash||0} | DRUGS: £${j.drugs||0} | WEAPONS: £${j.weapons||0} | VEHICLES: £${j.vehicles||0} | OTHER: £${j.other||0}
+      </div>
+      <div style="margin-bottom:1rem">
+        <div class="stat-label" style="margin-bottom:0.5rem">CREW & CUTS</div>
+        ${(j.crew||[]).map(c=>`<div class="crew-row"><div class="crew-avatar">${c[0]?.toUpperCase()}</div><div class="crew-name">${c.toUpperCase()}</div><div class="crew-cut">£${(j.perHead||0).toLocaleString()}</div></div>`).join("")||'<p style="color:var(--text-dim);font-family:var(--font-mono)">No crew listed.</p>'}
+      </div>
+      ${j.notes?`<div><div class="stat-label">NOTES</div><div style="margin-top:0.3rem">${j.notes}</div></div>`:''}`;
+    document.getElementById("jobDetailModal").classList.remove("hidden");
+  };
+  window.clearFilter=function(){document.getElementById("filterMonth").value="";document.getElementById("filterPerson").value="";loadJobs();};
+
+  // ══════════════════════════════════════════════
+  // MONEY CLEANING (boss)
+  // ══════════════════════════════════════════════
+  window.updateCleanCalc=function(){
+    const dirty=+document.getElementById("cleanDirty").value||0;
+    const rate=+document.getElementById("cleanRate").value||0;
+    const wePay=Math.round(dirty*rate/100);
+    document.getElementById("cleanWePay").value="£"+wePay.toLocaleString();
+    document.getElementById("cleanProfit").value="£"+(dirty-wePay).toLocaleString();
+  };
+  window.saveClean=async function(){
+    const date=document.getElementById("cleanDate").value;
+    const gang=document.getElementById("cleanGang").value.trim();
+    const dirty=+document.getElementById("cleanDirty").value||0;
+    const rate=+document.getElementById("cleanRate").value||0;
+    if(!date||!gang||!dirty){showAlert("cleanAlert","error","Fill in all required fields.");return;}
+    const wePay=Math.round(dirty*rate/100);
+    await db.collection("cleans").add({date,gang,dirtyAmount:dirty,rate,wePay,profit:dirty-wePay,method:document.getElementById("cleanMethod").value,contact:document.getElementById("cleanContact").value.trim(),notes:document.getElementById("cleanNotes").value.trim(),loggedBy:user});
+    showAlert("cleanAlert","success","Cleaning deal logged.");
+    loadCleans();
+  };
+  async function loadCleans(){
+    const snap=await db.collection("cleans").orderBy("date","desc").get();
+    const tbody=document.getElementById("cleanTable");
+    tbody.innerHTML=snap.empty
+      ? `<tr><td colspan="7" style="color:var(--text-dim);text-align:center;padding:2rem;font-family:var(--font-mono)">No cleaning deals yet.</td></tr>`
+      : snap.docs.map(d=>{const c=d.data();return`<tr>
+          <td class="mono">${c.date}</td><td>${c.gang}</td>
+          <td class="mono" style="color:var(--blood)">£${(c.dirtyAmount||0).toLocaleString()}</td>
+          <td class="mono">${c.rate}%</td>
+          <td class="mono" style="color:var(--amber)">£${(c.wePay||0).toLocaleString()}</td>
+          <td class="mono" style="color:var(--green)">£${(c.profit||0).toLocaleString()}</td>
+          <td>${c.method||"—"}</td>
+        </tr>`;}).join("");
+  }
+
+  // ══════════════════════════════════════════════
+  // PAYOUTS (boss)
+  // ══════════════════════════════════════════════
+  window.calcPayouts=async function(){
+    const month=document.getElementById("payoutMonth").value; if(!month)return;
+    const snap=await db.collection("jobs").orderBy("date","desc").get();
+    const jobs=snap.docs.map(d=>d.data()).filter(j=>j.date&&j.date.startsWith(month));
+    const crewTotals={};
+    jobs.forEach(j=>(j.crew||[]).forEach(c=>{if(!crewTotals[c])crewTotals[c]={jobs:0,total:0};crewTotals[c].jobs++;crewTotals[c].total+=j.perHead||0;}));
+    const bossCutTotal=jobs.reduce((s,j)=>s+(j.bossCut||0),0);
+    const list=document.getElementById("payoutList");
+    list.innerHTML=Object.keys(crewTotals).length===0
+      ? `<p style="color:var(--text-dim);font-family:var(--font-mono)">No jobs in this period.</p>`
+      : `<div class="stat-card" style="margin-bottom:1rem"><div class="stat-label">BOSS EARNINGS — ${month}</div><div class="stat-value gold">£${bossCutTotal.toLocaleString()}</div></div>
+        <div class="panel-title">CREW BREAKDOWN</div>
+        ${Object.entries(crewTotals).sort((a,b)=>b[1].total-a[1].total).map(([name,data])=>`
+          <div class="crew-row">
+            <div class="crew-avatar">${name[0]?.toUpperCase()}</div>
+            <div class="crew-name">${name.toUpperCase()}</div>
+            <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim)">${data.jobs} JOB${data.jobs!==1?'S':''}</div>
+            <div class="crew-cut" style="margin-left:auto">£${data.total.toLocaleString()}</div>
+          </div>`).join("")}`;
+  };
+
+  // ══════════════════════════════════════════════
+  // CONSTITUTION
+  // ══════════════════════════════════════════════
+  const DEFAULT_SECTIONS=[{id:"rules",title:"Gang Rules & Code of Conduct",rules:[
+    {title:"Loyalty Above All",desc:"No member shall betray the family to law enforcement, rival gangs, or any outside party. Betrayal is the highest offence.",severity:"mandatory"},
+    {title:"Silence is Survival",desc:"What happens within the family stays within the family. Never discuss operations, finances, or personnel with outsiders.",severity:"mandatory"},
+    {title:"Respect the Hierarchy",desc:"All orders from the Boss are final. Disagreements must be raised privately — never publicly undermined.",severity:"mandatory"},
+    {title:"No Freelancing",desc:"Members do not run independent jobs or deals without approval. All income-generating activity must be sanctioned.",severity:"mandatory"},
+    {title:"Cover Your Brothers",desc:"If a crew member is in danger, you do not abandon them. We move together, we protect each other.",severity:"important"},
+    {title:"Settle Disputes Internally",desc:"Conflicts between members are resolved within the family. No member acts against another without the Boss's knowledge.",severity:"important"},
+    {title:"Be Ready When Called",desc:"When a job is called, members are expected to be available and prepared. Repeated unavailability will be noted.",severity:"important"},
+    {title:"Respect Earns Rank",desc:"Rank is not given by request — it is earned through performance, loyalty, and time served.",severity:"guideline"},
+  ]}];
+
+  let editMode=false, sectionsData=[];
+
+  window.loadConstitution=async function(){
+    try{
+      const snap=await db.collection("constitution").doc("main").get();
+      if(snap.exists){
+        const data=snap.data();
+        sectionsData=data.sections||DEFAULT_SECTIONS;
+        if(data.preamble){document.getElementById("preambleDisplay").innerHTML=data.preamble;document.getElementById("preambleEdit").value=data.preamble;}
+        if(data.amended)document.getElementById("metaAmended").textContent=data.amended;
+      } else { sectionsData=JSON.parse(JSON.stringify(DEFAULT_SECTIONS)); }
+    }catch(e){sectionsData=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));}
+    renderConstitution();
+  };
+
+  async function saveConstitution(){
+    await db.collection("constitution").doc("main").set({sections:sectionsData,preamble:document.getElementById("preambleDisplay").innerHTML,amended:new Date().toLocaleDateString("en-GB"),updatedBy:user});
+    document.getElementById("metaAmended").textContent=new Date().toLocaleDateString("en-GB");
+    const ind=document.getElementById("saveIndicator");ind.style.opacity=1;setTimeout(()=>ind.style.opacity=0,2000);
+  }
+
+  function renderConstitution(){
+    document.getElementById("constitutionSections").innerHTML=sectionsData.map((sec,si)=>`
+      <div style="margin-bottom:2rem;border:1px solid var(--border);background:var(--panel);position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blood),transparent)"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);cursor:pointer" onclick="this.parentElement.querySelector('.con-body').classList.toggle('hidden')">
+          <span style="font-family:var(--font-display);color:var(--blood);font-size:1rem;margin-right:1rem">§${si+1}</span>
+          <span style="font-family:var(--font-display);font-size:1.4rem;letter-spacing:0.12em;color:var(--text-bright);flex:1">${sec.title}</span>
+          <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-dim)">▾</span>
+        </div>
+        <div class="con-body" style="padding:1.5rem">
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:0.8rem">
+            ${sec.rules.map((r,ri)=>{
+              const sevColor={mandatory:"var(--blood)",important:"var(--amber)",guideline:"var(--green)"}[r.severity]||"var(--text-dim)";
+              const sevLabel={mandatory:"MANDATORY",important:"IMPORTANT",guideline:"GUIDELINE"}[r.severity]||r.severity.toUpperCase();
+              const delBtn=isBoss&&editMode?`<button onclick="deleteRule(${si},${ri})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:0.2rem" title="Delete">🗑</button>`:'';
+              return`<li style="display:flex;gap:1rem;align-items:flex-start;padding:0.9rem 1rem;background:var(--bg3);border-left:3px solid var(--border)">
+                <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--blood);min-width:24px">${ri+1}.</span>
+                <div style="flex:1"><div style="font-weight:700;color:var(--text-bright);margin-bottom:0.25rem">${r.title}</div><div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5">${r.desc}</div></div>
+                <span style="font-family:var(--font-mono);font-size:0.55rem;letter-spacing:0.15em;padding:0.15rem 0.5rem;border:1px solid ${sevColor};color:${sevColor};white-space:nowrap">${sevLabel}</span>
+                ${delBtn}
+              </li>`;
+            }).join("")}
+          </ul>
+          ${isBoss&&editMode?`<div style="background:var(--bg3);border:1px dashed var(--border);padding:1.2rem;margin-top:1rem">
+            <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-bottom:0.8rem">ADD NEW RULE</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.8rem;align-items:end">
+              <div class="form-group"><label class="form-label">RULE TITLE</label><input class="form-control" id="nrt-${si}" placeholder="Short title"/></div>
+              <div class="form-group"><label class="form-label">SEVERITY</label><select class="form-control" id="nrs-${si}"><option value="mandatory">⛔ Mandatory</option><option value="important">⚠ Important</option><option value="guideline">✅ Guideline</option></select></div>
+              <button class="btn btn-danger" style="height:42px;margin-top:auto" onclick="addRule(${si})">ADD</button>
+            </div>
+            <div class="form-group" style="margin-top:0.6rem"><label class="form-label">DESCRIPTION</label><textarea class="form-control" id="nrd-${si}" placeholder="Full rule description..." style="min-height:60px"></textarea></div>
+          </div>`:''}
+        </div>
+      </div>`).join("");
+  }
+
+  window.toggleEditMode=function(){
+    editMode=!editMode;
+    document.getElementById("editModeBtn").textContent=editMode?"DISABLE EDITING":"ENABLE EDITING";
+    document.getElementById("editModeBtn").className=editMode?"btn btn-gold":"btn btn-danger";
+    renderConstitution();
+  };
+  window.addRule=async function(si){
+    const title=document.getElementById(`nrt-${si}`).value.trim();
+    const desc=document.getElementById(`nrd-${si}`).value.trim();
+    const sev=document.getElementById(`nrs-${si}`).value;
+    if(!title||!desc)return;
+    sectionsData[si].rules.push({title,desc,severity:sev});
+    await saveConstitution();renderConstitution();
+  };
+  window.deleteRule=async function(si,ri){
+    if(!confirm("Remove this rule?"))return;
+    sectionsData[si].rules.splice(ri,1);
+    await saveConstitution();renderConstitution();
+  };
+  window.togglePreambleEdit=function(){
+    const display=document.getElementById("preambleDisplay");
+    const edit=document.getElementById("preambleEdit");
+    const isEditing=edit.style.display==="block";
+    if(isEditing){display.innerHTML=edit.value;display.style.display="block";edit.style.display="none";saveConstitution();}
+    else{edit.value=display.innerHTML;edit.style.display="block";display.style.display="none";}
+  };
+  window.autoSavePreamble=function(){
+    clearTimeout(window._pTimer);
+    window._pTimer=setTimeout(async()=>{
+      await db.collection("constitution").doc("main").set({preamble:document.getElementById("preambleEdit").value,amended:new Date().toLocaleDateString("en-GB")},{merge:true});
+      const ind=document.getElementById("saveIndicator");ind.style.opacity=1;setTimeout(()=>ind.style.opacity=0,2000);
+    },1500);
+  };
+
+  // ══════════════════════════════════════════════
+  // UTILS
+  // ══════════════════════════════════════════════
+  function showAlert(id,type,msg){
+    const el=document.getElementById(id);
+    el.textContent=msg;el.className=`alert alert-${type}`;
+    setTimeout(()=>el.classList.add("hidden"),3000);
+  }
+</script>
+</body>
+</html>

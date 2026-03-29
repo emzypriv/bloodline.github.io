@@ -5,13 +5,13 @@
 // Create a project → Add Web App → Copy config below
 // ============================================================
 
-export const firebaseConfig = {
-  apiKey: "AIzaSyC6El4QT2--ecQNWV18e-4L4s26iol_eUk",
-  authDomain: "bloodline-efc76.firebaseapp.com",
-  projectId: "bloodline-efc76",
-  storageBucket: "bloodline-efc76.firebasestorage.app",
-  messagingSenderId: "97046048461",
-  appId: "1:97046048461:web:e1bdc760f130fb72830384"
+export const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // ============================================================

@@ -6,9 +6,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
 
 :root {
-  --blood:      #cc0000;
-  --blood-dark: #8b0000;
-  --blood-glow: rgba(204,0,0,0.4);
+  --blood:      #ff2d78;
+  --blood-dark: #c4005e;
+  --blood-glow: rgba(255,45,120,0.4);
   --gold:       #c8a84b;
   --gold-dim:   #8a6f2e;
   --bg:         #080808;
@@ -16,7 +16,7 @@
   --bg3:        #161616;
   --panel:      #111111;
   --border:     #2a2a2a;
-  --border-hot: #cc0000;
+  --border-hot: #ff2d78;
   --text:       #d4d4d4;
   --text-dim:   #666;
   --text-bright:#f0f0f0;
@@ -69,7 +69,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   background:
-    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(140,0,0,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,45,120,0.2) 0%, transparent 70%),
     var(--bg);
 }
 
@@ -96,7 +96,7 @@ body {
   font-size: 5rem;
   letter-spacing: 0.3em;
   color: var(--blood);
-  text-shadow: 0 0 30px var(--blood-glow), 0 0 60px rgba(204,0,0,0.2);
+  text-shadow: 0 0 30px var(--blood-glow), 0 0 60px rgba(255,45,120,0.2);
   line-height: 1;
 }
 
@@ -189,8 +189,8 @@ body {
 .role-btn.active {
   border-color: var(--blood);
   color: var(--blood);
-  background: rgba(204,0,0,0.08);
-  box-shadow: inset 0 0 12px rgba(204,0,0,0.1);
+  background: rgba(255,45,120,0.08);
+  box-shadow: inset 0 0 12px rgba(255,45,120,0.1);
 }
 .role-btn:hover { border-color: var(--blood); color: var(--blood); }
 
@@ -336,12 +336,12 @@ body {
   text-align: left;
 }
 .nav-item:hover {
-  background: rgba(204,0,0,0.06);
+  background: rgba(255,45,120,0.06);
   border-left-color: var(--blood);
   color: var(--text-bright);
 }
 .nav-item.active {
-  background: rgba(204,0,0,0.1);
+  background: rgba(255,45,120,0.1);
   border-left-color: var(--blood);
   color: var(--blood);
 }
@@ -532,11 +532,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   font-weight: 600;
   color: var(--text-bright);
 }
-.data-table tr:hover td { background: rgba(204,0,0,0.04); }
+.data-table tr:hover td { background: rgba(255,45,120,0.04); }
 .data-table .mono { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 400; }
 .data-table .badge {
   display: inline-block;
-  background: rgba(204,0,0,0.15);
+  background: rgba(255,45,120,0.15);
   border: 1px solid var(--blood-dark);
   color: var(--blood);
   font-family: var(--font-mono);
@@ -581,7 +581,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 }
 .cal-day:hover { background: var(--bg3); }
 .cal-day.other-month { opacity: 0.3; }
-.cal-day.today { background: rgba(204,0,0,0.08); border: 1px solid var(--blood-dark); }
+.cal-day.today { background: rgba(255,45,120,0.08); border: 1px solid var(--blood-dark); }
 .cal-day-num {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -780,7 +780,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   border-left: 3px solid;
 }
 .alert-success { background: rgba(0,204,102,0.08); border-color: var(--green); color: var(--green); }
-.alert-error { background: rgba(204,0,0,0.08); border-color: var(--blood); color: var(--blood); }
+.alert-error { background: rgba(255,45,120,0.08); border-color: var(--blood); color: var(--blood); }
 .alert.hidden { display: none; }
 
 /* ── Scrollbar ── */
