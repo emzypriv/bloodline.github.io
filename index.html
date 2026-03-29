@@ -1,15 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLOODLINE — Access</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
 </head>
-<body>
-<div class="login-box">
-<h1>🩸 Bloodline</h1>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-</div>
-<script type="module" src="js/auth.js"></script>
+<body class="login-page">
+  <div class="scanlines"></div>
+  <div class="noise"></div>
+
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="brand-icon">🩸</div>
+      <h1 class="brand-title">BLOODLINE</h1>
+      <p class="brand-sub">CREW MANAGEMENT SYSTEM</p>
+    </div>
+
+    <div class="login-box">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+
+      <h2 class="login-heading">IDENTIFY YOURSELF</h2>
+
+      <div class="field-group">
+        <label class="field-label">HANDLE</label>
+        <input type="text" id="loginName" class="field-input" placeholder="your street name" autocomplete="off"/>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ACCESS CODE</label>
+        <input type="password" id="loginPass" class="field-input" placeholder="••••••••"/>
+      </div>
+
+      <div class="role-select">
+        <button class="role-btn active" id="roleBoss" onclick="selectRole('boss')">
+          <span class="role-icon">👑</span> BOSS
+        </button>
+        <button class="role-btn" id="roleCrew" onclick="selectRole('crew')">
+          <span class="role-icon">🔫</span> CREW
+        </button>
+      </div>
+
+      <button class="btn-primary" onclick="doLogin()">ENTER THE BLOODLINE</button>
+
+      <p id="loginError" class="login-error"></p>
+    </div>
+
+    <p class="login-footer">BLOODLINE &copy; — STAY LOYAL. STAY QUIET.</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { FIREBASE_CONFIG } from "./js/config.js";
+
+    const app = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let selectedRole = "boss";
+
+    window.selectRole = function(role) {
+      selectedRole = role;
+      document.getElementById("roleBoss").classList.toggle("active", role === "boss");
+      document.getElementById("roleCrew").classList.toggle("active", role === "crew");
+    };
+
+    window.doLogin = async function() {
+      const handle = document.getElementById("loginName").value.trim();
+      const pass = document.getElementById("loginPass").value;
+      const err = document.getElementById("loginError");
+      err.textContent = "";
+
+      if (!handle || !pass) {
+        err.textContent = "⚠ Fill in all fields, soldier.";
+        return;
+      }
+
+      // Simple PIN-based auth stored in Firestore
+      // users/{handle} => { pin, role }
+      try {
+        const userDoc = await getDoc(doc(db, "users", handle.toLowerCase()));
+        if (!userDoc.exists()) {
+          err.textContent = "⚠ Unknown operative.";
+          return;
+        }
+        const data = userDoc.data();
+        if (data.pin !== pass) {
+          err.textContent = "⚠ Wrong code. Don't try again.";
+          return;
+        }
+        if (data.role !== selectedRole) {
+          err.textContent = `⚠ You are not a ${selectedRole}.`;
+          return;
+        }
+
+        sessionStorage.setItem("bl_user", handle.toLowerCase());
+        sessionStorage.setItem("bl_role", data.role);
+        sessionStorage.setItem("bl_display", data.displayName || handle);
+
+        if (data.role === "boss") {
+          window.location.href = "pages/boss-dashboard.html";
+        } else {
+          window.location.href = "pages/crew-dashboard.html";
+        }
+      } catch(e) {
+        err.textContent = "⚠ System error. Try again.";
+        console.error(e);
+      }
+    };
+  </script>
 </body>
 </html>
