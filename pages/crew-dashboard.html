@@ -126,10 +126,29 @@
   </main>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { FIREBASE_CONFIG } from "../js/config.js";
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+    // ============================================================
+    // PASTE YOUR FIREBASE CONFIG HERE (same as index.html)
+    // ============================================================
+    const FIREBASE_CONFIG = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ============================================================
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.firestore();
+
+    const collection = (d, c) => d.collection(c);
+    const query      = (ref, ...constraints) => { let q = ref; constraints.forEach(c => { q = c(q); }); return q; };
+    const orderBy    = (field, dir="asc") => (ref) => ref.orderBy(field, dir);
+    const _getDocs   = async (ref) => { const snap = await ref.get(); return { docs: snap.docs, empty: snap.empty }; };
 
 // ── Auth guard ──
 const role    = sessionStorage.getItem("bl_role");
@@ -138,9 +157,6 @@ const display = sessionStorage.getItem("bl_display");
 if (role !== "crew") { window.location.href = "../index.html"; }
 document.getElementById("displayUser").textContent = (display||user||"UNKNOWN").toUpperCase();
 document.getElementById("crewSubtitle").textContent = (display||user||"CREW").toUpperCase() + "'S EARNINGS";
-
-const app = initializeApp(FIREBASE_CONFIG);
-const db  = getFirestore(app);
 
 window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
 
@@ -159,7 +175,7 @@ window.showSection = function(id) {
 // MY CUTS
 // ══════════════════════════════════════════════
 async function loadMyCuts() {
-  const snap = await getDocs(query(collection(db,"jobs"),orderBy("date","desc")));
+  const snap = await _getDocs(query(db.collection("jobs"),orderBy("date","desc")));
   const allJobs = snap.docs.map(d=>({id:d.id,...d.data()}));
   const myJobs  = allJobs.filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
 
@@ -195,7 +211,7 @@ loadMyCuts();
 // MY JOBS TABLE
 // ══════════════════════════════════════════════
 window.loadMyJobs = async function() {
-  const snap = await getDocs(query(collection(db,"jobs"),orderBy("date","desc")));
+  const snap = await _getDocs(query(db.collection("jobs"),orderBy("date","desc")));
   let jobs = snap.docs.map(d=>({id:d.id,...d.data()}))
     .filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
 
@@ -222,7 +238,7 @@ window.loadMyJobs = async function() {
 let calDate = new Date(), calEvents = [];
 
 async function fetchEvents() {
-  const snap = await getDocs(collection(db,"events"));
+  const snap = await _getDocs(db.collection("events"));
   calEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
 }
 
@@ -280,7 +296,7 @@ window.calNext = ()=>{ calDate.setMonth(calDate.getMonth()+1); renderCalendar();
 // RECIPES (read-only)
 // ══════════════════════════════════════════════
 window.loadRecipes = async function() {
-  const snap = await getDocs(collection(db,"recipes"));
+  const snap = await _getDocs(db.collection("recipes"));
   const grid = document.getElementById("recipeGrid");
   if(snap.empty){ grid.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono)">No recipes in the system yet.</p>`; return; }
   grid.innerHTML = snap.docs.map(d=>{

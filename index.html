@@ -48,72 +48,101 @@
       <button class="btn-primary" onclick="doLogin()">ENTER THE BLOODLINE</button>
 
       <p id="loginError" class="login-error"></p>
+      <p id="debugLine" style="font-family:monospace;font-size:0.6rem;color:#555;text-align:center;margin-top:0.5rem;word-break:break-all;min-height:1rem;"></p>
     </div>
 
     <p class="login-footer">BLOODLINE &copy; — STAY LOYAL. STAY QUIET.</p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { FIREBASE_CONFIG } from "./js/config.js";
+  <!-- Firebase compat SDKs (no ES module imports needed) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    const app = initializeApp(FIREBASE_CONFIG);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  <script>
+    // ============================================================
+    // PASTE YOUR FIREBASE CONFIG HERE
+    // ============================================================
+    const FIREBASE_CONFIG = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ============================================================
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.firestore();
 
     let selectedRole = "boss";
 
-    window.selectRole = function(role) {
+    function debug(msg) {
+      document.getElementById("debugLine").textContent = msg;
+    }
+
+    function selectRole(role) {
       selectedRole = role;
       document.getElementById("roleBoss").classList.toggle("active", role === "boss");
       document.getElementById("roleCrew").classList.toggle("active", role === "crew");
-    };
+    }
 
-    window.doLogin = async function() {
-      const handle = document.getElementById("loginName").value.trim();
-      const pass = document.getElementById("loginPass").value;
-      const err = document.getElementById("loginError");
+    async function doLogin() {
+      const handle = document.getElementById("loginName").value.trim().toLowerCase();
+      const pass   = document.getElementById("loginPass").value;
+      const err    = document.getElementById("loginError");
       err.textContent = "";
+      debug("Attempting: " + handle + " as " + selectedRole);
 
       if (!handle || !pass) {
         err.textContent = "⚠ Fill in all fields, soldier.";
         return;
       }
 
-      // Simple PIN-based auth stored in Firestore
-      // users/{handle} => { pin, role }
       try {
-        const userDoc = await getDoc(doc(db, "users", handle.toLowerCase()));
-        if (!userDoc.exists()) {
+        debug("Connecting to Firestore...");
+        const userDoc = await db.collection("users").doc(handle).get();
+        debug("Response received. Found: " + userDoc.exists);
+
+        if (!userDoc.exists) {
           err.textContent = "⚠ Unknown operative.";
-          return;
-        }
-        const data = userDoc.data();
-        if (data.pin !== pass) {
-          err.textContent = "⚠ Wrong code. Don't try again.";
-          return;
-        }
-        if (data.role !== selectedRole) {
-          err.textContent = `⚠ You are not a ${selectedRole}.`;
+          debug("No user doc found for: " + handle);
           return;
         }
 
-        sessionStorage.setItem("bl_user", handle.toLowerCase());
-        sessionStorage.setItem("bl_role", data.role);
+        const data = userDoc.data();
+        debug("DB role: " + data.role + " | Chosen: " + selectedRole);
+
+        if (data.pin !== pass) {
+          err.textContent = "⚠ Wrong code.";
+          debug("PIN mismatch.");
+          return;
+        }
+
+        if (data.role !== selectedRole) {
+          err.textContent = "⚠ Wrong access level selected.";
+          debug("Role mismatch. Pick " + data.role + " on the buttons above.");
+          return;
+        }
+
+        debug("Access granted. Loading...");
+        sessionStorage.setItem("bl_user",    handle);
+        sessionStorage.setItem("bl_role",    data.role);
         sessionStorage.setItem("bl_display", data.displayName || handle);
 
-        if (data.role === "boss") {
-          window.location.href = "pages/boss-dashboard.html";
-        } else {
-          window.location.href = "pages/crew-dashboard.html";
-        }
+        window.location.href = data.role === "boss"
+          ? "pages/boss-dashboard.html"
+          : "pages/crew-dashboard.html";
+
       } catch(e) {
-        err.textContent = "⚠ System error. Try again.";
+        err.textContent = "⚠ System error.";
+        debug("ERROR: " + e.message);
         console.error(e);
       }
-    };
+    }
+
+    document.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+    debug("System online. Awaiting identification.");
   </script>
 </body>
 </html>

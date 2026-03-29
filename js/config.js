@@ -5,7 +5,7 @@
 // Create a project → Add Web App → Copy config below
 // ============================================================
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyC6El4QT2--ecQNWV18e-4L4s26iol_eUk",
   authDomain: "bloodline-efc76.firebaseapp.com",
   projectId: "bloodline-efc76",

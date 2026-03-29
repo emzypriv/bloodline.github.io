@@ -450,12 +450,47 @@
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, where, Timestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { FIREBASE_CONFIG } from "../js/config.js";
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+    // ============================================================
+    // PASTE YOUR FIREBASE CONFIG HERE (same as index.html)
+    // ============================================================
+    const FIREBASE_CONFIG = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ============================================================
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.firestore();
+
+    // Firestore compat helper shims so existing code works unchanged
+    const collection = (d, c) => d.collection(c);
+    const addDoc     = (ref, data) => ref.add(data);
+    const getDocs    = (ref) => ref.get();
+    const deleteDoc  = (ref) => ref.delete();
+    const doc        = (d, c, id) => d.collection(c).doc(id);
+    const query      = (ref, ...constraints) => {
+      let q = ref;
+      constraints.forEach(c => { q = c(q); });
+      return q;
+    };
+    const orderBy    = (field, dir="asc") => (ref) => ref.orderBy(field, dir);
+    const where      = (field, op, val)   => (ref) => ref.where(field, op, val);
+
+    // Patch getDocs to return { docs } with .data() and .id
+    const _getDocs = async (ref) => {
+      const snap = await ref.get();
+      return { docs: snap.docs, empty: snap.empty };
+    };
+
+    // Override getDocs globally
+    window._fsGetDocs = _getDocs;
 
 // ── Auth guard ──
 const role = sessionStorage.getItem("bl_role");
@@ -463,9 +498,6 @@ const user = sessionStorage.getItem("bl_user");
 const display = sessionStorage.getItem("bl_display");
 if (role !== "boss") { window.location.href = "../index.html"; }
 document.getElementById("displayUser").textContent = (display || user || "UNKNOWN").toUpperCase();
-
-const app = initializeApp(FIREBASE_CONFIG);
-const db = getFirestore(app);
 
 window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
 
@@ -543,9 +575,9 @@ function updatePayoutPreview() {
 // ══════════════════════════════════════════════
 async function loadOverview() {
   const [jobsSnap, cleansSnap, eventsSnap] = await Promise.all([
-    getDocs(query(collection(db, "jobs"), orderBy("date", "desc"))),
-    getDocs(collection(db, "cleans")),
-    getDocs(query(collection(db, "events"), orderBy("date")))
+    _fsGetDocs(query(db.collection("jobs"), orderBy("date", "desc"))),
+    _fsGetDocs(db.collection("cleans")),
+    _fsGetDocs(query(db.collection("events"), orderBy("date")))
   ]);
 
   const jobs = jobsSnap.docs.map(d => ({id:d.id,...d.data()}));
@@ -592,7 +624,7 @@ let calDate = new Date();
 let calEvents = [];
 
 async function fetchEvents() {
-  const snap = await getDocs(collection(db, "events"));
+  const snap = await _fsGetDocs(db.collection("events"));
   calEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
 }
 
@@ -644,7 +676,7 @@ window.saveEvent = async function() {
   const type = document.getElementById("evType").value;
   const notes = document.getElementById("evNotes").value.trim();
   if (!title || !date) return;
-  await addDoc(collection(db, "events"), { title, date, type, notes, createdBy: user });
+  await addDoc(db.collection("events"), { title, date, type, notes, createdBy: user });
   closeEventModal();
   renderCalendar();
 };
@@ -653,7 +685,7 @@ window.saveEvent = async function() {
 // RECIPES
 // ══════════════════════════════════════════════
 window.loadRecipes = async function() {
-  const snap = await getDocs(collection(db, "recipes"));
+  const snap = await _fsGetDocs(db.collection("recipes"));
   const grid = document.getElementById("recipeGrid");
   if (snap.empty) { grid.innerHTML = `<p style="color:var(--text-dim);font-family:var(--font-mono)">No recipes yet. Add one above.</p>`; return; }
   grid.innerHTML = snap.docs.map(d => {
@@ -672,7 +704,7 @@ window.loadRecipes = async function() {
 window.saveRecipe = async function() {
   const name = document.getElementById("recName").value.trim();
   if (!name) { showAlert("recipeAlert","error","Enter an item name."); return; }
-  await addDoc(collection(db,"recipes"),{
+  await addDoc(db.collection("recipes"),{
     name,
     category: document.getElementById("recCat").value,
     ingredients: document.getElementById("recIngredients").value.trim(),
@@ -688,7 +720,7 @@ window.saveRecipe = async function() {
 
 window.deleteRecipe = async function(id) {
   if (!confirm("Delete this recipe?")) return;
-  await deleteDoc(doc(db,"recipes",id));
+  await deleteDoc(db.collection("recipes").doc(id));
   loadRecipes();
 };
 
@@ -714,7 +746,7 @@ window.saveJob = async function() {
   const crew    = Array.from({length:6},(_,i) => document.getElementById(`crew${i+1}`).value.trim()).filter(Boolean);
   const perHead = crew.length ? Math.round(crewPot / crew.length) : 0;
 
-  await addDoc(collection(db,"jobs"),{
+  await addDoc(db.collection("jobs"),{
     date, type,
     location: document.getElementById("jobLocation").value.trim(),
     status: document.getElementById("jobStatus").value,
@@ -741,8 +773,8 @@ window.resetJobForm = function() {
 // JOB DASHBOARD
 // ══════════════════════════════════════════════
 window.loadJobs = async function() {
-  let q = query(collection(db,"jobs"), orderBy("date","desc"));
-  const snap = await getDocs(q);
+  let q = query(db.collection("jobs"), orderBy("date","desc"));
+  const snap = await _fsGetDocs(q);
   let jobs = snap.docs.map(d=>({id:d.id,...d.data()}));
 
   const monthFilter = document.getElementById("filterMonth").value;
@@ -774,7 +806,7 @@ window.loadJobs = async function() {
 };
 
 window.showJobDetail = async function(id) {
-  const snap = await getDocs(collection(db,"jobs"));
+  const snap = await _fsGetDocs(db.collection("jobs"));
   const j = snap.docs.find(d=>d.id===id)?.data();
   if (!j) return;
   document.getElementById("jobDetailContent").innerHTML = `
@@ -832,7 +864,7 @@ window.saveClean = async function() {
   if (!date||!gang||!dirty) { showAlert("cleanAlert","error","Fill in all required fields."); return; }
   const wePay  = Math.round(dirty * rate / 100);
   const profit = dirty - wePay;
-  await addDoc(collection(db,"cleans"),{
+  await addDoc(db.collection("cleans"),{
     date, gang, dirtyAmount:dirty, rate, wePay, profit,
     method: document.getElementById("cleanMethod").value,
     contact: document.getElementById("cleanContact").value.trim(),
@@ -844,7 +876,7 @@ window.saveClean = async function() {
 };
 
 async function loadCleans() {
-  const snap = await getDocs(query(collection(db,"cleans"),orderBy("date","desc")));
+  const snap = await _fsGetDocs(query(db.collection("cleans"),orderBy("date","desc")));
   const tbody = document.getElementById("cleanTable");
   if (snap.empty) { tbody.innerHTML=`<tr><td colspan="7" style="color:var(--text-dim);text-align:center;padding:2rem;font-family:var(--font-mono)">No cleaning deals yet.</td></tr>`; return; }
   tbody.innerHTML = snap.docs.map(d=>{
@@ -867,7 +899,7 @@ async function loadCleans() {
 window.calcPayouts = async function() {
   const month = document.getElementById("payoutMonth").value;
   if (!month) return;
-  const snap = await getDocs(query(collection(db,"jobs"),orderBy("date","desc")));
+  const snap = await _fsGetDocs(query(db.collection("jobs"),orderBy("date","desc")));
   const jobs = snap.docs.map(d=>d.data()).filter(j=>j.date&&j.date.startsWith(month));
 
   const crewTotals = {};
