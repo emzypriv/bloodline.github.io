@@ -73,7 +73,7 @@
       <div class="page-header"><h1 class="page-title">OVERVIEW</h1><span class="page-sub">GANG FINANCES AT A GLANCE</span></div>
 
       <!-- Boss edit bar -->
-      <div class="boss-only" style="display:none;margin-bottom:1.5rem">
+      <div class="boss-only" style="margin-bottom:1.5rem">
         <div class="panel" style="padding:1rem 1.5rem">
           <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
             <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-right:auto">BOSS — UPDATE BALANCES</span>
@@ -124,7 +124,7 @@
       </div>
 
       <!-- Personal Accounts (boss only) -->
-      <div class="panel boss-only" style="display:none">
+      <div class="panel boss-only">
         <div class="panel-title">👤 Personal Accounts</div>
         <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Only visible to Boss.</p>
         <div id="ovPersonalDisplay"></div>
@@ -182,7 +182,7 @@
     <!-- ══ CONSTITUTION ══ -->
     <section class="page-section" id="sec-constitution">
       <div class="page-header"><h1 class="page-title">CONSTITUTION</h1><span class="page-sub">CODE OF CONDUCT</span></div>
-      <div class="panel boss-only" style="display:none;margin-bottom:1rem;padding:1rem 1.5rem">
+      <div class="panel boss-only" style="margin-bottom:1rem;padding:1rem 1.5rem">
         <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap">
           <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-right:auto">BOSS EDIT MODE</span>
           <span id="saveIndicator" style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);opacity:0;transition:opacity 0.3s;letter-spacing:0.15em">SAVED</span>
@@ -229,6 +229,20 @@
             </select>
           </div>
 
+        </div>
+
+        <div class="panel-title" style="margin-top:1.5rem">Cut Structure</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">GANG CUT (%)</label>
+            <input class="form-control" type="number" id="jobGangCut" value="50" min="0" max="100" style="max-width:160px" oninput="updateJobPreview()"/>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem">Remainder split equally between crew</div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:1.2rem;max-width:220px">
+          <label class="form-label">GANG CUT FOR THIS JOB (%)</label>
+          <input class="form-control" type="number" id="jobGangCut" value="50" min="0" max="100" oninput="updateJobPreview()"/>
         </div>
 
         <div class="panel-title" style="margin-top:1.5rem">What We Got</div>
@@ -282,20 +296,7 @@
       </div>
     </section>
 
-    <!-- ══ MY JOBS (crew) ══ -->
-    <section class="page-section" id="sec-my-jobs">
-      <div class="page-header"><h1 class="page-title">MY JOBS</h1><span class="page-sub">YOUR OPERATIONS</span></div>
-      <div class="panel">
-        <div style="display:flex;gap:1rem;margin-bottom:1rem">
-          <div class="form-group"><label class="form-label">MONTH</label><input class="form-control" type="month" id="myJobMonth"/></div>
-          <button class="btn btn-ghost" style="margin-top:auto" onclick="loadMyJobs()">Filter</button>
-        </div>
-        <table class="data-table">
-          <thead><tr><th>DATE</th><th>TYPE</th><th>YOUR CUT</th></tr></thead>
-          <tbody id="myJobsBody"></tbody>
-        </table>
-      </div>
-    </section>
+
 
     <!-- ══ MONEY CLEANING (boss) ══ -->
     <section class="page-section" id="sec-money-clean">
@@ -382,13 +383,13 @@
       </div>
 
       <!-- Cut Settings -->
-      <div class="panel settings-section boss-strictly" style="display:none">
-        <div class="settings-section-title">Cut Structure</div>
+      <div class="panel settings-section boss-strictly">
+        <div class="settings-section-title">Cut Structure — Default</div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">GANG CUT (%)</label>
             <input class="form-control" type="number" id="settingGangCut" value="10" min="0" max="100" style="max-width:180px" oninput="updateCutPreview()"/>
-            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem">Taken from net first. Remainder split equally between crew.</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem">Default applied when logging a job. Can be overridden per job by Boss or Captain.</div>
           </div>
         </div>
         <div class="total-bar" id="cutPreviewBar" style="margin-top:1rem">
@@ -408,7 +409,7 @@
           <div class="form-group"><label class="form-label">DISPLAY NAME</label><input class="form-control" id="newMemberDisplay" placeholder="Ghost"/></div>
           <div class="form-group"><label class="form-label">ACCESS CODE (PIN)</label><input class="form-control" id="newMemberPin" placeholder="1234"/></div>
           <div class="form-group"><label class="form-label">ROLE</label>
-            <select class="form-control" id="newMemberRole"><option value="crew">Crew</option><option value="boss">Boss</option></select>
+            <select class="form-control" id="newMemberRole"><option value="crew">Crew</option><option value="captain">Captain</option><option value="boss">Boss</option></select>
           </div>
         </div>
         <div class="form-actions"><button class="btn btn-danger" onclick="addMember()">Add Member</button></div>
@@ -541,7 +542,7 @@ const CAPTAIN_NAV = [
 const CREW_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},
-  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"my-jobs",icon:"📋",label:"My Jobs"},
+  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
   {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},
 ];
 
@@ -567,7 +568,7 @@ function showSection(id, btn) {
   if(id==="calendar")      renderCalendar();
   if(id==="recipes")       loadRecipes();
   if(id==="constitution")  loadConstitution();
-  if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); }
+  if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); const jgc=document.getElementById("jobGangCut"); if(jgc) jgc.value=gangSettings.gangCut||50; }
   if(id==="job-dashboard") loadJobs();
   if(id==="money-clean")   {
     document.getElementById("cleanDate").valueAsDate=new Date();
@@ -883,7 +884,7 @@ async function loadMyCuts() {
 // ══════════════════════════════════════════════
 // MY JOBS (crew)
 // ══════════════════════════════════════════════
-window.loadMyJobs=async function(){
+window._loadMyJobs=async function(){
   const snap=await db.collection("jobs").orderBy("date","desc").get();
   let jobs=snap.docs.map(d=>d.data()).filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
   const mf=document.getElementById("myJobMonth").value;
@@ -1011,7 +1012,7 @@ window.updateJobPreview=function(){
   const gross = calcJobGross();
   const expenses=+document.getElementById("jobExpenses").value||0;
   const net=gross-expenses;
-  const gangPct=gangSettings.gangCut||0;
+  const gangPct=+(document.getElementById("jobGangCut")?.value)||gangSettings.gangCut||50;
   const gangCut=Math.round(net*gangPct/100);
   const crewPot=net-gangCut;
   const crew=Array.from({length:6},(_,i)=>document.getElementById(`crew${i+1}`)?.value).filter(Boolean);
@@ -1048,14 +1049,15 @@ window.saveJob=async function(){
   });
   const expenses=+document.getElementById("jobExpenses").value||0;
   const net=gross-expenses;
-  const gangCut=Math.round(net*gangSettings.gangCut/100);
+  const jobGangCutPct=+(document.getElementById("jobGangCut")?.value)||gangSettings.gangCut||50;
+  const gangCut=Math.round(net*jobGangCutPct/100);
   const crewPot=net-gangCut;
   const crew=Array.from({length:6},(_,i)=>document.getElementById(`crew${i+1}`)?.value).filter(Boolean);
   const perHead=crew.length?Math.round(crewPot/crew.length):0;
   await db.collection("jobs").add({
     date,type,
     items:jobItemData,expenses,gross,net,gangCut,crewPot,perHead,crew,
-    gangPct:gangSettings.gangCut,
+    gangPct:+(document.getElementById("jobGangCut")?.value)||gangSettings.gangCut||50,
     loggedBy:user,loggedAt:new Date().toISOString()
   });
   showAlert("jobAlert","success","Job logged.");
@@ -1064,6 +1066,7 @@ window.saveJob=async function(){
 
 window.resetJobForm=function(){
   document.getElementById("jobExpenses").value=0;
+  document.getElementById("jobGangCut").value=gangSettings.gangCut||50;
   document.getElementById("jobItemRows").innerHTML="";
   if(jobItems.length) addJobItemRow();
   document.getElementById("jobDate").valueAsDate=new Date();
@@ -1102,12 +1105,14 @@ window.showJobDetail=async function(id){
     <div class="grid-2" style="margin-bottom:1rem">
       <div><div class="stat-label">DATE</div><div style="font-weight:700">${j.date}</div></div>
       <div><div class="stat-label">TYPE</div><div style="font-weight:700">${j.type}</div></div>
+      <div><div class="stat-label">GANG CUT</div><div style="font-weight:700">${j.gangPct||0}%</div></div>
     </div>
     <div class="grid-3" style="margin-bottom:1rem">
       <div class="stat-card"><div class="stat-label">GROSS</div><div class="stat-value gold" style="font-size:1.2rem">£${(j.gross||0).toLocaleString()}</div></div>
       <div class="stat-card"><div class="stat-label">NET</div><div class="stat-value green" style="font-size:1.2rem">£${(j.net||0).toLocaleString()}</div></div>
-      <div class="stat-card"><div class="stat-label">PER HEAD</div><div class="stat-value blood" style="font-size:1.2rem">£${(j.perHead||0).toLocaleString()}</div></div>
+      <div class="stat-card"><div class="stat-label">GANG CUT (${j.gangPct||0}%)</div><div class="stat-value gold" style="font-size:1.2rem">£${(j.gangCut||0).toLocaleString()}</div></div>
     </div>
+    <div class="stat-card" style="margin-bottom:1rem"><div class="stat-label">PER HEAD</div><div class="stat-value green" style="font-size:1.2rem">£${(j.perHead||0).toLocaleString()}</div></div>
     <div style="margin-bottom:1rem">
       <div class="stat-label" style="margin-bottom:0.4rem">ITEMS TAKEN</div>
       ${(j.items||[]).length ? (j.items||[]).map(i=>`
