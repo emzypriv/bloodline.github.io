@@ -500,15 +500,18 @@ const user    = sessionStorage.getItem("bl_user");
 const display = sessionStorage.getItem("bl_display");
 if (!role || !user) { window.location.href = "../index.html"; }
 
-const isBoss = role === "boss";
-const isCrew = role === "crew";
+const isBoss        = role === "boss";
+const isCaptain     = role === "captain";
+const isCrew        = role === "crew";
+const isBossOrCap   = isBoss || isCaptain;
 
 document.getElementById("displayUser").textContent = (display||user||"UNKNOWN").toUpperCase();
 document.getElementById("roleTag").textContent = isBoss ? "BOSS" : "CREW";
 document.getElementById("roleTag").style.background = isBoss ? "var(--blood)" : "var(--gold-dim)";
-if (isCrew) document.getElementById("crewSubtitle").textContent = (display||user).toUpperCase() + "'S EARNINGS";
 
-document.querySelectorAll(".boss-only").forEach(el => el.style.display = isBoss ? "" : "none");
+
+document.querySelectorAll(".boss-only").forEach(el => el.style.display = isBossOrCap ? "" : "none");
+  // Payouts hidden from captain
   document.querySelectorAll(".boss-strictly").forEach(el => el.style.display = isBoss ? "" : "none");
 document.querySelectorAll(".crew-only").forEach(el => el.style.display = isCrew ? "" : "none");
 
