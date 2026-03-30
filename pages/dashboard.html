@@ -277,6 +277,71 @@
 
 
 
+    <!-- ══ PAWN OF THE DEAD ══ -->
+    <section class="page-section" id="sec-pawn">
+      <div class="page-header"><h1 class="page-title">PAWN OF THE DEAD</h1><span class="page-sub">PAWN SHOP LOG</span></div>
+
+      <!-- Log new item -->
+      <div class="panel" style="margin-bottom:1.5rem">
+        <div class="panel-title">Log Item</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">DATE</label><input class="form-control" type="date" id="pawnDate"/></div>
+          <div class="form-group"><label class="form-label">STATUS</label>
+            <select class="form-control" id="pawnStatus">
+              <option value="in">In — Bought from seller</option>
+              <option value="sold">Sold — Item moved on</option>
+              <option value="redeemed">Redeemed — Bought back</option>
+            </select>
+          </div>
+          <div class="form-group form-full"><label class="form-label">ITEM NAME / DESCRIPTION</label>
+            <input class="form-control" id="pawnItem" placeholder="e.g. Rolex Submariner, Gold Chain, PS5..."/>
+          </div>
+          <div class="form-group"><label class="form-label">WE PAID SELLER (£)</label>
+            <input class="form-control" type="number" id="pawnPaid" value="0" min="0" oninput="updatePawnCalc()"/>
+          </div>
+          <div class="form-group"><label class="form-label">ASKING / SELL PRICE (£)</label>
+            <input class="form-control" type="number" id="pawnAsk" value="0" min="0" oninput="updatePawnCalc()"/>
+          </div>
+        </div>
+        <div class="total-bar" style="margin-top:1rem">
+          <div class="total-item"><div class="total-label">PAID OUT</div><div class="total-val blood" id="pawnPaidOut">£0</div></div>
+          <div class="total-item"><div class="total-label">ASKING</div><div class="total-val gold" id="pawnAskOut">£0</div></div>
+          <div class="total-item"><div class="total-label">POTENTIAL PROFIT</div><div class="total-val green" id="pawnProfit">£0</div></div>
+        </div>
+        <div class="form-actions" style="margin-top:1rem">
+          <button class="btn btn-danger" onclick="savePawnItem()">Log Item</button>
+          <button class="btn btn-ghost" onclick="resetPawnForm()">Clear</button>
+        </div>
+        <div id="pawnAlert" class="alert hidden"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid-3" style="margin-bottom:1.5rem">
+        <div class="stat-card"><div class="stat-label">ITEMS IN STOCK</div><div class="stat-value" id="pawnStatIn">—</div></div>
+        <div class="stat-card"><div class="stat-label">TOTAL PAID OUT</div><div class="stat-value blood" id="pawnStatPaid">—</div></div>
+        <div class="stat-card"><div class="stat-label">TOTAL PROFIT</div><div class="stat-value green" id="pawnStatProfit">—</div></div>
+      </div>
+
+      <!-- Records -->
+      <div class="panel">
+        <div class="panel-title">All Items</div>
+        <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+          <div class="form-group" style="min-width:150px"><label class="form-label">FILTER STATUS</label>
+            <select class="form-control" id="pawnFilter" onchange="loadPawnRecords()">
+              <option value="">All</option>
+              <option value="in">In Stock</option>
+              <option value="sold">Sold</option>
+              <option value="redeemed">Redeemed</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>DATE</th><th>ITEM</th><th>STATUS</th><th>PAID OUT</th><th>ASKING</th><th>PROFIT</th><th></th></tr></thead>
+          <tbody id="pawnTable"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- ══ MONEY CLEANING (boss) ══ -->
     <section class="page-section" id="sec-money-clean">
       <div class="page-header"><h1 class="page-title">WASHITDADDY</h1><span class="page-sub">MONEY CLEANING</span></div>
@@ -506,14 +571,14 @@ const BOSS_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
-  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},{id:"payouts",icon:"💰",label:"Payouts"},
+  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},{id:"pawn",icon:"💀",label:"Pawn of the Dead"},{id:"payouts",icon:"💰",label:"Payouts"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 const CAPTAIN_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
-  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},
+  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},{id:"pawn",icon:"💀",label:"Pawn of the Dead"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 
@@ -521,7 +586,7 @@ const CREW_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
-  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},
+  {section:"FINANCE"},{id:"money-clean",icon:"💵",label:"WashitDaddy"},{id:"pawn",icon:"💀",label:"Pawn of the Dead"},
 ];
 
 const sidebar = document.getElementById("sidebar");
@@ -548,6 +613,7 @@ function showSection(id, btn) {
   if(id==="constitution")  loadConstitution();
   if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); const jgc=document.getElementById("jobGangCut"); if(jgc) jgc.value=gangSettings.gangCut||50; }
   if(id==="job-dashboard") loadJobs();
+  if(id==="pawn")          { loadPawnRecords(); }
   if(id==="money-clean")   {
     document.getElementById("cleanDate").valueAsDate=new Date();
     document.getElementById("cleanItemRows").innerHTML="";
@@ -1151,6 +1217,103 @@ window.updateCleanCalc=function(){
   document.getElementById("cleanTotalPay").textContent="£"+totalPay.toLocaleString();
   document.getElementById("cleanTotalProfit").textContent="£"+profit.toLocaleString();
 };
+
+// ══════════════════════════════════════════════
+// PAWN OF THE DEAD
+// ══════════════════════════════════════════════
+window.updatePawnCalc = function() {
+  const paid   = +document.getElementById("pawnPaid").value || 0;
+  const ask    = +document.getElementById("pawnAsk").value  || 0;
+  const profit = ask - paid;
+  document.getElementById("pawnPaidOut").textContent = "£" + paid.toLocaleString();
+  document.getElementById("pawnAskOut").textContent  = "£" + ask.toLocaleString();
+  document.getElementById("pawnProfit").textContent  = "£" + profit.toLocaleString();
+  document.getElementById("pawnProfit").style.color  = profit >= 0 ? "var(--green)" : "var(--blood)";
+};
+
+window.savePawnItem = async function() {
+  const date = document.getElementById("pawnDate").value;
+  const item = document.getElementById("pawnItem").value.trim();
+  if (!date || !item) { showAlert("pawnAlert","error","Date and item name required."); return; }
+  const paid   = +document.getElementById("pawnPaid").value || 0;
+  const ask    = +document.getElementById("pawnAsk").value  || 0;
+  const status = document.getElementById("pawnStatus").value;
+  await db.collection("pawn").add({
+    date, item, status, paid, ask,
+    profit: ask - paid,
+    loggedBy: user, loggedAt: new Date().toISOString()
+  });
+  showAlert("pawnAlert","success","Item logged.");
+  resetPawnForm();
+  loadPawnRecords();
+};
+
+window.resetPawnForm = function() {
+  document.getElementById("pawnItem").value = "";
+  document.getElementById("pawnPaid").value = 0;
+  document.getElementById("pawnAsk").value  = 0;
+  document.getElementById("pawnDate").valueAsDate = new Date();
+  document.getElementById("pawnStatus").value = "in";
+  updatePawnCalc();
+};
+
+window.updatePawnStatus = async function(id, newStatus) {
+  await db.collection("pawn").doc(id).update({ status: newStatus });
+  loadPawnRecords();
+};
+
+window.deletePawnItem = async function(id) {
+  if (!confirm("Delete this item?")) return;
+  await db.collection("pawn").doc(id).delete();
+  loadPawnRecords();
+};
+
+async function loadPawnRecords() {
+  // Set today on first load
+  const dateEl = document.getElementById("pawnDate");
+  if (dateEl && !dateEl.value) dateEl.valueAsDate = new Date();
+
+  const snap = await db.collection("pawn").orderBy("date","desc").get();
+  let items = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+  const filter = document.getElementById("pawnFilter")?.value;
+  if (filter) items = items.filter(i => i.status === filter);
+
+  // Stats (always from full set)
+  const all = snap.docs.map(d => d.data());
+  const inStock  = all.filter(i => i.status === "in");
+  const sold     = all.filter(i => i.status === "sold");
+  const totalPaid   = all.reduce((s,i) => s + (i.paid||0), 0);
+  const totalProfit = sold.reduce((s,i) => s + (i.profit||0), 0);
+  document.getElementById("pawnStatIn").textContent     = inStock.length;
+  document.getElementById("pawnStatPaid").textContent   = "£" + totalPaid.toLocaleString();
+  document.getElementById("pawnStatProfit").textContent = "£" + totalProfit.toLocaleString();
+
+  const statusLabel = { in:"IN STOCK", sold:"SOLD", redeemed:"REDEEMED" };
+  const statusColor = { in:"var(--gold)", sold:"var(--green)", redeemed:"var(--blood)" };
+
+  const tbody = document.getElementById("pawnTable");
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-dim);font-family:var(--font-mono);padding:2rem">No items logged yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(i => `<tr>
+    <td class="mono">${i.date}</td>
+    <td style="font-weight:700">${i.item}</td>
+    <td>
+      <select class="form-control" style="padding:0.3rem 0.5rem;font-size:0.8rem;height:auto"
+        onchange="updatePawnStatus('${i.id}', this.value)">
+        <option value="in"       ${i.status==='in'?'selected':''}>In Stock</option>
+        <option value="sold"     ${i.status==='sold'?'selected':''}>Sold</option>
+        <option value="redeemed" ${i.status==='redeemed'?'selected':''}>Redeemed</option>
+      </select>
+    </td>
+    <td class="mono" style="color:var(--blood)">£${(i.paid||0).toLocaleString()}</td>
+    <td class="mono" style="color:var(--gold)">£${(i.ask||0).toLocaleString()}</td>
+    <td class="mono" style="color:${(i.profit||0)>=0?'var(--green)':'var(--blood)'}">£${(i.profit||0).toLocaleString()}</td>
+    <td><button class="btn btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.6rem" onclick="deletePawnItem('${i.id}')">🗑</button></td>
+  </tr>`).join("");
+}
 
 window.saveClean=async function(){
   const date=document.getElementById("cleanDate").value;
