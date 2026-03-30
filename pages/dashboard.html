@@ -1324,7 +1324,7 @@ async function loadPawnRecords() {
   }).join("");
 }
 
-window.saveClean=async function(){{
+window.saveClean=async function(){
   const date=document.getElementById("cleanDate").value;
   if(!date){showAlert("cleanAlert","error","Date required.");return;}
   const rows=document.querySelectorAll("#cleanItemRows .clean-item-row");
