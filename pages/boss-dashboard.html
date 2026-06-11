@@ -331,9 +331,11 @@
     if (id==="log")      loadCrewForForm();
   };
 
-  document.querySelectorAll(".nav-btn[data-section]").forEach(btn => {
-    btn.addEventListener("click", function() {
-      showSection(this.getAttribute("data-section"));
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".nav-btn[data-section]").forEach(btn => {
+      btn.addEventListener("click", function() {
+        showSection(this.getAttribute("data-section"));
+      });
     });
   });
 

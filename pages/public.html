@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAWN OF THE DEAD — Browse</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    /* ── Tab strip ── */
+    .pub-tabs {
+      display: flex;
+      border-bottom: 2px solid var(--accent-red);
+      flex-shrink: 0;
+    }
+    .pub-tab {
+      flex: 1;
+      padding: 9px 4px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      color: var(--muted-text);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pub-tab:hover { color: var(--light-text); }
+    .pub-tab.active {
+      color: var(--primary-text);
+      border-bottom-color: var(--primary-text);
+      background: rgba(212,175,55,0.06);
+    }
+
+    /* ── Filter bars — hide inactive tab's controls ── */
+    .tab-controls { display: none; }
+    .tab-controls.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="phone-container">
+    <div class="phone-screen">
+
+      <header>
+        <div class="logo-section">
+          <div class="logo">☠️</div>
+          <h1>PAWN OF THE DEAD</h1>
+        </div>
+        <p id="headerSub">What We Purchase</p>
+
+        <!-- WE BUY filters (now first/default) -->
+        <div class="tab-controls active" id="ctrl-buy">
+          <div class="sort-controls">
+            <div class="search-bar">
+              <input type="text" id="buySearch" placeholder="Search price list…" oninput="applyBuyFilter()"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOR SALE filters -->
+        <div class="tab-controls" id="ctrl-sale">
+          <div class="sort-controls">
+            <div class="search-bar">
+              <input type="text" id="saleSearch" placeholder="Search items…" oninput="applyFilters()"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab strip -->
+        <div class="pub-tabs">
+          <button class="pub-tab active" id="tab-buy"  onclick="switchTab('buy')">💰 We Buy</button>
+          <button class="pub-tab"        id="tab-sale" onclick="switchTab('sale')">🛒 For Sale</button>
+        </div>
+      </header>
+
+      <!-- WE BUY (price list) — now first/default -->
+      <main id="page-buy" class="active">
+        <div id="priceListContainer">
+          <div class="empty-state"><span class="empty-icon">💀</span>Loading prices…</div>
+        </div>
+      </main>
+
+      <!-- FOR SALE -->
+      <main id="page-sale">
+        <div id="itemsContainer">
+          <div class="empty-state"><span class="empty-icon">💀</span>Loading inventory…</div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const FB_CONFIG = {
+      apiKey:            "AIzaSyBSCSW4pCsTtWJSsmh4n3gqpQkVZT9WVOU",
+      authDomain:        "pawn-of-the-dead.firebaseapp.com",
+      projectId:         "pawn-of-the-dead",
+      storageBucket:     "pawn-of-the-dead.firebasestorage.app",
+      messagingSenderId: "247522640326",
+      appId:             "1:247522640326:web:afdd7403d4294e21acf2c7"
+    };
+
+    let db         = null;
+    let allItems   = [];
+    let allPrices  = [];
+    let activeTab  = "buy";
+    let priceLoaded = false;
+
+    // ── Init ────────────────────────────────────────────────
+    function initFirebase() {
+      try {
+        if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(FB_CONFIG);
+        db = firebase.firestore();
+        loadPriceList(); // We Buy is the default tab
+        loadItems();     // pre-load For Sale in background
+      } catch (e) {
+        document.getElementById("priceListContainer").innerHTML =
+          `<div class="message error">Firebase error: ${e.message}</div>`;
+      }
+    }
+
+    // ── Tab switching ────────────────────────────────────────
+    function switchTab(tab) {
+      activeTab = tab;
+
+      // Toggle pages
+      document.querySelectorAll("main").forEach(m => m.classList.remove("active"));
+      document.getElementById("page-" + tab).classList.add("active");
+
+      // Toggle tab buttons
+      document.querySelectorAll(".pub-tab").forEach(b => b.classList.remove("active"));
+      document.getElementById("tab-" + tab).classList.add("active");
+
+      // Toggle filter bars
+      document.querySelectorAll(".tab-controls").forEach(c => c.classList.remove("active"));
+      document.getElementById("ctrl-" + tab).classList.add("active");
+
+      // Update subtitle
+      const subs = { buy: "What We Purchase", sale: "For Sale — Cursed Inventory" };
+      document.getElementById("headerSub").textContent = subs[tab];
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  FOR SALE TAB
+    // ════════════════════════════════════════════════════════
+    async function loadItems() {
+      try {
+        const snap = await db.collection("items").where("visible", "==", true).get();
+        allItems = [];
+
+        snap.forEach(doc => {
+          const d = { id: doc.id, ...doc.data() };
+          allItems.push(d);
+        });
+
+        applyFilters();
+      } catch (e) {
+        document.getElementById("itemsContainer").innerHTML =
+          `<div class="message error">${e.message}</div>`;
+      }
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById("saleSearch").value || "").toLowerCase();
+
+      let list = allItems.filter(i =>
+        !q || (i.name||"").toLowerCase().includes(q) || (i.category||"").toLowerCase().includes(q)
+      );
+
+      list.sort((a,b) => (a.name||"").localeCompare(b.name||""));
+      renderItems(list);
+    }
+
+    function renderItems(items) {
+      const container = document.getElementById("itemsContainer");
+
+      if (!items.length) {
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">☠️</span>No items found.</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="item-card">
+          <div class="item-header">
+            <h3>${escHtml(item.name)}</h3>
+            <span class="item-price">£${(item.price||0).toFixed(2)}</span>
+          </div>
+          <div class="item-meta">
+            <span class="item-category">📦 ${item.category ? cap(item.category) : 'N/A'}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  WE BUY TAB
+    // ════════════════════════════════════════════════════════
+    async function loadPriceList() {
+      try {
+        const snap = await db.collection("pricelist").get();
+        allPrices = [];
+
+        snap.forEach(doc => {
+          const d = { id: doc.id, ...doc.data() };
+          allPrices.push(d);
+        });
+
+        priceLoaded = true;
+        applyBuyFilter();
+      } catch (e) {
+        document.getElementById("priceListContainer").innerHTML =
+          `<div class="message error">${e.message}</div>`;
+      }
+    }
+
+    function applyBuyFilter() {
+      const q = (document.getElementById("buySearch").value || "").toLowerCase();
+
+      let list = allPrices.filter(e =>
+        !q || (e.name||"").toLowerCase().includes(q) || (e.category||"").toLowerCase().includes(q)
+      );
+
+      list.sort((a,b) => (a.name||"").localeCompare(b.name||""));
+      renderPriceList(list);
+    }
+
+    function renderPriceList(entries) {
+      const container = document.getElementById("priceListContainer");
+
+      if (!entries.length) {
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">☠️</span>Nothing found.</div>`;
+        return;
+      }
+
+      // Group by category
+      const groups = {};
+      entries.forEach(e => {
+        const k = e.category || "Uncategorised";
+        if (!groups[k]) groups[k] = [];
+        groups[k].push(e);
+      });
+
+      container.innerHTML = Object.keys(groups).sort().map(cat => `
+        <div class="category-group">
+          <div class="category-label">📦 ${cap(cat)}</div>
+          ${groups[cat].map(e => `
+            <div class="item-card">
+              <div class="item-header">
+                <h3>${escHtml(e.name)}</h3>
+                <span class="item-price">£${(e.buyPrice||0).toFixed(2)}</span>
+              </div>
+              ${e.notes ? `<div class="item-meta"><span class="item-category">${escHtml(e.notes)}</span></div>` : ''}
+            </div>
+          `).join("")}
+        </div>
+      `).join("");
+    }
+
+    // ── Utils ───────────────────────────────────────────────
+    function escHtml(str) {
+      return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    function cap(str) {
+      return String(str||"").charAt(0).toUpperCase() + String(str||"").slice(1);
+    }
+
+    window.addEventListener("load", initFirebase);
+  </script>
+</body>
+</html>

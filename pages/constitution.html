@@ -58,6 +58,7 @@
 <script>
   firebase.initializeApp(FIREBASE_CONFIG);
   const db = firebase.firestore();
+  db.settings({ experimentalForceLongPolling: true, merge: true });
 
   const role = sessionStorage.getItem("bl_role");
   const user = sessionStorage.getItem("bl_user");

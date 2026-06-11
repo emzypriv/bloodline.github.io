@@ -1,79 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <title>BLOODLINE — Access</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAWN OF THE DEAD — Access</title>
   <link rel="stylesheet" href="css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 </head>
 <body class="login-page">
-<div class="scanlines"></div>
+  <div class="phone-container">
+    <div class="phone-screen">
+      <div class="login-wrap">
 
-<div class="login-wrap">
-  <div class="login-brand">
-    <div class="brand-icon">🩸</div>
-    <h1 class="brand-title">BLOODLINE</h1>
-    <p class="brand-sub">Blood makes you related, Loyalty makes you Family</p>
+        <div class="login-brand">
+          <span class="brand-icon">☠️</span>
+          <h1 class="brand-title">PAWN OF THE DEAD</h1>
+          <p class="brand-sub">Undead Merchandise · Cursed Antiquities</p>
+        </div>
+
+        <div class="login-box">
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+
+          <h2 class="login-heading">Staff Access</h2>
+
+          <div class="field-group">
+            <label class="field-label">Username</label>
+            <input type="text" id="loginName" class="field-input" placeholder="enter your name" autocomplete="off"/>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Password</label>
+            <input type="password" id="loginPass" class="field-input" placeholder="••••••••"/>
+          </div>
+
+          <button class="btn-primary" onclick="handleLogin()">Enter the Crypt</button>
+
+          <p id="loginError" class="login-error"></p>
+        </div>
+
+        <p class="login-footer">PAWN OF THE DEAD © — We buy the dead, we sell the damned.</p>
+      </div>
+    </div>
   </div>
 
-  <div class="login-box">
-    <div class="corner tl"></div><div class="corner tr"></div>
-    <div class="corner bl"></div><div class="corner br"></div>
+  <!-- Firebase compat (LB-Phone safe — no ES module imports) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <h2 class="login-heading">IDENTIFY YOURSELF</h2>
+  <script>
+    // ── Firebase config ──────────────────────────────────────
+    const FB_CONFIG = {
+      apiKey:            "AIzaSyBSCSW4pCsTtWJSsmh4n3gqpQkVZT9WVOU",
+      authDomain:        "pawn-of-the-dead.firebaseapp.com",
+      projectId:         "pawn-of-the-dead",
+      storageBucket:     "pawn-of-the-dead.firebasestorage.app",
+      messagingSenderId: "247522640326",
+      appId:             "1:247522640326:web:afdd7403d4294e21acf2c7"
+    };
 
-    <div class="field-group">
-      <label class="field-label">HANDLE</label>
-      <input type="text" id="loginName" class="field-input" placeholder="your street name" autocomplete="off"/>
-    </div>
+    let db = null;
 
-    <div class="field-group">
-      <label class="field-label">ACCESS CODE</label>
-      <input type="password" id="loginPass" class="field-input" placeholder="••••••••"/>
-    </div>
+    function initFirebase() {
+      try {
+        // Guard against duplicate initialisation (LB-Phone reloads)
+        if (!firebase.apps || firebase.apps.length === 0) {
+          firebase.initializeApp(FB_CONFIG);
+        }
+        db = firebase.firestore();
 
-    <button class="btn-primary" onclick="doLogin()">ENTER THE BLOODLINE</button>
-    <p id="loginError" class="login-error"></p>
-    <p id="debugLine" style="font-family:monospace;font-size:0.55rem;color:#444;text-align:center;margin-top:6px;word-break:break-all;min-height:1rem;"></p>
-  </div>
-
-  <p class="login-footer">BLOODLINE © — By Blood, By Bond.</p>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="config.js"></script>
-<script>
-  firebase.initializeApp(FIREBASE_CONFIG);
-  const db = firebase.firestore();
-
-  function debug(msg) { document.getElementById("debugLine").textContent = msg; }
-
-  async function doLogin() {
-    const handle = document.getElementById("loginName").value.trim().toLowerCase();
-    const pass   = document.getElementById("loginPass").value;
-    const err    = document.getElementById("loginError");
-    err.textContent = "";
-    if (!handle || !pass) { err.textContent = "⚠ Fill in all fields."; return; }
-    try {
-      debug("Connecting...");
-      const userDoc = await db.collection("users").doc(handle).get();
-      if (!userDoc.exists) { err.textContent = "⚠ Unknown operative."; debug("Not found."); return; }
-      const data = userDoc.data();
-      if (data.pin !== pass) { err.textContent = "⚠ Wrong code."; debug("PIN mismatch."); return; }
-      sessionStorage.setItem("bl_user",    handle);
-      sessionStorage.setItem("bl_role",    data.role);
-      sessionStorage.setItem("bl_display", data.displayName || handle);
-      debug("Access granted.");
-      window.location.href = "pages/dashboard.html";
-    } catch(e) {
-      err.textContent = "⚠ System error.";
-      debug("ERROR: " + e.message);
+        // Disable long-polling / websockets that trip up FiveM's CEF
+      } catch (e) {
+        console.error("Firebase init error:", e);
+      }
     }
-  }
-  document.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
-  debug("System online.");
-</script>
+
+    async function handleLogin() {
+      const errEl = document.getElementById("loginError");
+      errEl.textContent = "";
+
+      if (!db) { errEl.textContent = "⚠ Firebase not ready — refresh."; return; }
+
+      const user = document.getElementById("loginName").value.trim().toLowerCase();
+      const pass = document.getElementById("loginPass").value;
+
+      if (!user || !pass) { errEl.textContent = "⚠ Fill in all fields."; return; }
+
+      try {
+        const doc = await db.collection("staff").doc(user).get();
+
+        if (!doc.exists) { errEl.textContent = "⚠ Unknown operative."; return; }
+
+        const data = doc.data();
+        if (data.pin !== pass) { errEl.textContent = "⚠ Wrong code."; return; }
+
+        sessionStorage.setItem("potd_user",    user);
+        sessionStorage.setItem("potd_role",    data.role    || "staff");
+        sessionStorage.setItem("potd_display", data.displayName || user);
+
+        window.location.href = "staff-dashboard.html";
+      } catch (e) {
+        errEl.textContent = "⚠ " + e.message;
+        console.error(e);
+      }
+    }
+
+    window.addEventListener("load", initFirebase);
+    document.addEventListener("keydown", e => { if (e.key === "Enter") handleLogin(); });
+  </script>
 </body>
 </html>
