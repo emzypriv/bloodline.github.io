@@ -48,9 +48,6 @@
     </button>
 
     <div class="nav-section">FINANCE</div>
-    <button class="nav-item" onclick="showSection('money-clean')">
-      <span class="nav-icon">💵</span> Money Cleaning
-    </button>
     <button class="nav-item" onclick="showSection('payouts')">
       <span class="nav-icon">💰</span> Crew Payouts
     </button>
@@ -68,7 +65,7 @@
         <span class="page-sub">BLOODLINE COMMAND CENTER</span>
       </div>
 
-      <div class="grid-4" id="overviewStats">
+      <div class="grid-2" id="overviewStats">
         <div class="stat-card">
           <div class="stat-label">TOTAL JOBS</div>
           <div class="stat-value" id="statJobs">—</div>
@@ -76,14 +73,6 @@
         <div class="stat-card">
           <div class="stat-label">GROSS TAKE</div>
           <div class="stat-value gold" id="statGross">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">CLEAN MONEY</div>
-          <div class="stat-value green" id="statClean">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">DIRTY BOUGHT</div>
-          <div class="stat-value blood" id="statDirty">—</div>
         </div>
       </div>
 
@@ -322,79 +311,6 @@
     </section>
 
     <!-- ══════════════════════════════════════════ -->
-    <!-- MONEY CLEANING (BOSS ONLY) -->
-    <!-- ══════════════════════════════════════════ -->
-    <section class="page-section" id="sec-money-clean">
-      <div class="page-header">
-        <h1 class="page-title">MONEY CLEANING</h1>
-        <span class="page-sub">BUYING DIRTY MONEY FROM OTHER GANGS</span>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">🏦 NEW CLEANING DEAL</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">DATE</label>
-            <input class="form-control" type="date" id="cleanDate"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">SELLER GANG</label>
-            <input class="form-control" id="cleanGang" placeholder="e.g. Los Santos Cartel"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">DIRTY AMOUNT (£)</label>
-            <input class="form-control" type="number" id="cleanDirty" value="0" oninput="updateCleanCalc()"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">BUY RATE (%)</label>
-            <input class="form-control" type="number" id="cleanRate" value="70" min="1" max="100" oninput="updateCleanCalc()"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">WE PAY THEM (£)</label>
-            <input class="form-control" id="cleanWePay" readonly style="color:var(--blood)"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">OUR PROFIT (£)</label>
-            <input class="form-control" id="cleanProfit" readonly style="color:var(--green)"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">CLEANING METHOD</label>
-            <select class="form-control" id="cleanMethod">
-              <option>Fake Business</option>
-              <option>Casino</option>
-              <option>Property Deal</option>
-              <option>Crypto Exchange</option>
-              <option>Offshore Transfer</option>
-              <option>Smurfing</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">CONTACT / BROKER</label>
-            <input class="form-control" id="cleanContact" placeholder="Who brokered this?"/>
-          </div>
-          <div class="form-group form-full">
-            <label class="form-label">NOTES</label>
-            <textarea class="form-control" id="cleanNotes" placeholder="Any conditions, risks, follow-up needed..."></textarea>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-gold" onclick="saveClean()">LOG CLEANING DEAL</button>
-        </div>
-        <div id="cleanAlert" class="alert hidden"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">📜 CLEANING RECORDS</div>
-        <table class="data-table">
-          <thead><tr>
-            <th>DATE</th><th>GANG</th><th>DIRTY £</th><th>RATE</th><th>WE PAID</th><th>PROFIT</th><th>METHOD</th>
-          </tr></thead>
-          <tbody id="cleanTable"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ══════════════════════════════════════════ -->
     <!-- PAYOUTS -->
     <!-- ══════════════════════════════════════════ -->
     <section class="page-section" id="sec-payouts">
@@ -516,7 +432,6 @@ window.showSection = function(id) {
   if (id === "calendar") renderCalendar();
   if (id === "recipes") loadRecipes();
   if (id === "job-dashboard") loadJobs();
-  if (id === "money-clean") { loadCleans(); document.getElementById("cleanDate").valueAsDate = new Date(); }
   if (id === "payouts") { const d = new Date(); document.getElementById("payoutMonth").value = d.toISOString().slice(0,7); }
 };
 
@@ -578,23 +493,18 @@ function updatePayoutPreview() {
 // OVERVIEW
 // ══════════════════════════════════════════════
 async function loadOverview() {
-  const [jobsSnap, cleansSnap, eventsSnap] = await Promise.all([
+  const [jobsSnap, eventsSnap] = await Promise.all([
     _fsGetDocs(query(db.collection("jobs"), orderBy("date", "desc"))),
-    _fsGetDocs(db.collection("cleans")),
     _fsGetDocs(query(db.collection("events"), orderBy("date")))
   ]);
 
   const jobs = jobsSnap.docs.map(d => ({id:d.id,...d.data()}));
-  const cleans = cleansSnap.docs.map(d => ({id:d.id,...d.data()}));
 
-  let gross = 0, clean = 0, dirty = 0;
+  let gross = 0;
   jobs.forEach(j => { gross += j.gross || 0; });
-  cleans.forEach(c => { clean += c.profit || 0; dirty += c.dirtyAmount || 0; });
 
   document.getElementById("statJobs").textContent = jobs.length;
   document.getElementById("statGross").textContent = "£" + gross.toLocaleString();
-  document.getElementById("statClean").textContent = "£" + clean.toLocaleString();
-  document.getElementById("statDirty").textContent = "£" + dirty.toLocaleString();
 
   const tbody = document.getElementById("overviewJobsBody");
   tbody.innerHTML = jobs.slice(0,5).map(j => `
@@ -847,55 +757,6 @@ window.clearFilter = function() {
   document.getElementById("filterPerson").value="";
   loadJobs();
 };
-
-// ══════════════════════════════════════════════
-// MONEY CLEANING
-// ══════════════════════════════════════════════
-window.updateCleanCalc = function() {
-  const dirty  = +document.getElementById("cleanDirty").value||0;
-  const rate   = +document.getElementById("cleanRate").value||0;
-  const wePay  = Math.round(dirty * rate / 100);
-  const profit = dirty - wePay;
-  document.getElementById("cleanWePay").value  = "£" + wePay.toLocaleString();
-  document.getElementById("cleanProfit").value = "£" + profit.toLocaleString();
-};
-
-window.saveClean = async function() {
-  const date  = document.getElementById("cleanDate").value;
-  const gang  = document.getElementById("cleanGang").value.trim();
-  const dirty = +document.getElementById("cleanDirty").value||0;
-  const rate  = +document.getElementById("cleanRate").value||0;
-  if (!date||!gang||!dirty) { showAlert("cleanAlert","error","Fill in all required fields."); return; }
-  const wePay  = Math.round(dirty * rate / 100);
-  const profit = dirty - wePay;
-  await addDoc(db.collection("cleans"),{
-    date, gang, dirtyAmount:dirty, rate, wePay, profit,
-    method: document.getElementById("cleanMethod").value,
-    contact: document.getElementById("cleanContact").value.trim(),
-    notes: document.getElementById("cleanNotes").value.trim(),
-    loggedBy: user, loggedAt: new Date().toISOString()
-  });
-  showAlert("cleanAlert","success","Cleaning deal logged.");
-  loadCleans();
-};
-
-async function loadCleans() {
-  const snap = await _fsGetDocs(query(db.collection("cleans"),orderBy("date","desc")));
-  const tbody = document.getElementById("cleanTable");
-  if (snap.empty) { tbody.innerHTML=`<tr><td colspan="7" style="color:var(--text-dim);text-align:center;padding:2rem;font-family:var(--font-mono)">No cleaning deals yet.</td></tr>`; return; }
-  tbody.innerHTML = snap.docs.map(d=>{
-    const c = d.data();
-    return `<tr>
-      <td class="mono">${c.date}</td>
-      <td>${c.gang}</td>
-      <td class="mono" style="color:var(--blood)">£${(c.dirtyAmount||0).toLocaleString()}</td>
-      <td class="mono">${c.rate}%</td>
-      <td class="mono" style="color:var(--amber)">£${(c.wePay||0).toLocaleString()}</td>
-      <td class="mono" style="color:var(--green)">£${(c.profit||0).toLocaleString()}</td>
-      <td>${c.method||"—"}</td>
-    </tr>`;
-  }).join("");
-}
 
 // ══════════════════════════════════════════════
 // PAYOUTS
