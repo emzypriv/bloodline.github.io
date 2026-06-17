@@ -133,11 +133,9 @@
     if (id==="jobs")     loadMyJobs();
   };
 
-  document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".nav-btn[data-section]").forEach(btn => {
-      btn.addEventListener("click", function() {
-        showSection(this.getAttribute("data-section"));
-      });
+  document.querySelectorAll(".nav-btn[data-section]").forEach(btn => {
+    btn.addEventListener("click", function() {
+      showSection(this.getAttribute("data-section"));
     });
   });
 
