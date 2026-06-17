@@ -1,11 +1,11 @@
 // ============================================================
 // BLOODLINE — Firebase Config
-// Edit this file once; all pages share it automatically.
+// Replace these values with your own Firebase project config
 // Go to: https://console.firebase.google.com
 // Create a project → Add Web App → Copy config below
 // ============================================================
 
-const FIREBASE_CONFIG = {
+export const FIREBASE_CONFIG = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
   projectId: "YOUR_PROJECT_ID",
@@ -24,7 +24,7 @@ const FIREBASE_CONFIG = {
 // 6. In Firestore, manually create a "users" collection:
 //    Document ID = their handle (lowercase, e.g. "ghost")
 //    Fields:
-//      pin: "1234"          (string - their access code)
-//      role: "boss"         (string - "boss" or "crew")
+//      pin: "1234"         (string - their access code)
+//      role: "boss"        (string - "boss" or "crew")
 //      displayName: "Ghost" (string - shown in UI)
 // ============================================================

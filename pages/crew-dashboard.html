@@ -2,71 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BLOODLINE — Crew</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 </head>
 <body>
 <div class="scanlines"></div>
-<div class="app-shell">
+<div class="noise"></div>
 
-  <!-- TOP BAR -->
+<div class="app-shell">
+  <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-brand">🩸 BLOODLINE</div>
-    <div class="topbar-badge gold">CREW</div>
-    <div class="topbar-user">OPR: <span id="displayUser">—</span></div>
-    <button class="btn-logout" onclick="logout()">OUT</button>
+    <div class="topbar-badge" style="background:var(--gold-dim)">CREW</div>
+    <div class="topbar-right">
+      <div class="topbar-user">OPERATIVE: <span id="displayUser">—</span></div>
+      <button class="btn-logout" onclick="logout()">LOGOUT</button>
+    </div>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">INTEL</div>
+    <button class="nav-item active" onclick="showSection('my-cuts')">
+      <span class="nav-icon">💰</span> My Cuts
+    </button>
+    <button class="nav-item" onclick="showSection('calendar')">
+      <span class="nav-icon">📅</span> Calendar
+    </button>
+    <button class="nav-item" onclick="showSection('recipes')">
+      <span class="nav-icon">🧪</span> Recipes
+    </button>
+    <button class="nav-item" onclick="window.location.href='constitution.html'">
+      <span class="nav-icon">📜</span> Constitution
+    </button>
+
+    <div class="nav-section">OPERATIONS</div>
+    <button class="nav-item" onclick="showSection('my-jobs')">
+      <span class="nav-icon">📋</span> My Jobs
+    </button>
+  </nav>
+
+  <!-- MAIN -->
   <main class="main-content">
 
     <!-- MY CUTS -->
-    <section class="page-section active" id="sec-cuts">
+    <section class="page-section active" id="sec-my-cuts">
       <div class="page-header">
         <h1 class="page-title">MY CUTS</h1>
         <span class="page-sub" id="crewSubtitle">YOUR EARNINGS</span>
       </div>
-      <div class="stats-row cols-3">
+
+      <div class="grid-3" style="margin-bottom:1.5rem">
         <div class="stat-card">
-          <div class="stat-label">JOBS</div>
+          <div class="stat-label">TOTAL JOBS</div>
           <div class="stat-value" id="myStatJobs">—</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">TOTAL</div>
+          <div class="stat-label">TOTAL EARNED</div>
           <div class="stat-value green" id="myStatTotal">—</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">THIS MO.</div>
+          <div class="stat-label">THIS MONTH</div>
           <div class="stat-value gold" id="myStatMonth">—</div>
         </div>
       </div>
+
       <div class="panel">
-        <div class="panel-title">💸 EARNINGS</div>
+        <div class="panel-title">💸 EARNINGS BREAKDOWN</div>
         <div id="myCutsBreakdown"></div>
       </div>
     </section>
 
-    <!-- MY JOBS -->
-    <section class="page-section" id="sec-jobs">
-      <div class="page-header">
-        <h1 class="page-title">MY JOBS</h1>
-        <span class="page-sub">OPERATIONS YOU WERE ON</span>
-      </div>
-      <div class="panel">
-        <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:10px">
-          <div class="form-group" style="flex:1;margin:0">
-            <label class="form-label">FILTER MONTH</label>
-            <input class="form-control" type="month" id="myJobMonth"/>
-          </div>
-          <button class="btn btn-ghost" onclick="loadMyJobs()">GO</button>
-        </div>
-        <div id="myJobsList"></div>
-      </div>
-    </section>
-
-    <!-- CALENDAR -->
+    <!-- CALENDAR (read-only) -->
     <section class="page-section" id="sec-calendar">
       <div class="page-header">
         <h1 class="page-title">CALENDAR</h1>
@@ -80,230 +89,231 @@
         </div>
         <div class="calendar-grid" id="calGrid"></div>
       </div>
-      <div class="panel">
+      <div class="panel" style="margin-top:1rem">
         <div class="panel-title">🗓 UPCOMING</div>
         <div id="upcomingList"></div>
       </div>
     </section>
 
-    <!-- RECIPES -->
+    <!-- RECIPES (read-only) -->
     <section class="page-section" id="sec-recipes">
       <div class="page-header">
         <h1 class="page-title">RECIPES</h1>
         <span class="page-sub">CRAFTING CATALOGUE</span>
       </div>
-      <div id="recipeList"></div>
+      <div class="recipe-grid" id="recipeGrid"></div>
     </section>
 
-    <!-- CONSTITUTION -->
-    <section class="page-section" id="sec-constitution">
+    <!-- MY JOBS -->
+    <section class="page-section" id="sec-my-jobs">
       <div class="page-header">
-        <h1 class="page-title">CONSTITUTION</h1>
-        <span class="page-sub">LAWS OF THE FAMILY</span>
+        <h1 class="page-title">MY JOBS</h1>
+        <span class="page-sub">OPERATIONS YOU WERE ON</span>
       </div>
-      <div id="constitutionSections"></div>
+      <div class="panel">
+        <div style="display:flex;gap:1rem;margin-bottom:1rem">
+          <div class="form-group">
+            <label class="form-label">FILTER BY MONTH</label>
+            <input class="form-control" type="month" id="myJobMonth"/>
+          </div>
+          <button class="btn btn-ghost" style="margin-top:auto" onclick="loadMyJobs()">FILTER</button>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>DATE</th><th>TYPE</th><th>LOCATION</th><th>STATUS</th><th>YOUR CUT</th>
+          </tr></thead>
+          <tbody id="myJobsBody"></tbody>
+        </table>
+      </div>
     </section>
 
   </main>
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="showSection('cuts', this)">
-      <span class="nav-icon">💰</span>CUTS
-    </button>
-    <button class="nav-btn" onclick="showSection('jobs', this)">
-      <span class="nav-icon">📋</span>JOBS
-    </button>
-    <button class="nav-btn" onclick="showSection('calendar', this)">
-      <span class="nav-icon">📅</span>CAL
-    </button>
-    <button class="nav-btn" onclick="showSection('recipes', this)">
-      <span class="nav-icon">🧪</span>RECIPES
-    </button>
-    <button class="nav-btn" onclick="showSection('constitution', this)">
-      <span class="nav-icon">📜</span>LAWS
-    </button>
-  </nav>
-
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="../config.js"></script>
 <script>
-  firebase.initializeApp(FIREBASE_CONFIG);
-  const db = firebase.firestore();
+    // ============================================================
+    // PASTE YOUR FIREBASE CONFIG HERE (same as index.html)
+    // ============================================================
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyC6El4QT2--ecQNWV18e-4L4s26iol_eUk",
+      authDomain: "bloodline-efc76.firebaseapp.com",
+      projectId: "bloodline-efc76",
+      storageBucket: "bloodline-efc76.firebasestorage.app",
+      messagingSenderId: "97046048461",
+      appId: "1:97046048461:web:e1bdc760f130fb72830384"
+    };
+    // ============================================================
 
-  // ── Auth ──
-  const role    = sessionStorage.getItem("bl_role");
-  const user    = sessionStorage.getItem("bl_user");
-  const display = sessionStorage.getItem("bl_display");
-  if (role !== "crew") { window.location.href = "../index.html"; }
-  document.getElementById("displayUser").textContent = (display||user||"?").toUpperCase();
-  document.getElementById("crewSubtitle").textContent = (display||user||"CREW").toUpperCase() + "'S EARNINGS";
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.firestore();
 
-  window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
+    const collection = (d, c) => d.collection(c);
+    const query      = (ref, ...constraints) => { let q = ref; constraints.forEach(c => { q = c(q); }); return q; };
+    const orderBy    = (field, dir="asc") => (ref) => ref.orderBy(field, dir);
+    const _getDocs   = async (ref) => { const snap = await ref.get(); return { docs: snap.docs, empty: snap.empty }; };
 
-  // ── Navigation ──
-  window.showSection = function(id, btn) {
-    document.querySelectorAll(".page-section").forEach(s => s.classList.remove("active"));
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById("sec-" + id).classList.add("active");
-    if (btn) btn.classList.add("active");
-    if (id === "calendar")      renderCalendar();
-    if (id === "recipes")       loadRecipes();
-    if (id === "constitution")  loadConstitution();
-    if (id === "jobs")          loadMyJobs();
-  };
+// ── Auth guard ──
+const role    = sessionStorage.getItem("bl_role");
+const user    = sessionStorage.getItem("bl_user");
+const display = sessionStorage.getItem("bl_display");
+if (role !== "crew") { window.location.href = "../index.html"; }
+document.getElementById("displayUser").textContent = (display||user||"UNKNOWN").toUpperCase();
+document.getElementById("crewSubtitle").textContent = (display||user||"CREW").toUpperCase() + "'S EARNINGS";
 
-  // ── My Cuts ──
-  async function loadMyCuts() {
-    const snap = await db.collection("jobs").orderBy("date","desc").get();
-    const allJobs = snap.docs.map(d=>({id:d.id,...d.data()}));
-    const myJobs  = allJobs.filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
-    const now     = new Date();
-    const month   = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const total   = myJobs.reduce((s,j)=>s+(j.perHead||0),0);
-    const monthT  = myJobs.filter(j=>j.date&&j.date.startsWith(month)).reduce((s,j)=>s+(j.perHead||0),0);
+window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
 
-    document.getElementById("myStatJobs").textContent  = myJobs.length;
-    document.getElementById("myStatTotal").textContent = "£"+total.toLocaleString();
-    document.getElementById("myStatMonth").textContent = "£"+monthT.toLocaleString();
+// ── Navigation ──
+window.showSection = function(id) {
+  document.querySelectorAll(".page-section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+  document.getElementById("sec-"+id).classList.add("active");
+  event.currentTarget.classList.add("active");
+  if (id==="calendar")  renderCalendar();
+  if (id==="recipes")   loadRecipes();
+  if (id==="my-jobs")   loadMyJobs();
+};
 
-    const el = document.getElementById("myCutsBreakdown");
-    if (!myJobs.length) { el.innerHTML = `<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.7rem">No jobs yet.</p>`; return; }
-    el.innerHTML = myJobs.map(j=>`
-      <div class="data-row">
-        <span class="mono" style="color:var(--text-dim);font-size:0.6rem;min-width:72px">${j.date}</span>
-        <span style="font-weight:700;font-size:0.8rem;flex:1">${j.type}</span>
-        <span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span>
-        <span class="mono" style="color:var(--green)">£${(j.perHead||0).toLocaleString()}</span>
+// ══════════════════════════════════════════════
+// MY CUTS
+// ══════════════════════════════════════════════
+async function loadMyCuts() {
+  const snap = await _getDocs(query(db.collection("jobs"),orderBy("date","desc")));
+  const allJobs = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const myJobs  = allJobs.filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
+
+  const now   = new Date();
+  const month = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisMonthJobs = myJobs.filter(j=>j.date&&j.date.startsWith(month));
+
+  const total      = myJobs.reduce((s,j)=>s+(j.perHead||0),0);
+  const monthTotal = thisMonthJobs.reduce((s,j)=>s+(j.perHead||0),0);
+
+  document.getElementById("myStatJobs").textContent  = myJobs.length;
+  document.getElementById("myStatTotal").textContent = "£"+total.toLocaleString();
+  document.getElementById("myStatMonth").textContent = "£"+monthTotal.toLocaleString();
+
+  const breakdown = document.getElementById("myCutsBreakdown");
+  if (myJobs.length===0) {
+    breakdown.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono)">You haven't been on any jobs yet.</p>`;
+    return;
+  }
+
+  breakdown.innerHTML = myJobs.map(j=>`
+    <div style="display:flex;align-items:center;gap:1rem;padding:0.7rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <span class="mono" style="color:var(--text-dim);min-width:100px">${j.date}</span>
+      <span style="font-weight:700;flex:1">${j.type}</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim)">${j.location||""}</span>
+      <span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span>
+      <span style="font-family:var(--font-mono);color:var(--green);font-size:1rem;min-width:80px;text-align:right">£${(j.perHead||0).toLocaleString()}</span>
+    </div>`).join("");
+}
+loadMyCuts();
+
+// ══════════════════════════════════════════════
+// MY JOBS TABLE
+// ══════════════════════════════════════════════
+window.loadMyJobs = async function() {
+  const snap = await _getDocs(query(db.collection("jobs"),orderBy("date","desc")));
+  let jobs = snap.docs.map(d=>({id:d.id,...d.data()}))
+    .filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
+
+  const mf = document.getElementById("myJobMonth").value;
+  if (mf) jobs = jobs.filter(j=>j.date&&j.date.startsWith(mf));
+
+  const tbody = document.getElementById("myJobsBody");
+  if (jobs.length===0) {
+    tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--text-dim);font-family:var(--font-mono);padding:2rem">No jobs found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = jobs.map(j=>`<tr>
+    <td class="mono">${j.date}</td>
+    <td>${j.type}</td>
+    <td>${j.location||"—"}</td>
+    <td><span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span></td>
+    <td class="mono" style="color:var(--green)">£${(j.perHead||0).toLocaleString()}</td>
+  </tr>`).join("");
+};
+
+// ══════════════════════════════════════════════
+// CALENDAR (read-only)
+// ══════════════════════════════════════════════
+let calDate = new Date(), calEvents = [];
+
+async function fetchEvents() {
+  const snap = await _getDocs(db.collection("events"));
+  calEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+window.renderCalendar = async function() {
+  await fetchEvents();
+  const y=calDate.getFullYear(), m=calDate.getMonth();
+  document.getElementById("calTitle").textContent =
+    calDate.toLocaleString("en-GB",{month:"long",year:"numeric"}).toUpperCase();
+
+  const grid  = document.getElementById("calGrid");
+  const days  = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
+  let html    = days.map(d=>`<div class="cal-header">${d}</div>`).join("");
+
+  const first    = new Date(y,m,1);
+  let startDay   = first.getDay()-1; if(startDay<0) startDay=6;
+  const inMonth  = new Date(y,m+1,0).getDate();
+  const today    = new Date().toISOString().slice(0,10);
+
+  for(let i=0;i<startDay;i++){
+    const d=new Date(y,m,-startDay+i+1).getDate();
+    html+=`<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+  }
+  for(let d=1;d<=inMonth;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=ds===today;
+    const dayEv=calEvents.filter(e=>e.date===ds);
+    html+=`<div class="cal-day${isToday?' today':''}">
+      <div class="cal-day-num">${d}</div>
+      ${dayEv.map(e=>`<div class="cal-event${e.type==='meeting'?' meeting':''}">${e.title}</div>`).join("")}
+    </div>`;
+  }
+  grid.innerHTML=html;
+
+  // Upcoming
+  const todayStr = new Date().toISOString().slice(0,10);
+  const upcoming = calEvents.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,10);
+  const upDiv    = document.getElementById("upcomingList");
+  if(!upcoming.length){
+    upDiv.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.8rem">Nothing scheduled.</p>`;
+  } else {
+    upDiv.innerHTML = upcoming.map(e=>`
+      <div style="display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--border)">
+        <span class="badge ${e.type==='meeting'?'gold':''}">${e.type==='meeting'?'MEETING':'EVENT'}</span>
+        <span style="font-weight:700">${e.title}</span>
+        ${e.notes?`<span style="color:var(--text-dim);font-size:0.8rem;font-family:var(--font-body)">${e.notes}</span>`:''}
+        <span style="margin-left:auto;font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim)">${e.date}</span>
       </div>`).join("");
   }
-  loadMyCuts();
+};
 
-  // ── My Jobs ──
-  window.loadMyJobs = async function() {
-    const snap = await db.collection("jobs").orderBy("date","desc").get();
-    let jobs = snap.docs.map(d=>({...d.data()}))
-      .filter(j=>(j.crew||[]).map(c=>c.toLowerCase()).includes(user));
-    const mf = document.getElementById("myJobMonth").value;
-    if (mf) jobs = jobs.filter(j=>j.date&&j.date.startsWith(mf));
-    const el = document.getElementById("myJobsList");
-    if (!jobs.length) { el.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.7rem;padding:8px 0">No jobs found.</p>`; return; }
-    el.innerHTML = jobs.map(j=>`
-      <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:4px">
-        <div style="display:flex;align-items:center;gap:6px;width:100%">
-          <span class="mono" style="color:var(--text-dim);font-size:0.6rem">${j.date}</span>
-          <span style="font-weight:700;font-size:0.85rem;flex:1">${j.type}</span>
-          <span class="badge ${j.status==='success'?'green':j.status==='partial'?'gold':''}">${(j.status||"?").toUpperCase()}</span>
-        </div>
-        <div style="display:flex;gap:8px;width:100%">
-          <span style="color:var(--text-dim);font-size:0.7rem;flex:1">${j.location||"—"}</span>
-          <span class="mono" style="color:var(--green)">£${(j.perHead||0).toLocaleString()}</span>
-        </div>
-      </div>`).join("");
-  };
+window.calPrev = ()=>{ calDate.setMonth(calDate.getMonth()-1); renderCalendar(); };
+window.calNext = ()=>{ calDate.setMonth(calDate.getMonth()+1); renderCalendar(); };
 
-  // ── Calendar ──
-  let calDate = new Date(), calEvents = [];
-  async function fetchEvents() {
-    const snap = await db.collection("events").get();
-    calEvents = snap.docs.map(d=>({id:d.id,...d.data()}));
-  }
-  window.renderCalendar = async function() {
-    await fetchEvents();
-    const y=calDate.getFullYear(), m=calDate.getMonth();
-    document.getElementById("calTitle").textContent = calDate.toLocaleString("en-GB",{month:"long",year:"numeric"}).toUpperCase();
-    const grid = document.getElementById("calGrid");
-    const days = ["M","T","W","T","F","S","S"];
-    let html = days.map(d=>`<div class="cal-header">${d}</div>`).join("");
-    const first = new Date(y,m,1);
-    let startDay = first.getDay()-1; if(startDay<0) startDay=6;
-    const inMonth = new Date(y,m+1,0).getDate();
-    const today = new Date().toISOString().slice(0,10);
-    for(let i=0;i<startDay;i++){
-      html+=`<div class="cal-day other-month"><div class="cal-day-num">${new Date(y,m,-startDay+i+1).getDate()}</div></div>`;
-    }
-    for(let d=1;d<=inMonth;d++){
-      const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const dayEv=calEvents.filter(e=>e.date===ds);
-      html+=`<div class="cal-day${ds===today?' today':''}">
-        <div class="cal-day-num">${d}</div>
-        ${dayEv.map(e=>`<div class="cal-event${e.type==='meeting'?' meeting':''}">${e.title}</div>`).join("")}
-      </div>`;
-    }
-    grid.innerHTML=html;
-    const todayStr=new Date().toISOString().slice(0,10);
-    const upcoming=calEvents.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,8);
-    const upDiv=document.getElementById("upcomingList");
-    if(!upcoming.length){upDiv.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.7rem">Nothing scheduled.</p>`;return;}
-    upDiv.innerHTML=upcoming.map(e=>`
-      <div class="data-row">
-        <span class="badge ${e.type==='meeting'?'gold':''}">${e.type==='meeting'?'MTG':'EVT'}</span>
-        <span style="font-weight:700;font-size:0.8rem;flex:1">${e.title}</span>
-        <span class="mono" style="color:var(--text-dim);font-size:0.6rem">${e.date}</span>
-      </div>`).join("");
-  };
-  window.calPrev=()=>{calDate.setMonth(calDate.getMonth()-1);renderCalendar();};
-  window.calNext=()=>{calDate.setMonth(calDate.getMonth()+1);renderCalendar();};
-
-  // ── Recipes ──
-  window.loadRecipes = async function() {
-    const snap = await db.collection("recipes").get();
-    const el = document.getElementById("recipeList");
-    if(snap.empty){el.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:0.7rem">No recipes yet.</p>`;return;}
-    el.innerHTML=snap.docs.map(d=>{
-      const r=d.data();
-      const ings=(r.ingredients||"").split("\n").filter(Boolean);
-      return `<div class="recipe-card">
-        <div class="recipe-card-tag ${r.category||''}">${(r.category||"ITEM").toUpperCase()}</div>
-        <div class="recipe-card-name">${r.name}</div>
-        <ul class="recipe-ingredients">${ings.map(i=>`<li>${i}</li>`).join("")}</ul>
-        <div class="recipe-yield">YIELD: ${r.yield||"?"} &nbsp;|&nbsp; VALUE: £${(+r.value||0).toLocaleString()}</div>
-      </div>`;
-    }).join("");
-  };
-
-  // ── Constitution ──
-  const DEFAULT_SECTIONS=[{id:"rules",title:"Gang Rules & Code of Conduct",rules:[
-    {title:"Loyalty Above All",desc:"No member shall betray the family to law enforcement, rival gangs, or any outside party.",severity:"mandatory"},
-    {title:"Silence is Survival",desc:"What happens within the family stays within the family.",severity:"mandatory"},
-    {title:"Respect the Hierarchy",desc:"All orders from the Boss are final.",severity:"mandatory"},
-    {title:"No Freelancing",desc:"Members do not run independent jobs without Boss approval.",severity:"mandatory"},
-    {title:"Cover Your Brothers",desc:"If a crew member is in danger, you do not abandon them.",severity:"important"},
-    {title:"Be Ready When Called",desc:"When a job is called, members are expected to be available.",severity:"important"},
-  ]}];
-  let sectionsData=[];
-  window.loadConstitution=async function(){
-    try{
-      const snap=await db.collection("constitution").doc("main").get();
-      sectionsData=snap.exists?(snap.data().sections||DEFAULT_SECTIONS):JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
-    }catch(e){sectionsData=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));}
-    renderConstitution();
-  };
-  function renderConstitution(){
-    const sevLabel={mandatory:"MAND",important:"IMP",guideline:"GUID"};
-    document.getElementById("constitutionSections").innerHTML=sectionsData.map((sec,si)=>`
-      <div class="con-section" id="csec-${si}">
-        <div class="con-section-header" onclick="document.getElementById('csec-${si}').classList.toggle('collapsed')">
-          <span class="con-section-num">§${si+1}</span>
-          <span class="con-section-title">${sec.title}</span>
-          <span class="con-section-toggle">▾</span>
-        </div>
-        <div class="con-section-body">
-          ${sec.rules.map((r,ri)=>`
-            <div class="rule-item">
-              <span class="rule-num">${ri+1}.</span>
-              <div class="rule-content">
-                <div class="rule-title">${r.title}</div>
-                <div class="rule-desc">${r.desc}</div>
-              </div>
-              <span class="rule-severity ${r.severity}">${sevLabel[r.severity]||r.severity.toUpperCase()}</span>
-            </div>`).join("")}
-        </div>
-      </div>`).join("");
-  }
+// ══════════════════════════════════════════════
+// RECIPES (read-only)
+// ══════════════════════════════════════════════
+window.loadRecipes = async function() {
+  const snap = await _getDocs(db.collection("recipes"));
+  const grid = document.getElementById("recipeGrid");
+  if(snap.empty){ grid.innerHTML=`<p style="color:var(--text-dim);font-family:var(--font-mono)">No recipes in the system yet.</p>`; return; }
+  grid.innerHTML = snap.docs.map(d=>{
+    const r=d.data();
+    const ings=(r.ingredients||"").split("\n").filter(Boolean);
+    return `<div class="recipe-card">
+      <div class="recipe-card-tag ${r.category==='weapon'?'weapon':''}">${r.category?.toUpperCase()||"ITEM"}</div>
+      <div class="recipe-card-name">${r.name}</div>
+      <ul class="recipe-ingredients">${ings.map(i=>`<li>${i}</li>`).join("")}</ul>
+      <div class="recipe-yield">YIELD: ${r.yield||"?"} &nbsp;|&nbsp; VALUE: £${(+r.value||0).toLocaleString()}</div>
+    </div>`;
+  }).join("");
+};
 </script>
 </body>
 </html>
