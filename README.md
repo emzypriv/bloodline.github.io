@@ -1,4 +1,4 @@
-# 🩸 BLOODLINE — Crew Management System
+# 🩸 RONIN — Crew Management System
 
 A dark, tactical gang operations dashboard built for GitHub Pages + Firebase.
 
@@ -9,13 +9,13 @@ A dark, tactical gang operations dashboard built for GitHub Pages + Firebase.
 ### 1. Firebase Setup
 
 1. Go to [https://console.firebase.google.com](https://console.firebase.google.com)
-2. Click **"Create a project"** → name it `bloodline`
+2. Click **"Create a project"** → name it `ronin`
 3. Disable Google Analytics (not needed) → **Create project**
 4. In the left sidebar → **Firestore Database** → **Create database**
    - Choose **"Start in test mode"** (you can lock it down later)
    - Pick a region close to you (e.g. `europe-west2` for UK)
 5. In left sidebar → **Project Settings** (gear icon) → **Your apps** → click **"Add app"** → Web (`</>`)
-6. Register app name as `bloodline-web`
+6. Register app name as `ronin-web`
 7. **Copy the `firebaseConfig` object** — you'll need the values below
 
 ### 2. Update Config File
@@ -53,7 +53,7 @@ In Firestore, manually create the **`users`** collection:
 
 ### 4. GitHub Pages Deployment
 
-1. Create a new **GitHub repository** (e.g. `bloodline-dashboard`)
+1. Create a new **GitHub repository** (e.g. `ronin-dashboard`)
 2. Make it **Private** (recommended for security)
 3. Upload all files, keeping the folder structure:
    ```
@@ -65,7 +65,7 @@ In Firestore, manually create the **`users`** collection:
    ```
 4. Go to repo **Settings** → **Pages**
 5. Under **Source**, select: `main` branch → `/ (root)` → **Save**
-6. Your site will be live at: `https://yourusername.github.io/bloodline-dashboard/`
+6. Your site will be live at: `https://yourusername.github.io/ronin-dashboard/`
 
 ### 5. Firestore Security Rules (Optional but Recommended)
 
@@ -91,7 +91,7 @@ service cloud.firestore {
 ## 📁 FILE STRUCTURE
 
 ```
-bloodline/
+ronin/
 ├── index.html                  ← Login page
 ├── css/
 │   └── style.css               ← All styles
@@ -142,4 +142,4 @@ bloodline/
 
 ---
 
-*BLOODLINE — Stay loyal. Stay quiet.*
+*RONIN — Stay loyal. Stay quiet.*

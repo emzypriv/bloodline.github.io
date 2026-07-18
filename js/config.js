@@ -1,5 +1,5 @@
 // ============================================================
-// BLOODLINE — Firebase Config
+// RONIN — Firebase Config
 // Replace these values with your own Firebase project config
 // Go to: https://console.firebase.google.com
 // Create a project → Add Web App → Copy config below
@@ -17,7 +17,7 @@ export const FIREBASE_CONFIG = {
 // ============================================================
 // SETUP INSTRUCTIONS:
 // 1. Go to https://console.firebase.google.com
-// 2. Create new project called "bloodline"
+// 2. Create new project called "ronin"
 // 3. Enable Firestore Database (start in test mode)
 // 4. Go to Project Settings > Your Apps > Add Web App
 // 5. Copy the firebaseConfig object values above

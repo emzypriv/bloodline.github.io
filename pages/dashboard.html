@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BLOODLINE — Dashboard</title>
+  <title>RONIN — Dashboard</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -24,7 +24,7 @@
     .total-val.blood { color:var(--blood); }
     .settings-section { margin-bottom:2rem; }
     .settings-section-title { font-family:var(--font-display); font-size:1.2rem; letter-spacing:0.15em; color:var(--text-bright); margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
-    .member-tag { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(229,28,28,0.1); border:1px solid var(--blood-dark); color:var(--blood); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.1em; padding:0.2rem 0.6rem; margin:0.2rem; }
+    .member-tag { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(26,143,76,0.1); border:1px solid var(--blood-dark); color:var(--blood); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.1em; padding:0.2rem 0.6rem; margin:0.2rem; }
     .topbar-logo { width:36px; height:36px; object-fit:contain; border-radius:2px; }
   </style>
 </head>
@@ -35,7 +35,7 @@
 <div class="app-shell">
   <header class="topbar">
     <img id="topbarLogo" src="" alt="" class="topbar-logo" style="display:none"/>
-    <div class="topbar-brand"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg> BLOODLINE</div>
+    <div class="topbar-brand"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg> RONIN</div>
     <div class="topbar-badge" id="roleTag">—</div>
     <div class="topbar-right">
       <div class="topbar-user">OPERATIVE: <span id="displayUser">—</span></div>
@@ -171,7 +171,7 @@
       </div>
       <div style="max-width:860px;margin:0 auto">
         <div style="text-align:center;padding:2rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem">
-          <div style="font-family:var(--font-display);font-size:3rem;letter-spacing:0.3em;color:var(--blood);text-shadow:0 0 30px var(--blood-glow)">BLOODLINE</div>
+          <div style="font-family:var(--font-display);font-size:3rem;letter-spacing:0.3em;color:var(--blood);text-shadow:0 0 30px var(--blood-glow)">RONIN</div>
           <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.35em;color:var(--text-dim);margin-top:0.4rem">GANG CONSTITUTION & CODE OF CONDUCT</div>
           <div style="font-family:var(--font-body);font-size:1rem;font-style:italic;color:var(--gold);margin-top:0.6rem;font-weight:600">"Blood makes you related, Loyalty makes you Family."</div>
           <div style="display:flex;justify-content:center;gap:2rem;margin-top:1rem">
@@ -180,17 +180,17 @@
           </div>
         </div>
         <div id="preambleDisplay" style="background:var(--bg3);border:1px solid var(--border);border-left:4px solid var(--blood);padding:1.2rem 1.5rem;margin-bottom:2rem;font-family:var(--font-body);font-size:0.95rem;line-height:1.7;color:var(--text-dim);font-style:italic">
-          <strong style="color:var(--text-bright);font-style:normal">Bloodline</strong> is a collective of like-minded people, all pulling in the same direction. Our intent is not to cause detriment to counterparts, civilians, or government bodies in the first instance. Being a part of Bloodline is understanding the basic ethos of being approachable, accommodating, and understanding.<br><br>
-          Our aim is to make our way in this life by sticking it to the man — corporate entities overcome by greed that benefit off the common person. Bloodline will not target individually owned businesses or rob individuals of their hard-earned possessions.<br><br>
-          Members of Bloodline buy into the concept of <em>One in, all in</em>. Any member must consider their motives before embarking on any extracurricular activity. One must put selfish wants to one side and consider the bigger picture as a priority.<br><br>
-          Bloodline will not be a pushover. Any injustice done to a member will be discussed as a collective, debated, and voted on democratically. Only then will a resolution be implemented.
+          <strong style="color:var(--text-bright);font-style:normal">Ronin</strong> is a collective of like-minded people, all pulling in the same direction. Our intent is not to cause detriment to counterparts, civilians, or government bodies in the first instance. Being a part of Ronin is understanding the basic ethos of being approachable, accommodating, and understanding.<br><br>
+          Our aim is to make our way in this life by sticking it to the man — corporate entities overcome by greed that benefit off the common person. Ronin will not target individually owned businesses or rob individuals of their hard-earned possessions.<br><br>
+          Members of Ronin buy into the concept of <em>One in, all in</em>. Any member must consider their motives before embarking on any extracurricular activity. One must put selfish wants to one side and consider the bigger picture as a priority.<br><br>
+          Ronin will not be a pushover. Any injustice done to a member will be discussed as a collective, debated, and voted on democratically. Only then will a resolution be implemented.
         </div>
         <textarea id="preambleEdit" style="display:none;width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text-bright);font-family:var(--font-body);font-size:0.95rem;padding:0.8rem;min-height:100px;resize:vertical;outline:none" oninput="autoSavePreamble()"></textarea>
         <div id="constitutionSections"></div>
         <div style="text-align:center;padding:2rem 0;border-top:1px solid var(--border);margin-top:2rem">
           <div style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.3em;color:var(--text-dim)">SWORN & SEALED</div>
           <div style="width:200px;height:1px;background:var(--border);margin:1rem auto"></div>
-          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--blood);letter-spacing:0.2em;display:inline-flex;align-items:center;gap:0.4rem"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg> BLOODLINE — BY BLOOD, BY BOND <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg></div>
+          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--blood);letter-spacing:0.2em;display:inline-flex;align-items:center;gap:0.4rem"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg> RONIN — BY BLOOD, BY BOND <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg></div>
         </div>
       </div>
     </section>
@@ -319,7 +319,7 @@
           </div>
         </div>
         <div class="form-grid">
-          <div class="form-group"><label class="form-label">GANG NAME</label><input class="form-control" id="settingGangName" placeholder="Bloodline"/></div>
+          <div class="form-group"><label class="form-label">GANG NAME</label><input class="form-control" id="settingGangName" placeholder="Ronin"/></div>
           <div class="form-group"><label class="form-label">FOUNDED DATE</label><input class="form-control" type="date" id="settingFounded"/></div>
           <div class="form-group form-full"><label class="form-label">GANG MOTTO</label><input class="form-control" id="settingMotto" placeholder="Blood makes you related, Loyalty makes you Family"/></div>
         </div>
@@ -908,7 +908,7 @@ window.updateJobPreview=function(){
       crew.map(c=>{
         const member=membersList.find(m=>m.id===c);
         const name=member?.displayName||c;
-        return `<div style="background:rgba(229,28,28,0.08);border:1px solid var(--blood-dark);padding:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.75rem">
+        return `<div style="background:rgba(26,143,76,0.08);border:1px solid var(--blood-dark);padding:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.75rem">
           <span style="color:var(--text-dim)">${name}</span> <span style="color:var(--green)">£${perHead.toLocaleString()}</span>
         </div>`;
       }).join("")+`</div>`;
@@ -1287,15 +1287,15 @@ const DEFAULT_SECTIONS=[
     {title:"Hangaround",desc:"Not full members. Can only act as instructed. No access to the bank account, keys, or compound.",severity:"guideline"},
   ]},
   {id:"conduct",title:"Article II — Code of Conduct",rules:[
-    {title:"Behaviour",desc:"Members will strive to produce a conducive environment for all. Consider the repercussions of your actions before acting. When possible, discuss with other Bloodline members before any action that may bring the collective into disrepute. Respect will be shown to all members regardless of rank or position.",severity:"mandatory"},
-    {title:"Conflict Resolution",desc:"Conversation over violence, always. Unhappy about something? Then speak. Discussion first and foremost. Bloodline asks for a certain level of constraint subject to situation. Members should be contacted and support given internally before any act of retribution.",severity:"mandatory"},
-    {title:"George Lane Loyalty Clause",desc:"Loyalty to the crew will be rewarded. Betrayal warrants the ultimate sacrifice if it puts the crew in danger. This includes not going by the Bloodline code. Disloyalty to the collective is the highest offence.",severity:"mandatory"},
+    {title:"Behaviour",desc:"Members will strive to produce a conducive environment for all. Consider the repercussions of your actions before acting. When possible, discuss with other Ronin members before any action that may bring the collective into disrepute. Respect will be shown to all members regardless of rank or position.",severity:"mandatory"},
+    {title:"Conflict Resolution",desc:"Conversation over violence, always. Unhappy about something? Then speak. Discussion first and foremost. Ronin asks for a certain level of constraint subject to situation. Members should be contacted and support given internally before any act of retribution.",severity:"mandatory"},
+    {title:"George Lane Loyalty Clause",desc:"Loyalty to the crew will be rewarded. Betrayal warrants the ultimate sacrifice if it puts the crew in danger. This includes not going by the Ronin code. Disloyalty to the collective is the highest offence.",severity:"mandatory"},
   ]},
   {id:"activities",title:"Article III — Gang Activities",rules:[
-    {title:"Legal Work",desc:"Legal work is encouraged. Get out in the city, network, and make legitimate money — for the benefit of both the individual and Bloodline. Good relations with third parties is key.",severity:"important"},
-    {title:"Illegal Operations",desc:"Illegal activity should be constrained to corporate entities — banks, shops, pharmacies, etc. Illegal activities that victimise civilian-run businesses is considered a betrayal of the Bloodline code of ethics.",severity:"mandatory"},
+    {title:"Legal Work",desc:"Legal work is encouraged. Get out in the city, network, and make legitimate money — for the benefit of both the individual and Ronin. Good relations with third parties is key.",severity:"important"},
+    {title:"Illegal Operations",desc:"Illegal activity should be constrained to corporate entities — banks, shops, pharmacies, etc. Illegal activities that victimise civilian-run businesses is considered a betrayal of the Ronin code of ethics.",severity:"mandatory"},
     {title:"Job Protocol",desc:"Crime is only to be done when you have sufficient crew to complete the job. There is no rush. When completing a group heist or criminal activity, you must switch to the Job Radio.",severity:"mandatory"},
-    {title:"Territory — Vespucci Beach",desc:"Bloodline's claim is the Vespucci Beach area: from Vitus Street to the Lifeguard Tower and the sea to Tap Street. Local businesses are not to be affected. Protection can be offered.",severity:"important"},
+    {title:"Territory — Vespucci Beach",desc:"Ronin's claim is the Vespucci Beach area: from Vitus Street to the Lifeguard Tower and the sea to Tap Street. Local businesses are not to be affected. Protection can be offered.",severity:"important"},
     {title:"Don't Shit on Your Own Doorstep",desc:"3 postcode radius around the block is a crime no-go zone. We do not create problems on our own doorstep.",severity:"mandatory"},
   ]},
   {id:"finance",title:"Article IV — Financial Management",rules:[
@@ -1310,7 +1310,7 @@ const DEFAULT_SECTIONS=[
     {title:"Meetings",desc:"To be called regularly when needed and in emergencies. Led by Captains to discuss matters of importance as well as general catch-ups.",severity:"important"},
   ]},
   {id:"dissolution",title:"Article VII — Dissolution",rules:[
-    {title:"Conditions for Disbandment",desc:"The decision for dissolution will not be taken lightly. All Captains must unanimously agree before Bloodline is dissolved.",severity:"mandatory"},
+    {title:"Conditions for Disbandment",desc:"The decision for dissolution will not be taken lightly. All Captains must unanimously agree before Ronin is dissolved.",severity:"mandatory"},
   ]},
 ];
 let editMode=false,sectionsData=[];
