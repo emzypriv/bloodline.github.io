@@ -4,25 +4,27 @@
    ============================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
 
 :root {
-  --blood:      #1a8f4c;
-  --blood-dark: #0c5029;
-  --blood-glow: rgba(26,143,76,0.45);
-  --gold:       #c8a84b;
-  --gold-dim:   #8a6f2e;
+  --blood:      #15803d;
+  --blood-dark: #0a3d1c;
+  --blood-glow: rgba(21,128,61,0.45);
+  --gold:       #2f9e57;
+  --gold-dim:   #1c5e33;
   --bg:         #080808;
   --bg2:        #0f0f0f;
   --bg3:        #161616;
   --panel:      #111111;
   --border:     #2a2a2a;
-  --border-hot: #1a8f4c;
+  --border-hot: #15803d;
   --text:       #d4d4d4;
   --text-dim:   #666;
   --text-bright:#f0f0f0;
   --green:      #00cc66;
-  --amber:      #ffaa00;
+  --amber:      #66b23e;
   --font-display: 'Barlow Condensed', sans-serif;
+  --font-brand:   'Permanent Marker', 'Barlow Condensed', cursive; /* brush wordmark — swap here */
   --font-mono:    'JetBrains Mono', monospace;
   --font-body:    'Barlow', sans-serif;
 }
@@ -69,7 +71,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   background:
-    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(26,143,76,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(21,128,61,0.2) 0%, transparent 70%),
     var(--bg);
 }
 
@@ -97,7 +99,7 @@ body {
   font-size: 5rem;
   letter-spacing: 0.3em;
   color: var(--blood);
-  text-shadow: 0 0 30px var(--blood-glow), 0 0 60px rgba(26,143,76,0.2);
+  text-shadow: 0 0 30px var(--blood-glow), 0 0 60px rgba(21,128,61,0.2);
   line-height: 1;
 }
 
@@ -190,8 +192,8 @@ body {
 .role-btn.active {
   border-color: var(--blood);
   color: var(--blood);
-  background: rgba(26,143,76,0.08);
-  box-shadow: inset 0 0 12px rgba(26,143,76,0.1);
+  background: rgba(21,128,61,0.08);
+  box-shadow: inset 0 0 12px rgba(21,128,61,0.1);
 }
 .role-btn:hover { border-color: var(--blood); color: var(--blood); }
 
@@ -341,12 +343,12 @@ body {
   text-align: left;
 }
 .nav-item:hover {
-  background: rgba(26,143,76,0.06);
+  background: rgba(21,128,61,0.06);
   border-left-color: var(--blood);
   color: var(--text-bright);
 }
 .nav-item.active {
-  background: rgba(26,143,76,0.1);
+  background: rgba(21,128,61,0.1);
   border-left-color: var(--blood);
   color: var(--blood);
 }
@@ -537,11 +539,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   font-weight: 600;
   color: var(--text-bright);
 }
-.data-table tr:hover td { background: rgba(26,143,76,0.04); }
+.data-table tr:hover td { background: rgba(21,128,61,0.04); }
 .data-table .mono { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 400; }
 .data-table .badge {
   display: inline-block;
-  background: rgba(26,143,76,0.15);
+  background: rgba(21,128,61,0.15);
   border: 1px solid var(--blood-dark);
   color: var(--blood);
   font-family: var(--font-mono);
@@ -586,7 +588,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 }
 .cal-day:hover { background: var(--bg3); }
 .cal-day.other-month { opacity: 0.3; }
-.cal-day.today { background: rgba(26,143,76,0.08); border: 1px solid var(--blood-dark); }
+.cal-day.today { background: rgba(21,128,61,0.08); border: 1px solid var(--blood-dark); }
 .cal-day-num {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -785,7 +787,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   border-left: 3px solid;
 }
 .alert-success { background: rgba(0,204,102,0.08); border-color: var(--green); color: var(--green); }
-.alert-error { background: rgba(26,143,76,0.08); border-color: var(--blood); color: var(--blood); }
+.alert-error { background: rgba(21,128,61,0.08); border-color: var(--blood); color: var(--blood); }
 .alert.hidden { display: none; }
 
 /* ── Scrollbar ── */
@@ -819,6 +821,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
   /* Login page */
   .login-wrap { padding: 1rem; gap: 1.2rem; max-width: 100%; }
+  .login-logo { width: min(240px, 68vw); }
   .brand-icon svg { width: 2rem; height: 2rem; }
   .brand-title { font-size: 2.4rem; letter-spacing: 0.15em; }
   .brand-sub { font-size: 0.55rem; letter-spacing: 0.2em; }
@@ -929,4 +932,12 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   .crew-cut { font-size: 0.8rem; }
 
   .alert { font-size: 0.7rem; padding: 0.6rem 0.8rem; }
+}
+
+/* ── RONIN brush wordmark + login logo ── */
+.brand-title { font-family: var(--font-brand); letter-spacing: 0.04em; font-weight: 400; }
+.topbar-brand { font-family: var(--font-brand); letter-spacing: 0.02em; font-weight: 400; }
+.login-logo {
+  width: min(320px, 78vw); height: auto; display: block; margin: 0 auto;
+  filter: drop-shadow(0 0 34px rgba(21,128,61,0.30));
 }

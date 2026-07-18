@@ -24,7 +24,7 @@
     .total-val.blood { color:var(--blood); }
     .settings-section { margin-bottom:2rem; }
     .settings-section-title { font-family:var(--font-display); font-size:1.2rem; letter-spacing:0.15em; color:var(--text-bright); margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
-    .member-tag { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(26,143,76,0.1); border:1px solid var(--blood-dark); color:var(--blood); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.1em; padding:0.2rem 0.6rem; margin:0.2rem; }
+    .member-tag { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(21,128,61,0.1); border:1px solid var(--blood-dark); color:var(--blood); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.1em; padding:0.2rem 0.6rem; margin:0.2rem; }
     .topbar-logo { width:36px; height:36px; object-fit:contain; border-radius:2px; }
   </style>
 </head>
@@ -35,7 +35,7 @@
 <div class="app-shell">
   <header class="topbar">
     <img id="topbarLogo" src="" alt="" class="topbar-logo" style="display:none"/>
-    <div class="topbar-brand"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg> RONIN</div>
+    <div class="topbar-brand"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="var(--blood)"><g transform="rotate(-45 12 12)"><rect x="2.2" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="7.8" cy="12" r="1.8"/><rect x="8.3" y="10.9" width="13.2" height="2.2" rx="1.1"/></g><g transform="rotate(45 12 12)"><rect x="16.6" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="16.2" cy="12" r="1.8"/><rect x="2.5" y="10.9" width="13.2" height="2.2" rx="1.1"/></g></g></svg> RONIN</div>
     <div class="topbar-badge" id="roleTag">—</div>
     <div class="topbar-right">
       <div class="topbar-user">OPERATIVE: <span id="displayUser">—</span></div>
@@ -158,6 +158,33 @@
       <div class="recipe-grid" id="recipeGrid"></div>
     </section>
 
+    <!-- CRAFT CALCULATOR -->
+    <section class="page-section" id="sec-calculator">
+      <div class="page-header"><h1 class="page-title">CRAFT CALC</h1><span class="page-sub">MATERIALS PER BATCH</span></div>
+      <div class="panel">
+        <div class="panel-title">🧮 Batch Calculator</div>
+        <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Pick a recipe and how many you want to make — it totals every material for you.</p>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">RECIPE</label>
+            <select class="form-control" id="calcRecipe"><option value="">— select a recipe —</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">AMOUNT TO CRAFT</label>
+            <input class="form-control" type="number" min="1" step="1" id="calcAmount" value="1"/>
+          </div>
+        </div>
+        <div class="form-actions"><button class="btn btn-danger" onclick="calcCraft()">CALCULATE</button></div>
+      </div>
+      <div class="panel hidden" id="calcResultPanel" style="margin-top:1rem">
+        <div class="panel-title">📦 Shopping List</div>
+        <div id="calcSummary" style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-dim);margin-bottom:0.9rem"></div>
+        <table class="data-table">
+          <thead><tr><th>MATERIAL</th><th>PER CRAFT</th><th>TOTAL NEEDED</th></tr></thead>
+          <tbody id="calcBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+
     <!-- ══ CONSTITUTION ══ -->
     <section class="page-section" id="sec-constitution">
       <div class="page-header"><h1 class="page-title">CONSTITUTION</h1><span class="page-sub">CODE OF CONDUCT</span></div>
@@ -171,9 +198,9 @@
       </div>
       <div style="max-width:860px;margin:0 auto">
         <div style="text-align:center;padding:2rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem">
-          <div style="font-family:var(--font-display);font-size:3rem;letter-spacing:0.3em;color:var(--blood);text-shadow:0 0 30px var(--blood-glow)">RONIN</div>
+          <div style="font-family:var(--font-brand);font-size:3.4rem;letter-spacing:0.05em;color:var(--blood);text-shadow:0 0 30px var(--blood-glow)">RONIN</div>
           <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.35em;color:var(--text-dim);margin-top:0.4rem">GANG CONSTITUTION & CODE OF CONDUCT</div>
-          <div style="font-family:var(--font-body);font-size:1rem;font-style:italic;color:var(--gold);margin-top:0.6rem;font-weight:600">"Blood makes you related, Loyalty makes you Family."</div>
+          <div style="font-family:var(--font-body);font-size:1rem;font-style:italic;color:var(--gold);margin-top:0.6rem;font-weight:600">"Honor Above All."</div>
           <div style="display:flex;justify-content:center;gap:2rem;margin-top:1rem">
             <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim)">VERSION: <b style="color:var(--text-bright)">1.0</b></span>
             <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim)">AMENDED: <b style="color:var(--text-bright)" id="metaAmended">—</b></span>
@@ -190,7 +217,7 @@
         <div style="text-align:center;padding:2rem 0;border-top:1px solid var(--border);margin-top:2rem">
           <div style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.3em;color:var(--text-dim)">SWORN & SEALED</div>
           <div style="width:200px;height:1px;background:var(--border);margin:1rem auto"></div>
-          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--blood);letter-spacing:0.2em;display:inline-flex;align-items:center;gap:0.4rem"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg> RONIN — BY BLOOD, BY BOND <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg></div>
+          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--blood);letter-spacing:0.2em;display:inline-flex;align-items:center;gap:0.4rem"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><g fill="var(--blood)"><g transform="rotate(-45 12 12)"><rect x="2.2" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="7.8" cy="12" r="1.8"/><rect x="8.3" y="10.9" width="13.2" height="2.2" rx="1.1"/></g><g transform="rotate(45 12 12)"><rect x="16.6" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="16.2" cy="12" r="1.8"/><rect x="2.5" y="10.9" width="13.2" height="2.2" rx="1.1"/></g></g></svg> RONIN — BY BLOOD, BY BOND <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:0.8rem;height:0.8rem;flex-shrink:0"><g fill="var(--blood)"><g transform="rotate(-45 12 12)"><rect x="2.2" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="7.8" cy="12" r="1.8"/><rect x="8.3" y="10.9" width="13.2" height="2.2" rx="1.1"/></g><g transform="rotate(45 12 12)"><rect x="16.6" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="16.2" cy="12" r="1.8"/><rect x="2.5" y="10.9" width="13.2" height="2.2" rx="1.1"/></g></g></svg></div>
         </div>
       </div>
     </section>
@@ -304,7 +331,7 @@
         <div class="settings-section-title">Gang Profile</div>
         <div class="gang-logo-wrap">
           <div id="logoPreviewWrap">
-            <div class="gang-logo-placeholder" id="logoPlaceholder"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:2rem;height:2rem"><path d="M12 2C12 2 5 11 5 16a7 7 0 0 0 14 0c0-5-7-14-7-14z" fill="var(--blood)"/></svg></div>
+            <div class="gang-logo-placeholder" id="logoPlaceholder"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:2rem;height:2rem"><g fill="var(--blood)"><g transform="rotate(-45 12 12)"><rect x="2.2" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="7.8" cy="12" r="1.8"/><rect x="8.3" y="10.9" width="13.2" height="2.2" rx="1.1"/></g><g transform="rotate(45 12 12)"><rect x="16.6" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="16.2" cy="12" r="1.8"/><rect x="2.5" y="10.9" width="13.2" height="2.2" rx="1.1"/></g></g></svg></div>
             <img id="logoPreview" src="" alt="Gang Logo" class="gang-logo-img" style="display:none"/>
           </div>
           <div style="display:flex;flex-direction:column;gap:0.6rem">
@@ -321,7 +348,7 @@
         <div class="form-grid">
           <div class="form-group"><label class="form-label">GANG NAME</label><input class="form-control" id="settingGangName" placeholder="Ronin"/></div>
           <div class="form-group"><label class="form-label">FOUNDED DATE</label><input class="form-control" type="date" id="settingFounded"/></div>
-          <div class="form-group form-full"><label class="form-label">GANG MOTTO</label><input class="form-control" id="settingMotto" placeholder="Blood makes you related, Loyalty makes you Family"/></div>
+          <div class="form-group form-full"><label class="form-label">GANG MOTTO</label><input class="form-control" id="settingMotto" placeholder="Honor Above All"/></div>
         </div>
         <div class="form-actions"><button class="btn btn-danger" onclick="saveGangProfile()">Save Profile</button></div>
         <div id="profileAlert" class="alert hidden"></div>
@@ -459,21 +486,21 @@ let membersList  = [];
 // ── Sidebar ──
 const BOSS_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
-  {id:"recipes",icon:"🧪",label:"Bench Wench"},
+  {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
   {section:"FINANCE"},{id:"payouts",icon:"💰",label:"Payouts"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 const CAPTAIN_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
-  {id:"recipes",icon:"🧪",label:"Bench Wench"},
+  {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 
 const CREW_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
-  {id:"recipes",icon:"🧪",label:"Bench Wench"},
+  {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
 ];
 
@@ -498,6 +525,7 @@ function showSection(id, btn) {
   if(id==="overview")      loadOverview();
   if(id==="calendar")      renderCalendar();
   if(id==="recipes")       loadRecipes();
+  if(id==="calculator")    loadCalcRecipes();
   if(id==="constitution")  loadConstitution();
   if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); const jgc=document.getElementById("jobGangCut"); if(jgc) jgc.value=gangSettings.gangCut||50; }
   if(id==="job-dashboard") loadJobs();
@@ -852,6 +880,54 @@ window.saveRecipe=async function(){
 window.deleteRecipe=async function(id){if(!confirm("Delete?"))return;await db.collection("recipes").doc(id).delete();loadRecipes();};
 
 // ══════════════════════════════════════════════
+// CRAFT CALCULATOR
+// ══════════════════════════════════════════════
+let calcRecipes=[];
+window.loadCalcRecipes=async function(){
+  const snap=await db.collection("recipes").get();
+  calcRecipes=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const sel=document.getElementById("calcRecipe"); const cur=sel.value;
+  sel.innerHTML='<option value="">— select a recipe —</option>'+calcRecipes
+    .slice().sort((a,b)=>(a.name||"").localeCompare(b.name||""))
+    .map(r=>`<option value="${r.id}">${r.name||"Unnamed"}</option>`).join("");
+  if(cur) sel.value=cur;
+  sel.onchange=()=>{ if(sel.value) calcCraft(); };
+  document.getElementById("calcAmount").oninput=()=>{ if(sel.value) calcCraft(); };
+};
+function parseIngredient(line){
+  line=(line||"").trim(); if(!line) return null;
+  let m=line.match(/^(\d+(?:\.\d+)?)\s*[x×*]?\s+(.+)$/i);   // "2x Gunpowder" / "2 Gunpowder"
+  if(m) return {qty:parseFloat(m[1]),name:m[2].trim()};
+  m=line.match(/^(.+?)\s*[x×*]\s*(\d+(?:\.\d+)?)$/i);        // "Gunpowder x2"
+  if(m) return {qty:parseFloat(m[2]),name:m[1].trim()};
+  m=line.match(/^(.+?)\s*[:=]\s*(\d+(?:\.\d+)?)$/);          // "Gunpowder: 2"
+  if(m) return {qty:parseFloat(m[2]),name:m[1].trim()};
+  return {qty:1,name:line};                                       // no number -> assume 1
+}
+window.calcCraft=function(){
+  const sel=document.getElementById("calcRecipe");
+  const rec=calcRecipes.find(r=>r.id===sel.value);
+  const panel=document.getElementById("calcResultPanel");
+  if(!rec){ panel.classList.add("hidden"); return; }
+  let amount=parseInt(document.getElementById("calcAmount").value,10);
+  if(!amount||amount<1) amount=1;
+  const yieldPer=Math.max(1,parseInt(rec.yield,10)||1);
+  const crafts=Math.ceil(amount/yieldPer);
+  const lines=(rec.ingredients||"").split("\n").map(parseIngredient).filter(Boolean);
+  const body=document.getElementById("calcBody");
+  body.innerHTML = lines.length
+    ? lines.map(l=>{
+        const total=Math.round(l.qty*crafts*100)/100;
+        return `<tr><td>${l.name}</td><td class="mono">${l.qty}</td><td class="mono green">${total.toLocaleString()}</td></tr>`;
+      }).join("")
+    : `<tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:1.5rem">No ingredients listed for this recipe yet.</td></tr>`;
+  document.getElementById("calcSummary").innerHTML =
+    `Crafting <b style="color:var(--text-bright)">${amount.toLocaleString()}× ${rec.name}</b>`+
+    (yieldPer>1?` — yields ${yieldPer} each, so ${crafts} batch${crafts>1?"es":""}` : ` — ${crafts} craft${crafts>1?"s":""}`);
+  panel.classList.remove("hidden");
+};
+
+// ══════════════════════════════════════════════
 // JOB FORM — Crew Slots from members list
 // ══════════════════════════════════════════════
 function populateJobTypes() {
@@ -908,7 +984,7 @@ window.updateJobPreview=function(){
       crew.map(c=>{
         const member=membersList.find(m=>m.id===c);
         const name=member?.displayName||c;
-        return `<div style="background:rgba(26,143,76,0.08);border:1px solid var(--blood-dark);padding:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.75rem">
+        return `<div style="background:rgba(21,128,61,0.08);border:1px solid var(--blood-dark);padding:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.75rem">
           <span style="color:var(--text-dim)">${name}</span> <span style="color:var(--green)">£${perHead.toLocaleString()}</span>
         </div>`;
       }).join("")+`</div>`;
