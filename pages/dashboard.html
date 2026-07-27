@@ -34,6 +34,7 @@
 
 <div class="app-shell">
   <header class="topbar">
+    <button class="nav-toggle" aria-label="Menu" onclick="toggleNav()">☰</button>
     <img id="topbarLogo" src="" alt="" class="topbar-logo" style="display:none"/>
     <div class="topbar-brand"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="var(--blood)"><g transform="rotate(-45 12 12)"><rect x="2.2" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="7.8" cy="12" r="1.8"/><rect x="8.3" y="10.9" width="13.2" height="2.2" rx="1.1"/></g><g transform="rotate(45 12 12)"><rect x="16.6" y="11.1" width="5.2" height="1.8" rx="0.9"/><circle cx="16.2" cy="12" r="1.8"/><rect x="2.5" y="10.9" width="13.2" height="2.2" rx="1.1"/></g></g></svg> RONIN</div>
     <div class="topbar-badge" id="roleTag">—</div>
@@ -44,6 +45,7 @@
   </header>
 
   <nav class="sidebar" id="sidebar"></nav>
+  <div class="nav-backdrop" onclick="closeNav()"></div>
 
   <main class="main-content">
 
@@ -411,6 +413,65 @@
 
     </section>
 
+    <!-- ══ STORAGE DROP-OFF LOG (all roles) ══ -->
+    <section class="page-section" id="sec-storage">
+      <div class="page-header"><h1 class="page-title">STORAGE</h1><span class="page-sub">DROP-OFF LOG — WHAT THE GANG OWES YOU</span></div>
+
+      <!-- Your running totals -->
+      <div class="grid-3" style="margin-bottom:1.5rem">
+        <div class="stat-card"><div class="stat-label">ITEMS BANKED</div><div class="stat-value" id="stStatItems">—</div></div>
+        <div class="stat-card"><div class="stat-label">OWED TO YOU</div><div class="stat-value gold" id="stStatOwed">—</div></div>
+        <div class="stat-card"><div class="stat-label">PAID OUT</div><div class="stat-value green" id="stStatPaid">—</div></div>
+      </div>
+
+      <!-- Log a drop-off -->
+      <div class="panel">
+        <div class="panel-title">📦 LOG A DROP-OFF</div>
+        <div class="form-grid-3" style="align-items:end">
+          <div class="form-group">
+            <label class="form-label">ITEM</label>
+            <select class="form-control" id="stItem" onchange="onStorageChange()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">QTY</label>
+            <input class="form-control" type="number" id="stQty" value="1" min="1" oninput="onStorageChange()"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">DATE</label>
+            <input class="form-control" type="date" id="stDate"/>
+          </div>
+        </div>
+        <div class="total-bar" style="margin-top:1rem">
+          <div class="total-item"><div class="total-label">UNIT PRICE</div><div class="total-val gold" id="stUnit">£0</div></div>
+          <div class="total-item"><div class="total-label">QTY</div><div class="total-val" id="stQtyEcho">0</div></div>
+          <div class="total-item"><div class="total-label">GANG PAYS YOU</div><div class="total-val green" id="stPayout">£0</div></div>
+        </div>
+        <div class="form-actions" style="margin-top:1.2rem">
+          <button class="btn btn-danger" onclick="submitDeposit()">Log Drop-Off</button>
+        </div>
+        <div id="stAlert" class="alert hidden"></div>
+      </div>
+
+      <!-- My drop-offs -->
+      <div class="panel" style="margin-top:1.5rem">
+        <div class="panel-title">🧾 MY DROP-OFFS</div>
+        <table class="data-table">
+          <thead><tr><th>DATE</th><th>ITEM</th><th>QTY</th><th>UNIT</th><th>OWED</th><th>STATUS</th></tr></thead>
+          <tbody id="myDropsBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Boss/captain: everyone's pending payouts -->
+      <div class="panel boss-only" style="margin-top:1.5rem">
+        <div class="panel-title">💰 PENDING PAYOUTS — ALL CREW</div>
+        <div class="total-bar" style="margin-bottom:1rem">
+          <div class="total-item"><div class="total-label">TOTAL OWED BY GANG</div><div class="total-val blood" id="stGrandOwed">£0</div></div>
+          <div class="total-item"><div class="total-label">PENDING DROP-OFFS</div><div class="total-val" id="stPendingCount">0</div></div>
+        </div>
+        <div id="allDropsList"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -478,6 +539,10 @@ document.querySelectorAll(".crew-only").forEach(el => el.style.display = isCrew 
 
 window.logout = () => { sessionStorage.clear(); window.location.href = "../index.html"; };
 
+// ── Mobile drawer nav ──
+window.toggleNav = () => document.body.classList.toggle("nav-open");
+window.closeNav  = () => document.body.classList.remove("nav-open");
+
 // Cached data
 let gangSettings = { gangCut: 10 };
 let membersList  = [];
@@ -486,24 +551,26 @@ let membersList  = [];
 const BOSS_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
-  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
+  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
   {section:"FINANCE"},{id:"payouts",icon:"💰",label:"Payouts"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 const CAPTAIN_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
-  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
+  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 
 const CREW_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
-  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},
+  {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
 ];
 
 const sidebar = document.getElementById("sidebar");
+sidebar.addEventListener("click", e => { if (e.target.closest(".nav-item")) closeNav(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeNav(); });
 (isBoss ? BOSS_NAV : isCaptain ? CAPTAIN_NAV : CREW_NAV).forEach(item => {
   if (item.section) {
     const d = document.createElement("div"); d.className="nav-section"; d.textContent=item.section; sidebar.appendChild(d);
@@ -529,6 +596,7 @@ function showSection(id, btn) {
   if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); const jgc=document.getElementById("jobGangCut"); if(jgc) jgc.value=gangSettings.gangCut||50; }
   if(id==="job-dashboard") loadJobs();
   if(id==="payouts")       initPayoutWeek();
+  if(id==="storage")       loadStorage();
   if(id==="settings")      loadSettings();
 }
 
@@ -1486,6 +1554,124 @@ window.autoSavePreamble=function(){clearTimeout(window._pT);window._pT=setTimeou
 // ══════════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// STORAGE DROP-OFF LOG
+// Reuses settings/jobitems ({name, valuePerUnit}) as the
+// per-unit price the gang pays for banked items.
+// ══════════════════════════════════════════════
+function renderStorageItems(){
+  const sel=document.getElementById("stItem");
+  if(!sel) return;
+  sel.innerHTML = jobItems.length
+    ? jobItems.map((p,i)=>`<option value="${i}">${p.name} — £${(+p.valuePerUnit||0).toLocaleString()}/unit</option>`).join("")
+    : '<option value="">— no items set —</option>';
+  onStorageChange();
+}
+
+window.onStorageChange=function(){
+  const item = jobItems[+document.getElementById("stItem").value];
+  const unit = item ? (+item.valuePerUnit||0) : 0;
+  const qty  = +document.getElementById("stQty").value || 0;
+  document.getElementById("stUnit").textContent    = "£"+unit.toLocaleString();
+  document.getElementById("stQtyEcho").textContent = qty.toLocaleString();
+  document.getElementById("stPayout").textContent  = "£"+(unit*qty).toLocaleString();
+};
+
+window.submitDeposit=async function(){
+  const item = jobItems[+document.getElementById("stItem").value];
+  if(!item){ showAlert("stAlert","error","No items set. Ask the boss to add them in Settings → Job Items."); return; }
+  const qty = +document.getElementById("stQty").value || 0;
+  if(qty<=0){ showAlert("stAlert","error","Enter a quantity."); return; }
+  const date  = document.getElementById("stDate").value || new Date().toISOString().slice(0,10);
+  const unit  = +item.valuePerUnit||0;
+  const total = unit*qty;
+  try{
+    await db.collection("storage").add({
+      user, displayName: display||user,
+      item:item.name, unitValue:unit, qty, total,
+      date, status:"pending", loggedAt:new Date().toISOString()
+    });
+    showAlert("stAlert","success",`Logged ${qty}× ${item.name} — £${total.toLocaleString()} owed to you.`);
+    document.getElementById("stQty").value=1;
+    onStorageChange();
+    loadStorage();
+  }catch(e){ showAlert("stAlert","error","Couldn't save. "+e.message); }
+};
+
+async function loadStorage(){
+  renderStorageItems();
+  const d=document.getElementById("stDate"); if(d && !d.value) d.valueAsDate=new Date();
+
+  let all=[];
+  try{
+    const snap=await db.collection("storage").get();
+    all=snap.docs.map(x=>({id:x.id,...x.data()}));
+  }catch(e){ console.error("storage load error:",e); }
+  window._storageAll = all;
+
+  // ── Your own drop-offs ──
+  const mine=all.filter(x=>(x.user||"").toLowerCase()===user)
+    .sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.loggedAt||"").localeCompare(a.loggedAt||""));
+  const owed  = mine.filter(x=>x.status!=="paid").reduce((s,x)=>s+(x.total||0),0);
+  const paid  = mine.filter(x=>x.status==="paid").reduce((s,x)=>s+(x.total||0),0);
+  const units = mine.reduce((s,x)=>s+(x.qty||0),0);
+  document.getElementById("stStatItems").textContent = units.toLocaleString();
+  document.getElementById("stStatOwed").textContent  = "£"+owed.toLocaleString();
+  document.getElementById("stStatPaid").textContent  = "£"+paid.toLocaleString();
+
+  document.getElementById("myDropsBody").innerHTML = mine.length ? mine.map(x=>`<tr>
+    <td class="mono">${x.date||"—"}</td>
+    <td>${x.item||"—"}</td>
+    <td class="mono">${(x.qty||0).toLocaleString()}</td>
+    <td class="mono">£${(x.unitValue||0).toLocaleString()}</td>
+    <td class="mono" style="color:var(--green)">£${(x.total||0).toLocaleString()}</td>
+    <td><span class="badge ${x.status==="paid"?"green":"gold"}">${(x.status||"pending").toUpperCase()}</span></td>
+  </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;color:var(--text-dim);font-family:var(--font-mono);padding:2rem">Nothing dropped off yet.</td></tr>`;
+
+  // ── Boss/captain: everyone's pending payouts, grouped ──
+  if(isBossOrCap){
+    const pending=all.filter(x=>x.status!=="paid");
+    document.getElementById("stGrandOwed").textContent  = "£"+pending.reduce((s,x)=>s+(x.total||0),0).toLocaleString();
+    document.getElementById("stPendingCount").textContent = pending.length;
+
+    const groups={};
+    pending.forEach(x=>{
+      const key=(x.user||"unknown").toLowerCase();
+      (groups[key]=groups[key]||{name:x.displayName||x.user||"Unknown",items:[],total:0});
+      groups[key].items.push(x); groups[key].total+=x.total||0;
+    });
+    const keys=Object.keys(groups).sort((a,b)=>groups[b].total-groups[a].total);
+    document.getElementById("allDropsList").innerHTML = keys.length ? keys.map(k=>{
+      const g=groups[k];
+      const rows=g.items.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`
+        <div style="display:flex;gap:1rem;align-items:center;padding:0.4rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+          <span class="mono" style="color:var(--text-dim);min-width:90px">${x.date||"—"}</span>
+          <span style="flex:1">${x.item} <span class="mono" style="color:var(--text-dim)">×${x.qty}</span></span>
+          <span class="mono" style="color:var(--green);min-width:70px;text-align:right">£${(x.total||0).toLocaleString()}</span>
+        </div>`).join("");
+      return `<div style="background:var(--bg3);border:1px solid var(--border);padding:1rem;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.6rem">
+          <span style="font-family:var(--font-display);font-size:1.1rem;letter-spacing:0.1em;color:var(--text-bright)">${(g.name||"").toUpperCase()}</span>
+          <span class="badge gold">£${g.total.toLocaleString()} OWED</span>
+          <button class="btn btn-danger" style="margin-left:auto;font-size:0.72rem" onclick="payMember('${k}')">Mark Paid</button>
+        </div>
+        ${rows}
+      </div>`;
+    }).join("") : `<p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-dim)">No pending drop-offs. All squared up. ✔</p>`;
+  }
+}
+
+window.payMember=async function(key){
+  const pend=(window._storageAll||[]).filter(x=>(x.user||"unknown").toLowerCase()===key && x.status!=="paid");
+  if(!pend.length) return;
+  const sum=pend.reduce((s,x)=>s+(x.total||0),0);
+  if(!confirm(`Mark ${pend.length} drop-off(s) as PAID? (£${sum.toLocaleString()})`)) return;
+  try{
+    await Promise.all(pend.map(x=>db.collection("storage").doc(x.id).update({status:"paid",paidBy:user,paidAt:new Date().toISOString()})));
+    loadStorage();
+  }catch(e){ alert("Couldn't update: "+e.message); }
+};
+
 function showAlert(id,type,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className=`alert alert-${type}`;setTimeout(()=>el.classList.add("hidden"),3000);}
 </script>
 </body>

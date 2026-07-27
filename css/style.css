@@ -354,6 +354,33 @@ body {
 }
 .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
+/* ── Mobile nav: hamburger toggle + backdrop (hidden on desktop) ── */
+.nav-toggle {
+  display: none;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-bright);
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 46px;
+  height: 42px;
+  border-radius: 4px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nav-toggle:active,
+.nav-toggle:hover { border-color: var(--blood); color: var(--blood); }
+
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 150;
+}
+
 /* ── Main Content ── */
 .main-content {
   padding: 2rem;
@@ -796,142 +823,157 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 ::-webkit-scrollbar-thumb:hover { background: var(--blood-dark); }
 
-/* ── Responsive: Tablet ── */
+/* ── Responsive: Tablet & phone (drawer nav kicks in here) ── */
 @media (max-width: 768px) {
-  .app-shell { grid-template-columns: 1fr; grid-template-rows: 60px auto 1fr; }
-  .sidebar { position: relative; height: auto; flex-direction: row; overflow-x: auto; flex-wrap: wrap; padding: 0.5rem; }
-  .nav-section { display: none; }
-  .nav-item { padding: 0.5rem 0.8rem; font-size: 0.8rem; border-left: none; border-bottom: 2px solid transparent; }
-  .nav-item.active, .nav-item:hover { border-left-color: transparent; border-bottom-color: var(--blood); }
+  body { font-size: 16px; }
+
+  /* Single column. The sidebar becomes a fixed off-canvas drawer, so the
+     shell grid only needs the topbar row + the content row. */
+  .app-shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+
+  .topbar { flex-wrap: wrap; padding: 0.5rem 0.8rem; gap: 0.6rem; }
+
+  /* Show the hamburger button */
+  .nav-toggle { display: inline-flex; }
+
+  /* Sidebar → slide-in drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(82vw, 300px);
+    height: 100vh;
+    height: 100dvh;
+    padding: 1rem 0 2rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.15rem;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 200;
+    box-shadow: 0 0 40px rgba(0,0,0,0.7);
+    -webkit-overflow-scrolling: touch;
+  }
+  body.nav-open .sidebar { transform: translateX(0); }
+  body.nav-open .nav-backdrop { display: block; }
+
+  /* Big, readable, easy-to-tap menu items */
+  .nav-section { display: block; font-size: 0.62rem; letter-spacing: 0.25em; padding: 1rem 1.4rem 0.4rem; }
+  .nav-item {
+    font-size: 1.05rem;
+    padding: 0.9rem 1.4rem;
+    gap: 0.9rem;
+    letter-spacing: 0.03em;
+    border-left: 3px solid transparent;
+    border-bottom: none;
+  }
+  .nav-item .nav-icon { font-size: 1.35rem; width: 26px; }
+  .nav-item.active, .nav-item:hover { border-left-color: var(--blood); border-bottom-color: transparent; }
+
+  .main-content { padding: 1.1rem; }
+
   .grid-2, .grid-3, .grid-4, .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
-  .main-content { padding: 1rem; }
 }
 
 /* =============================================
    LB PHONE — in-game phone webview
-   Phone screens render small (~340-400px wide).
-   This breakpoint rescales type, spacing, and
-   layout so the app is fully usable on-screen.
+   Phone screens render small (~340-420px wide).
+   Everything here is sized UP for readability and
+   for easy tapping in-game. Nav is the drawer from
+   the 768px block above.
    ============================================= */
 @media (max-width: 480px) {
 
   html { -webkit-text-size-adjust: 100%; }
-
-  body { font-size: 14px; overflow-x: hidden; }
+  body { font-size: 16px; overflow-x: hidden; }
 
   /* Login page */
   .login-wrap { padding: 1rem; gap: 1.2rem; max-width: 100%; }
-  .login-logo { width: min(240px, 68vw); }
-  .brand-icon svg { width: 2rem; height: 2rem; }
-  .brand-title { font-size: 2.4rem; letter-spacing: 0.15em; }
-  .brand-sub { font-size: 0.55rem; letter-spacing: 0.2em; }
-  .login-box { padding: 1.2rem; gap: 0.9rem; }
-  .login-heading { font-size: 1.1rem; letter-spacing: 0.12em; }
-  .field-label { font-size: 0.6rem; letter-spacing: 0.2em; }
-  .field-input { font-size: 0.85rem; padding: 0.6rem 0.8rem; }
-  .role-btn { font-size: 0.9rem; padding: 0.6rem; }
-  .btn-primary { font-size: 1rem; padding: 0.8rem; letter-spacing: 0.12em; }
-  .login-error { font-size: 0.7rem; }
-  .login-footer { font-size: 0.5rem; letter-spacing: 0.1em; }
+  .login-logo { width: min(250px, 72vw); }
+  .brand-icon svg { width: 2.1rem; height: 2.1rem; }
+  .brand-title { font-size: 2.6rem; letter-spacing: 0.15em; }
+  .brand-sub { font-size: 0.6rem; letter-spacing: 0.2em; }
+  .login-box { padding: 1.3rem; gap: 1rem; }
+  .login-heading { font-size: 1.2rem; letter-spacing: 0.12em; }
+  .field-label { font-size: 0.65rem; letter-spacing: 0.2em; }
+  .field-input { font-size: 1rem; padding: 0.75rem 0.9rem; }
+  .role-btn { font-size: 1rem; padding: 0.75rem; }
+  .btn-primary { font-size: 1.05rem; padding: 0.9rem; letter-spacing: 0.12em; }
+  .login-error { font-size: 0.8rem; }
+  .login-footer { font-size: 0.55rem; letter-spacing: 0.1em; }
 
-  /* App shell — fully stacked, no sidebar columns */
-  .app-shell { grid-template-columns: 1fr; grid-template-rows: 52px auto 1fr; min-height: 100vh; }
-
-  .topbar { padding: 0 0.7rem; gap: 0.5rem; flex-wrap: wrap; min-height: 52px; }
-  .topbar-brand { font-size: 1.1rem; letter-spacing: 0.12em; }
-  .topbar-brand svg { width: 1rem; height: 1rem; }
-  .topbar-badge { font-size: 0.5rem; padding: 0.1rem 0.35rem; }
+  /* Topbar */
+  .topbar { padding: 0.5rem 0.7rem; gap: 0.5rem; min-height: 52px; }
+  .topbar-brand { font-size: 1.4rem; letter-spacing: 0.06em; }
+  .topbar-brand svg { width: 1.1rem; height: 1.1rem; }
+  .topbar-badge { font-size: 0.55rem; padding: 0.15rem 0.45rem; }
   .topbar-right { gap: 0.5rem; }
-  .topbar-user { font-size: 0.6rem; }
-  .btn-logout { font-size: 0.6rem; padding: 0.3rem 0.5rem; }
+  .topbar-user { font-size: 0.62rem; }
+  .btn-logout { font-size: 0.65rem; padding: 0.35rem 0.6rem; }
 
-  /* Sidebar becomes a horizontal scroll-strip of icon buttons */
-  .sidebar {
-    position: relative;
-    height: auto;
-    flex-direction: row;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding: 0.4rem;
-    gap: 0.3rem;
-    top: 0;
-    -webkit-overflow-scrolling: touch;
-  }
-  .nav-section { display: none; }
-  .nav-item {
-    flex: 0 0 auto;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.6rem;
-    letter-spacing: 0;
-    border-left: none;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-  }
-  .nav-item .nav-icon { font-size: 1.1rem; width: auto; }
-  .nav-item:hover, .nav-item.active { border-left-color: transparent; border-bottom-color: var(--blood); }
+  .main-content { padding: 0.9rem; }
 
-  .main-content { padding: 0.8rem; }
+  .page-header { gap: 0.5rem; margin-bottom: 1.2rem; padding-bottom: 0.8rem; flex-wrap: wrap; }
+  .page-title { font-size: 1.9rem; letter-spacing: 0.06em; }
+  .page-sub { font-size: 0.62rem; letter-spacing: 0.12em; }
 
-  .page-header { gap: 0.5rem; margin-bottom: 1.2rem; padding-bottom: 0.7rem; flex-wrap: wrap; }
-  .page-title { font-size: 1.5rem; letter-spacing: 0.08em; }
-  .page-sub { font-size: 0.55rem; letter-spacing: 0.1em; }
+  .panel { padding: 1.1rem; margin-bottom: 1.1rem; }
+  .panel-title { font-size: 1.2rem; letter-spacing: 0.06em; margin-bottom: 1rem; }
 
-  .panel { padding: 0.9rem; margin-bottom: 1rem; }
-  .panel-title { font-size: 1rem; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
-
-  /* Everything that was multi-column collapses to one column */
   .grid-2, .grid-3, .grid-4,
   .form-grid, .form-grid-3,
-  .role-select { grid-template-columns: 1fr; gap: 0.7rem; }
+  .role-select { grid-template-columns: 1fr; gap: 0.8rem; }
 
-  .stat-card { padding: 0.8rem; }
-  .stat-label { font-size: 0.55rem; letter-spacing: 0.15em; }
-  .stat-value { font-size: 1.4rem; }
+  /* Inline-styled item rows in the job form — stack so they don't overflow */
+  .job-item-row { grid-template-columns: 1fr 1fr !important; }
 
-  .form-label { font-size: 0.55rem; letter-spacing: 0.15em; }
-  .form-control { font-size: 0.85rem; padding: 0.55rem 0.7rem; }
-  .form-actions { flex-wrap: wrap; gap: 0.6rem; margin-top: 0.7rem; }
+  .stat-card { padding: 1rem; }
+  .stat-label { font-size: 0.62rem; letter-spacing: 0.15em; }
+  .stat-value { font-size: 1.9rem; }
 
-  .btn { font-size: 0.8rem; padding: 0.55rem 1.1rem; letter-spacing: 0.08em; }
+  .form-label { font-size: 0.62rem; letter-spacing: 0.15em; }
+  .form-control { font-size: 1rem; padding: 0.7rem 0.85rem; }
+  .form-actions { flex-wrap: wrap; gap: 0.7rem; margin-top: 0.9rem; }
 
-  /* Tables: don't squeeze columns, let them scroll instead */
-  .data-table { font-size: 0.75rem; }
-  .data-table th { font-size: 0.5rem; padding: 0.4rem 0.5rem; }
-  .data-table td { padding: 0.45rem 0.5rem; }
-  .data-table .badge { font-size: 0.5rem; padding: 0.1rem 0.35rem; }
+  .btn { font-size: 0.95rem; padding: 0.75rem 1.3rem; letter-spacing: 0.06em; }
+
+  /* Tables scroll sideways instead of crushing columns */
+  .data-table { font-size: 0.85rem; }
+  .data-table th { font-size: 0.58rem; padding: 0.5rem 0.6rem; }
+  .data-table td { padding: 0.6rem; }
+  .data-table .badge { font-size: 0.58rem; padding: 0.15rem 0.45rem; }
   .panel:has(.data-table) { overflow-x: auto; }
-  .panel .data-table { min-width: 480px; }
+  .panel .data-table { min-width: 460px; }
 
   /* Calendar */
-  .cal-header { font-size: 0.45rem; padding: 0.3rem 0.1rem; }
-  .cal-day { min-height: 48px; padding: 0.2rem; }
-  .cal-day-num { font-size: 0.6rem; }
-  .cal-event { font-size: 0.5rem; padding: 0.05rem 0.2rem; }
-  .cal-nav-title { font-size: 1.1rem; }
-  .cal-nav-btn { width: 28px; height: 28px; font-size: 1rem; }
+  .cal-header { font-size: 0.5rem; padding: 0.35rem 0.1rem; }
+  .cal-day { min-height: 54px; padding: 0.25rem; }
+  .cal-day-num { font-size: 0.7rem; }
+  .cal-event { font-size: 0.55rem; padding: 0.08rem 0.25rem; }
+  .cal-nav-title { font-size: 1.2rem; }
+  .cal-nav-btn { width: 34px; height: 34px; font-size: 1.2rem; }
 
   /* Modals */
-  .modal { padding: 1.2rem; max-width: 92vw; max-height: 85vh; }
-  .modal-title { font-size: 1.1rem; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
-  .modal-close { width: 26px; height: 26px; top: 0.7rem; right: 0.7rem; }
+  .modal { padding: 1.3rem; max-width: 94vw; max-height: 86vh; }
+  .modal-title { font-size: 1.2rem; letter-spacing: 0.06em; margin-bottom: 0.9rem; }
+  .modal-close { width: 32px; height: 32px; top: 0.7rem; right: 0.7rem; }
 
   /* Recipe cards */
-  .recipe-grid { grid-template-columns: 1fr; gap: 0.7rem; }
-  .recipe-card { padding: 0.9rem; }
-  .recipe-card-name { font-size: 1.05rem; padding-right: 2.5rem; }
-  .recipe-card-tag { font-size: 0.5rem; padding: 0.1rem 0.5rem; }
-  .recipe-ingredients li { font-size: 0.7rem; }
-  .recipe-yield { font-size: 0.6rem; }
+  .recipe-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+  .recipe-card { padding: 1rem; }
+  .recipe-card-name { font-size: 1.15rem; padding-right: 2.5rem; }
+  .recipe-card-tag { font-size: 0.55rem; padding: 0.12rem 0.55rem; }
+  .recipe-ingredients li { font-size: 0.8rem; }
+  .recipe-yield { font-size: 0.65rem; }
 
   /* Crew rows */
-  .crew-row { gap: 0.7rem; padding: 0.6rem 0; }
-  .crew-avatar { width: 28px; height: 28px; font-size: 0.8rem; }
-  .crew-name { font-size: 0.85rem; }
-  .crew-cut { font-size: 0.8rem; }
+  .crew-row { gap: 0.7rem; padding: 0.7rem 0; }
+  .crew-avatar { width: 34px; height: 34px; font-size: 0.9rem; }
+  .crew-name { font-size: 0.95rem; }
+  .crew-cut { font-size: 0.9rem; }
 
-  .alert { font-size: 0.7rem; padding: 0.6rem 0.8rem; }
+  .alert { font-size: 0.8rem; padding: 0.7rem 0.9rem; }
 }
 
 /* ── RONIN brush wordmark + login logo ── */
