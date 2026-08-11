@@ -24,8 +24,75 @@
     .total-val.blood { color:var(--blood); }
     .settings-section { margin-bottom:2rem; }
     .settings-section-title { font-family:var(--font-display); font-size:1.2rem; letter-spacing:0.15em; color:var(--text-bright); margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
-    .member-tag { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(21,128,61,0.1); border:1px solid var(--blood-dark); color:var(--blood); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.1em; padding:0.2rem 0.6rem; margin:0.2rem; }
+    .member-tag { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(156,107,62,0.1); border:1px solid var(--blood-dark); color:var(--blood); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.1em; padding:0.2rem 0.6rem; margin:0.2rem; }
     .topbar-logo { width:36px; height:36px; object-fit:contain; border-radius:2px; }
+
+    /* ── CHAT / CHANNELS ─────────────────────────── */
+    #sec-chat.active { display:flex; flex-direction:column; height:calc(100vh - 120px); min-height:380px; }
+    #sec-chat .page-header { margin-bottom:1rem; }
+    .chat-wrap { flex:1; min-height:0; display:flex; gap:1rem; }
+    .chat-channels { width:240px; flex-shrink:0; background:var(--bg2); border:1px solid var(--border); border-radius:4px; display:flex; flex-direction:column; overflow:hidden; }
+    .chat-channels-head { display:flex; align-items:center; gap:0.5rem; padding:0.8rem; border-bottom:1px solid var(--border); }
+    .chat-channels-head .chat-ch-title { font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.2em; color:var(--text-dim); }
+    .chat-new-btn { margin-left:auto; background:var(--bg3); border:1px solid var(--border); color:var(--blood); font-family:var(--font-display); font-size:0.75rem; letter-spacing:0.08em; padding:0.25rem 0.55rem; border-radius:3px; cursor:pointer; }
+    .chat-new-btn:hover { border-color:var(--blood); }
+    .chat-channels-list { overflow-y:auto; flex:1; padding:0.4rem; display:flex; flex-direction:column; gap:0.1rem; }
+    .chan-item { display:flex; align-items:center; gap:0.45rem; width:100%; text-align:left; background:none; border:none; border-left:2px solid transparent; color:var(--text-dim); font-family:var(--font-body); font-weight:600; font-size:0.9rem; padding:0.55rem 0.6rem; cursor:pointer; border-radius:3px; }
+    .chan-item:hover { background:rgba(156,107,62,0.06); color:var(--text-bright); }
+    .chan-item.active { background:rgba(156,107,62,0.1); border-left-color:var(--blood); color:var(--blood); }
+    .chan-item .chan-hash { opacity:0.55; font-weight:700; }
+    .chan-item .chan-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chan-item .chan-lock { font-size:0.72rem; opacity:0.75; }
+    .chat-main { flex:1; min-width:0; display:flex; flex-direction:column; background:var(--bg2); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+    .chat-head { display:flex; align-items:center; gap:0.6rem; padding:0.75rem 1rem; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .chat-head-info { min-width:0; }
+    .chat-head-name { font-family:var(--font-display); font-size:1.2rem; letter-spacing:0.05em; color:var(--text-bright); line-height:1.1; }
+    .chat-head-desc { font-family:var(--font-mono); font-size:0.66rem; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chat-head-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text-dim); font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.1em; padding:0.35rem 0.6rem; border-radius:3px; cursor:pointer; }
+    .chat-head-btn:hover { border-color:var(--blood); color:var(--blood); }
+    .chat-back { display:none; background:var(--bg3); border:1px solid var(--border); color:var(--text-bright); border-radius:4px; font-size:1.15rem; line-height:1; width:38px; height:34px; cursor:pointer; flex-shrink:0; }
+    .chat-messages { flex:1; min-height:0; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.1rem; }
+    .msg { display:flex; gap:0.7rem; padding:0.3rem 0; }
+    .msg.grouped { padding-top:0.02rem; }
+    .msg.grouped .msg-avatar { visibility:hidden; height:0; }
+    .msg-avatar { width:34px; height:34px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:0.95rem; background:var(--bg3); border:1px solid var(--border); color:var(--text-bright); }
+    .msg-body { flex:1; min-width:0; }
+    .msg-head { display:flex; align-items:baseline; gap:0.5rem; margin-bottom:0.05rem; }
+    .msg-name { font-weight:700; font-size:0.9rem; }
+    .msg-name.boss { color:var(--blood); }
+    .msg-name.captain { color:var(--gold); }
+    .msg-name.crew { color:var(--text-bright); }
+    .msg-role { font-family:var(--font-mono); font-size:0.5rem; letter-spacing:0.1em; color:var(--text-dim); border:1px solid var(--border); padding:0 0.3rem; border-radius:2px; }
+    .msg-time { font-family:var(--font-mono); font-size:0.58rem; color:var(--text-dim); }
+    .msg-text { font-size:0.92rem; color:var(--text-bright); line-height:1.45; overflow-wrap:anywhere; white-space:pre-wrap; }
+    .msg-del { margin-left:auto; background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:0.7rem; opacity:0; padding:0 0.3rem; }
+    .msg:hover .msg-del { opacity:0.6; }
+    .msg-del:hover { color:var(--blood); opacity:1; }
+    .chat-compose { flex-shrink:0; border-top:1px solid var(--border); padding:0.7rem; display:flex; gap:0.6rem; align-items:flex-end; }
+    .chat-input { flex:1; background:var(--bg3); border:1px solid var(--border); color:var(--text-bright); font-family:var(--font-body); font-size:0.95rem; padding:0.6rem 0.8rem; border-radius:4px; resize:none; max-height:140px; min-height:22px; line-height:1.4; }
+    .chat-input:focus { outline:none; border-color:var(--blood); box-shadow:0 0 0 2px var(--blood-glow); }
+    .chat-readonly { flex-shrink:0; border-top:1px solid var(--border); padding:0.8rem; text-align:center; font-family:var(--font-mono); font-size:0.72rem; color:var(--text-dim); }
+    .chat-empty { margin:auto; text-align:center; color:var(--text-dim); font-family:var(--font-mono); font-size:0.8rem; padding:2rem; line-height:1.6; }
+    /* permission editor */
+    .perm-block { margin-top:0.4rem; }
+    .radio-group { display:flex; flex-direction:column; gap:0.35rem; margin-top:0.4rem; }
+    .radio-opt { display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.9rem; color:var(--text-bright); font-family:var(--font-body); }
+    .radio-opt input { accent-color:var(--blood); width:16px; height:16px; }
+    .perm-list { display:flex; flex-direction:column; gap:0.15rem; max-height:190px; overflow-y:auto; border:1px solid var(--border); border-radius:4px; padding:0.5rem; margin-top:0.5rem; background:var(--bg3); }
+    .perm-row { display:flex; align-items:center; gap:0.6rem; padding:0.3rem 0.2rem; cursor:pointer; font-size:0.88rem; color:var(--text-bright); }
+    .perm-row input { width:16px; height:16px; accent-color:var(--blood); flex-shrink:0; }
+    .perm-row .perm-meta { margin-left:auto; font-family:var(--font-mono); font-size:0.6rem; color:var(--text-dim); letter-spacing:0.08em; }
+    .perm-row.locked { opacity:0.5; }
+
+    @media (max-width:768px) {
+      #sec-chat.active { height:calc(100dvh - 74px); }
+      .chat-wrap { gap:0; }
+      .chat-channels { width:100%; }
+      .chat-back { display:flex; align-items:center; justify-content:center; }
+      .chat-wrap .chat-main { display:none; }
+      .chat-wrap.chat-open .chat-channels { display:none; }
+      .chat-wrap.chat-open .chat-main { display:flex; }
+    }
   </style>
 </head>
 <body>
@@ -413,6 +480,40 @@
 
     </section>
 
+    <!-- ══ CHAT (all roles) ══ -->
+    <section class="page-section" id="sec-chat">
+      <div class="page-header"><h1 class="page-title">CHAT</h1><span class="page-sub">SECURE COMMS</span></div>
+      <div class="chat-wrap" id="chatWrap">
+        <!-- Channel list -->
+        <div class="chat-channels">
+          <div class="chat-channels-head">
+            <span class="chat-ch-title">CHANNELS</span>
+            <button class="chat-new-btn boss-only" onclick="openChannelModal()">+ NEW</button>
+          </div>
+          <div class="chat-channels-list" id="chatChannelList"></div>
+        </div>
+        <!-- Message pane -->
+        <div class="chat-main">
+          <div class="chat-head" id="chatHead" style="display:none">
+            <button class="chat-back" onclick="chatBackToList()">‹</button>
+            <div class="chat-head-info">
+              <div class="chat-head-name" id="chatHeadName">—</div>
+              <div class="chat-head-desc" id="chatHeadDesc"></div>
+            </div>
+            <button class="chat-head-btn boss-only" id="chatManageBtn" style="margin-left:auto" onclick="openChannelModal(currentChannelId)">MANAGE</button>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-empty" id="chatPlaceholder">Select a channel to start talking.</div>
+          </div>
+          <div class="chat-compose" id="chatCompose" style="display:none">
+            <textarea class="chat-input" id="chatInput" rows="1" placeholder="Message…" oninput="autoGrowChat(this)"></textarea>
+            <button class="btn btn-danger" onclick="sendMessage()">SEND</button>
+          </div>
+          <div class="chat-readonly" id="chatReadonly" style="display:none">🔒 You have read-only access to this channel.</div>
+        </div>
+      </div>
+    </section>
+
     <!-- ══ STORAGE DROP-OFF LOG (all roles) ══ -->
     <section class="page-section" id="sec-storage">
       <div class="page-header"><h1 class="page-title">STORAGE</h1><span class="page-sub">DROP-OFF LOG — WHAT THE GANG OWES YOU</span></div>
@@ -499,6 +600,49 @@
   </div>
 </div>
 
+<!-- CHANNEL MODAL -->
+<div class="modal-backdrop hidden" id="channelModal">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeChannelModal()">✕</button>
+    <div class="modal-title" id="channelModalTitle">New Channel</div>
+
+    <div class="form-grid" style="margin-bottom:0.4rem">
+      <div class="form-group"><label class="form-label">CHANNEL NAME</label><input class="form-control" id="chName" placeholder="ops-planning"/></div>
+      <div class="form-group"><label class="form-label">ICON (emoji)</label><input class="form-control" id="chIcon" placeholder="💬" maxlength="4"/></div>
+    </div>
+    <div class="form-group form-full" style="margin-bottom:1rem"><label class="form-label">DESCRIPTION (optional)</label><input class="form-control" id="chDesc" placeholder="What's this channel for?"/></div>
+
+    <!-- VISIBILITY -->
+    <div class="perm-block">
+      <label class="form-label">👁 WHO CAN SEE THIS CHANNEL</label>
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="chView" value="all" onchange="onViewModeChange()"/> Everyone in the gang</label>
+        <label class="radio-opt"><input type="radio" name="chView" value="leadership" onchange="onViewModeChange()"/> Boss &amp; Captains only</label>
+        <label class="radio-opt"><input type="radio" name="chView" value="custom" onchange="onViewModeChange()"/> Specific members…</label>
+      </div>
+      <div class="perm-list" id="chViewList" style="display:none"></div>
+    </div>
+
+    <!-- POSTING -->
+    <div class="perm-block" style="margin-top:1rem">
+      <label class="form-label">✍ WHO CAN SEND MESSAGES</label>
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="chPost" value="viewers" onchange="onPostModeChange()"/> Anyone who can see it</label>
+        <label class="radio-opt"><input type="radio" name="chPost" value="leadership" onchange="onPostModeChange()"/> Boss &amp; Captains only</label>
+        <label class="radio-opt"><input type="radio" name="chPost" value="custom" onchange="onPostModeChange()"/> Specific members…</label>
+      </div>
+      <div class="perm-list" id="chPostList" style="display:none"></div>
+      <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text-dim);margin-top:0.4rem">Boss always has full access. People can only post in channels they can see.</div>
+    </div>
+
+    <div id="channelAlert" class="alert hidden" style="margin-top:1rem"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:1.2rem">
+      <button class="btn btn-danger" style="flex:1" onclick="saveChannel()">Save Channel</button>
+      <button class="btn btn-ghost" id="chDeleteBtn" style="display:none" onclick="deleteChannel()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
@@ -551,6 +695,7 @@ let membersList  = [];
 const BOSS_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
+  {section:"COMMS"},{id:"chat",icon:"💬",label:"Chat"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
   {section:"FINANCE"},{id:"payouts",icon:"💰",label:"Payouts"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
@@ -558,6 +703,7 @@ const BOSS_NAV = [
 const CAPTAIN_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
+  {section:"COMMS"},{id:"chat",icon:"💬",label:"Chat"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
@@ -565,6 +711,7 @@ const CAPTAIN_NAV = [
 const CREW_NAV = [
   {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
+  {section:"COMMS"},{id:"chat",icon:"💬",label:"Chat"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
 ];
 
@@ -588,6 +735,8 @@ function showSection(id, btn) {
   if(sec) sec.classList.add("active");
   if(btn) btn.classList.add("active");
 
+  if (typeof stopChatPoll === "function") stopChatPoll();
+
   if(id==="overview")      loadOverview();
   if(id==="calendar")      renderCalendar();
   if(id==="recipes")       loadRecipes();
@@ -598,6 +747,7 @@ function showSection(id, btn) {
   if(id==="payouts")       initPayoutWeek();
   if(id==="storage")       loadStorage();
   if(id==="settings")      loadSettings();
+  if(id==="chat")          openChat();
 }
 
 // ── Load gang settings on boot ──
@@ -1051,7 +1201,7 @@ window.updateJobPreview=function(){
       crew.map(c=>{
         const member=membersList.find(m=>m.id===c);
         const name=member?.displayName||c;
-        return `<div style="background:rgba(21,128,61,0.08);border:1px solid var(--blood-dark);padding:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.75rem">
+        return `<div style="background:rgba(156,107,62,0.08);border:1px solid var(--blood-dark);padding:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.75rem">
           <span style="color:var(--text-dim)">${name}</span> <span style="color:var(--green)">£${perHead.toLocaleString()}</span>
         </div>`;
       }).join("")+`</div>`;
@@ -1673,6 +1823,375 @@ window.payMember=async function(key){
 };
 
 function showAlert(id,type,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className=`alert alert-${type}`;setTimeout(()=>el.classList.add("hidden"),3000);}
+
+// ══════════════════════════════════════════════
+// CHAT / CHANNELS  (Discord-style comms)
+//   Firestore:
+//     channels/{id}           → { name, icon, description,
+//                                  view:{mode:'all'|'leadership'|'custom', members:[handles]},
+//                                  post:{mode:'viewers'|'leadership'|'custom', members:[handles]},
+//                                  createdBy, createdAt }
+//     channels/{id}/messages  → { text, user, display, role, createdAt }
+//   Live updates use light polling (matches the app's proven .get()
+//   pattern in the LB Phone / CEF webview — no websockets required).
+// ══════════════════════════════════════════════
+let chatChannels = [];        // channels the current user can SEE
+let currentChannelId = null;
+let currentChannel = null;
+let chatPollTimer = null;
+let lastMsgSig = "";
+let chatStick = true;         // auto-scroll only when already near the bottom
+const CHAT_POLL_MS = 3500;
+
+const escHtml = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// ── Permission helpers ──
+function canViewChannel(ch){
+  if(isBoss) return true;
+  const v = ch.view || {mode:"all"};
+  if(v.mode==="all")        return true;
+  if(v.mode==="leadership") return isBossOrCap;
+  if(v.mode==="custom")     return (v.members||[]).includes(user);
+  return false;
+}
+function canPostChannel(ch){
+  if(!canViewChannel(ch)) return false;
+  if(isBoss) return true;
+  const p = ch.post || {mode:"viewers"};
+  if(p.mode==="viewers")    return true;              // already passed the view check
+  if(p.mode==="leadership") return isBossOrCap;
+  if(p.mode==="custom")     return (p.members||[]).includes(user);
+  return false;
+}
+const canManageChannels = () => isBossOrCap;
+
+// ── Enter this section ──
+window.openChat = async function(){
+  await loadChannels();
+  // Desktop: auto-open the first visible channel if none chosen.
+  const wide = window.innerWidth > 768;
+  if(!currentChannelId && wide && chatChannels.length){
+    selectChannel(chatChannels[0].id);
+  } else if(currentChannelId && chatChannels.some(c=>c.id===currentChannelId)){
+    selectChannel(currentChannelId);          // reopen & resume polling
+  } else {
+    currentChannelId = null; currentChannel = null;
+    document.getElementById("chatWrap").classList.remove("chat-open");
+    document.getElementById("chatHead").style.display = "none";
+    document.getElementById("chatCompose").style.display = "none";
+    document.getElementById("chatReadonly").style.display = "none";
+    document.getElementById("chatMessages").innerHTML =
+      `<div class="chat-empty">${chatChannels.length?"Select a channel to start talking.":(canManageChannels()?"No channels yet.<br>Hit <b>+ NEW</b> to create the first one.":"No channels available to you yet.")}</div>`;
+  }
+};
+
+async function loadChannels(){
+  let all = [];
+  try{
+    const snap = await db.collection("channels").get();
+    all = snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){ console.error("channel load error:",e); }
+  all.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  chatChannels = all.filter(canViewChannel);
+  renderChannelList();
+}
+
+function renderChannelList(){
+  const list = document.getElementById("chatChannelList");
+  if(!chatChannels.length){
+    list.innerHTML = `<div style="padding:0.8rem;font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);line-height:1.6">${canManageChannels()?"No channels yet.":"Nothing here yet."}</div>`;
+    return;
+  }
+  list.innerHTML = chatChannels.map(ch=>{
+    const restricted = (ch.view?.mode && ch.view.mode!=="all");
+    const active = ch.id===currentChannelId ? " active" : "";
+    return `<button class="chan-item${active}" onclick="selectChannel('${ch.id}')">
+      <span class="chan-hash">${ch.icon?escHtml(ch.icon):"#"}</span>
+      <span class="chan-name">${escHtml(ch.name||"channel")}</span>
+      ${restricted?'<span class="chan-lock" title="Restricted">🔒</span>':''}
+    </button>`;
+  }).join("");
+}
+
+// ── Open a channel ──
+window.selectChannel = function(id){
+  const ch = chatChannels.find(c=>c.id===id);
+  if(!ch){ return; }
+  currentChannelId = id; currentChannel = ch;
+  chatStick = true; lastMsgSig = "";
+
+  document.querySelectorAll("#chatChannelList .chan-item").forEach(b=>b.classList.remove("active"));
+  renderChannelList();
+
+  // Head
+  document.getElementById("chatHead").style.display = "flex";
+  document.getElementById("chatHeadName").innerHTML = `${ch.icon?escHtml(ch.icon)+" ":"# "}${escHtml(ch.name||"")}`;
+  document.getElementById("chatHeadDesc").textContent = ch.description||"";
+  document.getElementById("chatManageBtn").style.display = canManageChannels() ? "" : "none";
+
+  // Compose vs read-only
+  const post = canPostChannel(ch);
+  document.getElementById("chatCompose").style.display  = post ? "flex" : "none";
+  document.getElementById("chatReadonly").style.display = post ? "none" : "block";
+
+  // Mobile: swap to the message pane
+  document.getElementById("chatWrap").classList.add("chat-open");
+
+  const box = document.getElementById("chatMessages");
+  box.innerHTML = `<div class="chat-empty">Loading…</div>`;
+
+  loadMessages(true);
+  startChatPoll();
+};
+
+window.chatBackToList = function(){
+  stopChatPoll();
+  currentChannelId = null; currentChannel = null;
+  document.getElementById("chatWrap").classList.remove("chat-open");
+  renderChannelList();
+};
+
+// ── Messages ──
+async function loadMessages(initial){
+  const cid = currentChannelId;
+  if(!cid) return;
+  let msgs = [];
+  try{
+    const snap = await db.collection("channels").doc(cid).collection("messages").get();
+    msgs = snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){ console.error("message load error:",e); return; }
+  if(cid!==currentChannelId) return;   // user switched channel mid-fetch
+  msgs.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+
+  const sig = msgs.map(m=>m.id).join(",");
+  if(sig===lastMsgSig && !initial) return;   // nothing changed, avoid re-render jank
+  lastMsgSig = sig;
+  renderMessages(msgs);
+}
+
+function renderMessages(msgs){
+  const box = document.getElementById("chatMessages");
+  if(!msgs.length){
+    box.innerHTML = `<div class="chat-empty">No messages yet.<br>Start the conversation. 👊</div>`;
+    return;
+  }
+  let prevUser = null;
+  box.innerHTML = msgs.map(m=>{
+    const roleCls = m.role==="boss"?"boss":m.role==="captain"?"captain":"crew";
+    const grouped = m.user===prevUser;
+    prevUser = m.user;
+    const name = escHtml(m.display||m.user||"?");
+    const avatar = (name[0]||"?").toUpperCase();
+    const canDel = isBossOrCap || m.user===user;
+    return `<div class="msg${grouped?' grouped':''}">
+      <div class="msg-avatar">${avatar}</div>
+      <div class="msg-body">
+        ${grouped?"":`<div class="msg-head">
+          <span class="msg-name ${roleCls}">${name}</span>
+          <span class="msg-role">${(m.role||"crew").toUpperCase()}</span>
+          <span class="msg-time">${fmtTime(m.createdAt)}</span>
+        </div>`}
+        <div class="msg-text">${escHtml(m.text)}${canDel?`<button class="msg-del" title="Delete" onclick="deleteMessage('${m.id}')">🗑</button>`:""}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  if(chatStick) box.scrollTop = box.scrollHeight;
+}
+
+window.sendMessage = async function(){
+  if(!currentChannel){ return; }
+  if(!canPostChannel(currentChannel)){ return; }
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if(!text) return;
+  const cid = currentChannelId;
+  input.value = ""; autoGrowChat(input); chatStick = true;
+  try{
+    await db.collection("channels").doc(cid).collection("messages").add({
+      text, user, display: display||user, role, createdAt: Date.now(), ts: new Date().toISOString()
+    });
+    await loadMessages(true);
+  }catch(e){
+    input.value = text;   // put it back so they don't lose it
+    alert("Couldn't send: "+e.message);
+  }
+};
+
+window.deleteMessage = async function(mid){
+  if(!currentChannelId) return;
+  if(!confirm("Delete this message?")) return;
+  try{
+    await db.collection("channels").doc(currentChannelId).collection("messages").doc(mid).delete();
+    await loadMessages(true);
+  }catch(e){ alert("Couldn't delete: "+e.message); }
+};
+
+function fmtTime(ms){
+  if(!ms) return "";
+  const d = new Date(ms), now = new Date();
+  const t = d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  if(d.toDateString()===now.toDateString()) return t;
+  return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"})+" "+t;
+}
+
+window.autoGrowChat = function(el){ el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,140)+"px"; };
+
+// ── Polling lifecycle ──
+function startChatPoll(){
+  stopChatPoll();
+  chatPollTimer = setInterval(()=>{ if(currentChannelId) loadMessages(false); }, CHAT_POLL_MS);
+}
+function stopChatPoll(){ if(chatPollTimer){ clearInterval(chatPollTimer); chatPollTimer=null; } }
+
+// Track whether the user is scrolled to the bottom (so we don't yank them down)
+document.addEventListener("DOMContentLoaded",()=>{
+  const box = document.getElementById("chatMessages");
+  if(box) box.addEventListener("scroll",()=>{ chatStick = (box.scrollHeight - box.scrollTop - box.clientHeight) < 60; });
+  const input = document.getElementById("chatInput");
+  if(input) input.addEventListener("keydown",e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
+});
+// (DOMContentLoaded may have already fired — wire up immediately too)
+(function(){
+  const box = document.getElementById("chatMessages");
+  if(box) box.addEventListener("scroll",()=>{ chatStick = (box.scrollHeight - box.scrollTop - box.clientHeight) < 60; });
+  const input = document.getElementById("chatInput");
+  if(input) input.addEventListener("keydown",e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
+})();
+
+// ══════════════════════════════════════════════
+// CHANNEL MODAL (create / edit / delete)
+// ══════════════════════════════════════════════
+let editingChannelId = null;
+
+window.openChannelModal = async function(id){
+  if(!canManageChannels()) return;
+  editingChannelId = id || null;
+  // make sure we have an up-to-date member list for the pickers
+  if(!membersList.length){
+    try{ const s=await db.collection("users").get(); membersList=s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){}
+  }
+  const ch = editingChannelId ? chatChannels.find(c=>c.id===editingChannelId) : null;
+
+  document.getElementById("channelModalTitle").textContent = ch ? "Edit Channel" : "New Channel";
+  document.getElementById("chName").value  = ch?.name || "";
+  document.getElementById("chIcon").value  = ch?.icon || "";
+  document.getElementById("chDesc").value  = ch?.description || "";
+  document.getElementById("chDeleteBtn").style.display = ch ? "" : "none";
+
+  const vMode = ch?.view?.mode || "all";
+  const pMode = ch?.post?.mode || "viewers";
+  document.querySelectorAll('input[name="chView"]').forEach(r=>r.checked = r.value===vMode);
+  document.querySelectorAll('input[name="chPost"]').forEach(r=>r.checked = r.value===pMode);
+
+  buildViewList(ch?.view?.members || []);
+  buildPostList(ch?.post?.members || []);
+  onViewModeChange(); onPostModeChange();
+
+  document.getElementById("channelModal").classList.remove("hidden");
+};
+window.closeChannelModal = () => document.getElementById("channelModal").classList.add("hidden");
+
+function memberRoleTag(m){ return (m.role||"crew").toUpperCase(); }
+
+function buildViewList(selected){
+  const box = document.getElementById("chViewList");
+  box.innerHTML = membersList.map(m=>{
+    return `<label class="perm-row">
+      <input type="checkbox" class="ch-view-cb" value="${m.id}" ${selected.includes(m.id)?"checked":""} onchange="buildPostList(getPostSelected())">
+      <span>${escHtml(m.displayName||m.id)}</span>
+      <span class="perm-meta">${escHtml(m.id)} · ${memberRoleTag(m)}</span>
+    </label>`;
+  }).join("") || `<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim)">No members found. Add them in Settings.</div>`;
+}
+
+function getViewSelected(){ return Array.from(document.querySelectorAll(".ch-view-cb:checked")).map(c=>c.value); }
+function getPostSelected(){ return Array.from(document.querySelectorAll(".ch-post-cb:checked")).map(c=>c.value); }
+
+// Who will be able to SEE the channel, given the current visibility choice —
+// used to constrain the "specific members" posting list.
+function currentViewableSet(){
+  const mode = document.querySelector('input[name="chView"]:checked')?.value || "all";
+  if(mode==="all")        return new Set(membersList.map(m=>m.id));
+  if(mode==="leadership") return new Set(membersList.filter(m=>m.role==="boss"||m.role==="captain").map(m=>m.id));
+  return new Set(getViewSelected());   // custom
+}
+
+function buildPostList(selected){
+  const box = document.getElementById("chPostList");
+  const viewable = currentViewableSet();
+  box.innerHTML = membersList.map(m=>{
+    const allowed = viewable.has(m.id) || m.role==="boss";   // boss always allowed
+    return `<label class="perm-row ${allowed?"":"locked"}" title="${allowed?"":"Can't post — they can't see this channel"}">
+      <input type="checkbox" class="ch-post-cb" value="${m.id}" ${selected.includes(m.id)&&allowed?"checked":""} ${allowed?"":"disabled"}>
+      <span>${escHtml(m.displayName||m.id)}</span>
+      <span class="perm-meta">${escHtml(m.id)} · ${memberRoleTag(m)}</span>
+    </label>`;
+  }).join("") || `<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim)">No members found.</div>`;
+}
+
+window.onViewModeChange = function(){
+  const mode = document.querySelector('input[name="chView"]:checked')?.value || "all";
+  document.getElementById("chViewList").style.display = mode==="custom" ? "flex" : "none";
+  buildPostList(getPostSelected());   // viewable set changed → refresh post options
+};
+window.onPostModeChange = function(){
+  const mode = document.querySelector('input[name="chPost"]:checked')?.value || "viewers";
+  document.getElementById("chPostList").style.display = mode==="custom" ? "flex" : "none";
+};
+
+window.saveChannel = async function(){
+  if(!canManageChannels()) return;
+  const name = document.getElementById("chName").value.trim();
+  if(!name){ showAlert("channelAlert","error","Channel name required."); return; }
+
+  const vMode = document.querySelector('input[name="chView"]:checked')?.value || "all";
+  const pMode = document.querySelector('input[name="chPost"]:checked')?.value || "viewers";
+  const view = { mode:vMode, members: vMode==="custom" ? getViewSelected() : [] };
+  const post = { mode:pMode, members: pMode==="custom" ? getPostSelected() : [] };
+
+  // Safety: a custom poster must also be a viewer.
+  if(vMode==="custom" && pMode==="custom"){
+    const vSet = new Set(view.members);
+    post.members = post.members.filter(h=>vSet.has(h));
+  }
+
+  const data = {
+    name,
+    icon: document.getElementById("chIcon").value.trim(),
+    description: document.getElementById("chDesc").value.trim(),
+    view, post
+  };
+
+  try{
+    if(editingChannelId){
+      await db.collection("channels").doc(editingChannelId).set(data,{merge:true});
+    }else{
+      data.createdBy = user; data.createdAt = Date.now();
+      const ref = await db.collection("channels").add(data);
+      currentChannelId = ref.id;   // jump into the new channel
+    }
+    closeChannelModal();
+    await loadChannels();
+    if(currentChannelId && chatChannels.some(c=>c.id===currentChannelId)) selectChannel(currentChannelId);
+    else openChat();
+  }catch(e){ showAlert("channelAlert","error","Couldn't save: "+e.message); }
+};
+
+window.deleteChannel = async function(){
+  if(!editingChannelId) return;
+  if(!confirm("Delete this channel and ALL its messages? This can't be undone.")) return;
+  const cid = editingChannelId;
+  try{
+    // best-effort clear of messages, then the channel doc
+    const ms = await db.collection("channels").doc(cid).collection("messages").get();
+    await Promise.all(ms.docs.map(d=>d.ref.delete()));
+    await db.collection("channels").doc(cid).delete();
+    closeChannelModal();
+    if(currentChannelId===cid){ stopChatPoll(); currentChannelId=null; currentChannel=null; }
+    await openChat();
+  }catch(e){ showAlert("channelAlert","error","Couldn't delete: "+e.message); }
+};
 </script>
 </body>
 </html>
