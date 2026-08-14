@@ -288,6 +288,31 @@
       </div>
     </section>
 
+    <!-- ══ ORG CHART ══ -->
+    <section class="page-section" id="sec-org-chart">
+      <div class="page-header">
+        <h1 class="page-title">ORG CHART</h1>
+        <span class="page-sub">CHAIN OF COMMAND</span>
+      </div>
+
+      <!-- Boss/Captain edit bar -->
+      <div class="panel boss-only" style="margin-bottom:1rem;padding:1rem 1.5rem">
+        <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap">
+          <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--text-dim);margin-right:auto">BOSS / CAPTAIN EDIT MODE</span>
+          <span id="orgSaveInd" style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);opacity:0;transition:opacity 0.3s;letter-spacing:0.15em">SAVED</span>
+          <button class="btn btn-ghost" id="orgAddBtn" style="display:none" onclick="openOrgModal(null,null)">＋ Add Position</button>
+          <button class="btn btn-danger" id="orgEditBtn" onclick="toggleOrgEdit()">Enable Editing</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="org-scroll">
+          <div id="orgTree" class="org-tree"></div>
+        </div>
+        <div id="orgEmpty" style="display:none;text-align:center;padding:2.5rem 1rem;color:var(--text-dim);font-family:var(--font-mono);font-size:0.85rem"></div>
+      </div>
+    </section>
+
     <!-- ══ LOG A JOB (boss) ══ -->
     <section class="page-section" id="sec-job-form">
       <div class="page-header"><h1 class="page-title">LOG A JOB</h1><span class="page-sub">RECORD THE OPERATION</span></div>
@@ -575,6 +600,38 @@
 </div>
 
 <!-- EVENT MODAL -->
+<div class="modal-backdrop hidden" id="orgModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOrgModal()">✕</button>
+    <div class="modal-title" id="orgModalTitle">Add Position</div>
+    <div class="form-group" style="margin-bottom:0.8rem">
+      <label class="form-label">RANK / TITLE</label>
+      <input class="form-control" id="orgRank" placeholder="e.g. Underboss, Captain, Enforcer"/>
+    </div>
+    <div class="form-group" style="margin-bottom:0.8rem">
+      <label class="form-label">LINK MEMBER <span style="color:var(--text-dim)">(optional)</span></label>
+      <select class="form-control" id="orgMember" onchange="orgMemberPicked()"></select>
+    </div>
+    <div class="form-group" style="margin-bottom:0.8rem">
+      <label class="form-label">NAME</label>
+      <input class="form-control" id="orgName" placeholder="Street name shown on the card"/>
+    </div>
+    <div class="form-group" style="margin-bottom:0.8rem">
+      <label class="form-label">REPORTS TO</label>
+      <select class="form-control" id="orgParent"></select>
+    </div>
+    <div class="form-group" style="margin-bottom:1rem">
+      <label class="form-label">NOTES <span style="color:var(--text-dim)">(optional)</span></label>
+      <input class="form-control" id="orgNotes" placeholder="Territory, speciality, callsign..."/>
+    </div>
+    <div id="orgModalAlert" class="alert hidden" style="margin-bottom:0.8rem"></div>
+    <div style="display:flex;gap:0.6rem">
+      <button class="btn btn-danger" style="flex:1" onclick="saveOrgNode()">Save Position</button>
+      <button class="btn btn-ghost" id="orgDeleteBtn" style="display:none" onclick="deleteOrgNode()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop hidden" id="eventModal">
   <div class="modal">
     <button class="modal-close" onclick="closeEventModal()">✕</button>
@@ -691,7 +748,7 @@ let membersList  = [];
 
 // ── Sidebar ──
 const BOSS_NAV = [
-  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
+  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"org-chart",icon:"🏛️",label:"Org Chart"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
   {section:"COMMS"},{id:"chat",icon:"💬",label:"Chat"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
@@ -699,7 +756,7 @@ const BOSS_NAV = [
   {section:"ADMIN"},{id:"settings",icon:"⚙️",label:"Settings"},
 ];
 const CAPTAIN_NAV = [
-  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
+  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"org-chart",icon:"🏛️",label:"Org Chart"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
   {section:"COMMS"},{id:"chat",icon:"💬",label:"Chat"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
@@ -707,7 +764,7 @@ const CAPTAIN_NAV = [
 ];
 
 const CREW_NAV = [
-  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"calendar",icon:"📅",label:"Calendar"},
+  {section:"INTEL"},{id:"overview",icon:"📊",label:"Overview"},{id:"constitution",icon:"📜",label:"Constitution"},{id:"org-chart",icon:"🏛️",label:"Org Chart"},{id:"calendar",icon:"📅",label:"Calendar"},
   {id:"recipes",icon:"🧪",label:"Bench Wench"},{id:"calculator",icon:"🧮",label:"Craft Calc"},
   {section:"COMMS"},{id:"chat",icon:"💬",label:"Chat"},
   {section:"OPERATIONS"},{id:"job-form",icon:"💼",label:"Log a Job"},{id:"job-dashboard",icon:"📋",label:"Job Records"},{id:"storage",icon:"📦",label:"Storage"},
@@ -740,6 +797,7 @@ function showSection(id, btn) {
   if(id==="recipes")       loadRecipes();
   if(id==="calculator")    loadCalcRecipes();
   if(id==="constitution")  loadConstitution();
+  if(id==="org-chart")     loadOrgChart();
   if(id==="job-form")      { populateJobTypes(); initJobItemRows(); initCrewSlots(); const jgc=document.getElementById("jobGangCut"); if(jgc) jgc.value=gangSettings.gangCut||50; }
   if(id==="job-dashboard") loadJobs();
   if(id==="payouts")       initPayoutWeek();
@@ -2189,6 +2247,210 @@ window.deleteChannel = async function(){
     if(currentChannelId===cid){ stopChatPoll(); currentChannelId=null; currentChannel=null; }
     await openChat();
   }catch(e){ showAlert("channelAlert","error","Couldn't delete: "+e.message); }
+};
+
+// ══════════════════════════════════════════════
+// ORG CHART   (view: everyone · edit: boss + captains)
+// Stored as one doc: orgchart/main = { nodes:[...] }
+// node = { id, rank, name, member?, reportsTo, notes }
+// ══════════════════════════════════════════════
+let orgNodes    = [];
+let orgEditMode = false;
+let orgEditingId = null;
+
+const orgId  = () => "n" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const oEsc   = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function orgTier(rank){
+  const r = (rank||"").toLowerCase();
+  if(/boss|underboss|leader|kingpin|don\b/.test(r))            return 1;
+  if(/captain|capo|lieutenant|\blt\b|second/.test(r))          return 2;
+  if(/enforcer|sergeant|veteran|senior|shot.?caller/.test(r))  return 3;
+  return 4;
+}
+function orgAlert(msg){ const a=document.getElementById("orgModalAlert"); if(a){ a.textContent=msg; a.className="alert alert-error"; } }
+function orgFlashSaved(){ const i=document.getElementById("orgSaveInd"); if(i){ i.style.opacity=1; setTimeout(()=>i.style.opacity=0,2000); } }
+
+async function loadOrgChart(){
+  try{
+    const doc = await db.collection("orgchart").doc("main").get();
+    orgNodes = doc.exists ? (doc.data().nodes || []) : [];
+  }catch(e){ orgNodes = []; }
+  document.getElementById("orgAddBtn").style.display = (isBossOrCap && orgEditMode) ? "" : "none";
+  renderOrgChart();
+}
+
+async function saveOrg(){
+  try{
+    await db.collection("orgchart").doc("main")
+      .set({ nodes: orgNodes, updatedBy: user, updatedAt: new Date().toISOString() });
+    orgFlashSaved();
+  }catch(e){ orgAlert("Couldn't save: " + e.message); }
+}
+
+function orgChildrenOf(id){ return orgNodes.filter(n => n.reportsTo === id); }
+function orgDescendants(id){
+  const out = new Set(), stack = [id];
+  while(stack.length){
+    const cur = stack.pop();
+    orgChildrenOf(cur).forEach(c => { if(!out.has(c.id)){ out.add(c.id); stack.push(c.id); } });
+  }
+  return out;
+}
+
+function renderOrgChart(){
+  const tree  = document.getElementById("orgTree");
+  const empty = document.getElementById("orgEmpty");
+
+  if(!orgNodes.length){
+    tree.innerHTML = "";
+    empty.style.display = "block";
+    empty.innerHTML = isBossOrCap
+      ? `Nothing here yet.<br><br><button class="btn btn-ghost" onclick="seedOrgFromRoster()">Build starter chart from roster</button>`
+      : `The chain of command hasn't been set up yet.`;
+    return;
+  }
+  empty.style.display = "none";
+
+  const ids   = new Set(orgNodes.map(n => n.id));
+  const roots = orgNodes.filter(n => !n.reportsTo || !ids.has(n.reportsTo));
+  tree.innerHTML = `<ul>${roots.map(r => renderOrgNode(r)).join("")}</ul>`;
+}
+
+function renderOrgNode(n){
+  const kids   = orgChildrenOf(n.id);
+  const linked = n.member ? membersList.find(m => m.id === n.member) : null;
+  const tier   = orgTier(n.rank);
+  const ctrls  = (isBossOrCap && orgEditMode) ? `
+      <div class="org-actions">
+        <button title="Add report" onclick="openOrgModal(null,'${n.id}')">＋</button>
+        <button title="Edit"        onclick="openOrgModal('${n.id}',null)">✎</button>
+        <button title="Delete"      onclick="quickDeleteOrg('${n.id}')">🗑</button>
+      </div>` : "";
+  return `<li>
+    <div class="org-node tier-${tier}">
+      ${ctrls}
+      <div class="org-rank">${oEsc(n.rank || "—")}</div>
+      <div class="org-name">${oEsc(n.name || "—")}</div>
+      ${linked ? `<div class="org-link">🔗 ${oEsc(linked.displayName || linked.id)}</div>` : ""}
+      ${n.notes ? `<div class="org-notes">${oEsc(n.notes)}</div>` : ""}
+    </div>
+    ${kids.length ? `<ul>${kids.map(k => renderOrgNode(k)).join("")}</ul>` : ""}
+  </li>`;
+}
+
+window.toggleOrgEdit = function(){
+  if(!isBossOrCap) return;
+  orgEditMode = !orgEditMode;
+  const btn = document.getElementById("orgEditBtn");
+  btn.textContent = orgEditMode ? "Done Editing" : "Enable Editing";
+  document.getElementById("orgAddBtn").style.display = orgEditMode ? "" : "none";
+  renderOrgChart();
+};
+
+window.openOrgModal = function(nodeId, parentId){
+  if(!isBossOrCap) return;
+  orgEditingId = nodeId;
+  const node = nodeId ? orgNodes.find(n => n.id === nodeId) : null;
+
+  document.getElementById("orgModalTitle").textContent = node ? "Edit Position" : "Add Position";
+  document.getElementById("orgRank").value  = node?.rank  || "";
+  document.getElementById("orgName").value  = node?.name  || "";
+  document.getElementById("orgNotes").value = node?.notes || "";
+
+  const msel = document.getElementById("orgMember");
+  msel.innerHTML = `<option value="">— none —</option>` +
+    membersList.map(m => `<option value="${m.id}">${oEsc(m.displayName || m.id)} (${(m.role||"").toUpperCase()})</option>`).join("");
+  msel.value = node?.member || "";
+
+  const banned = nodeId ? orgDescendants(nodeId) : new Set();
+  const psel = document.getElementById("orgParent");
+  psel.innerHTML = `<option value="">— Top level —</option>` +
+    orgNodes.filter(n => n.id !== nodeId && !banned.has(n.id))
+      .map(n => `<option value="${n.id}">${oEsc(n.rank || "?")} — ${oEsc(n.name || "?")}</option>`).join("");
+  psel.value = node ? (node.reportsTo || "") : (parentId || "");
+
+  document.getElementById("orgDeleteBtn").style.display = node ? "" : "none";
+  document.getElementById("orgModalAlert").classList.add("hidden");
+  document.getElementById("orgModal").classList.remove("hidden");
+};
+window.closeOrgModal = () => document.getElementById("orgModal").classList.add("hidden");
+
+window.orgMemberPicked = function(){
+  const id = document.getElementById("orgMember").value;
+  if(!id) return;
+  const m = membersList.find(x => x.id === id);
+  const nameField = document.getElementById("orgName");
+  if(m && !nameField.value.trim()) nameField.value = m.displayName || m.id;
+};
+
+window.saveOrgNode = async function(){
+  const rank  = document.getElementById("orgRank").value.trim();
+  const name  = document.getElementById("orgName").value.trim();
+  if(!rank && !name){ orgAlert("Give it at least a rank or a name."); return; }
+  const member    = document.getElementById("orgMember").value || "";
+  const reportsTo = document.getElementById("orgParent").value || null;
+  const notes     = document.getElementById("orgNotes").value.trim();
+
+  if(orgEditingId){
+    const n = orgNodes.find(x => x.id === orgEditingId);
+    if(n) Object.assign(n, { rank, name, member, reportsTo, notes });
+  }else{
+    orgNodes.push({ id: orgId(), rank, name, member, reportsTo, notes });
+  }
+  await saveOrg();
+  closeOrgModal();
+  renderOrgChart();
+};
+
+async function removeOrgNode(id){
+  const node = orgNodes.find(n => n.id === id);
+  if(!node) return;
+  const newParent = node.reportsTo || null;      // promote orphans one level up
+  orgNodes.forEach(n => { if(n.reportsTo === id) n.reportsTo = newParent; });
+  orgNodes = orgNodes.filter(n => n.id !== id);
+  await saveOrg();
+}
+window.deleteOrgNode = async function(){
+  if(!orgEditingId) return;
+  if(!confirm("Delete this position? Anyone reporting to them moves up a level.")) return;
+  await removeOrgNode(orgEditingId);
+  closeOrgModal();
+  renderOrgChart();
+};
+window.quickDeleteOrg = async function(id){
+  if(!confirm("Delete this position? Anyone reporting to them moves up a level.")) return;
+  await removeOrgNode(id);
+  renderOrgChart();
+};
+
+window.seedOrgFromRoster = async function(){
+  if(!isBossOrCap) return;
+  if(!membersList.length){
+    try{ const s = await db.collection("users").get(); membersList = s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){}
+  }
+  const bosses = membersList.filter(m => m.role === "boss");
+  const caps   = membersList.filter(m => m.role === "captain");
+  const crew   = membersList.filter(m => m.role === "crew");
+  const nodes  = [];
+  const topId  = orgId();
+
+  if(bosses.length){
+    nodes.push({ id: topId, rank:"Boss", name: bosses[0].displayName||bosses[0].id, member: bosses[0].id, reportsTo:null, notes:"" });
+    bosses.slice(1).forEach(b => nodes.push({ id: orgId(), rank:"Boss", name: b.displayName||b.id, member: b.id, reportsTo: topId, notes:"" }));
+  }else{
+    nodes.push({ id: topId, rank:"Boss", name:"—", member:"", reportsTo:null, notes:"" });
+  }
+
+  const capIds = [];
+  caps.forEach(c => { const id = orgId(); capIds.push(id); nodes.push({ id, rank:"Captain", name: c.displayName||c.id, member: c.id, reportsTo: topId, notes:"" }); });
+  crew.forEach((c,i) => {
+    const parent = capIds.length ? capIds[i % capIds.length] : topId;
+    nodes.push({ id: orgId(), rank:"Crew", name: c.displayName||c.id, member: c.id, reportsTo: parent, notes:"" });
+  });
+
+  orgNodes = nodes;
+  await saveOrg();
+  renderOrgChart();
 };
 </script>
 </body>

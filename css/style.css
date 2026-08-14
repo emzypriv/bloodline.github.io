@@ -801,6 +801,130 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 ::-webkit-scrollbar-thumb:hover { background: var(--blood-dark); }
 
+/* ============================================================
+   Org Chart — nested top-down tree with connector lines
+   ============================================================ */
+.org-scroll { overflow-x: auto; padding: 0.5rem 0 1rem; }
+
+.org-tree { display: inline-block; min-width: 100%; text-align: center; }
+
+.org-tree ul {
+  position: relative;
+  padding-top: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  list-style: none;
+}
+.org-tree li {
+  position: relative;
+  padding: 22px 10px 0;
+  list-style: none;
+}
+
+/* connector lines drawn from each child up to the sibling bar */
+.org-tree li::before,
+.org-tree li::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 50%;
+  width: 50%; height: 22px;
+  border-top: 2px solid var(--border);
+}
+.org-tree li::after {
+  right: auto; left: 50%;
+  border-left: 2px solid var(--border);
+}
+.org-tree li:only-child::before,
+.org-tree li:only-child::after { display: none; }
+.org-tree li:first-child::before,
+.org-tree li:last-child::after  { border: 0 none; }
+.org-tree li:last-child::before { border-right: 2px solid var(--border); }
+
+/* vertical drop from a parent node into its children row */
+.org-tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  width: 0; height: 22px;
+  border-left: 2px solid var(--border);
+}
+
+/* the very top row has no incoming line */
+.org-tree > ul { padding-top: 0; }
+.org-tree > ul > li { padding-top: 0; }
+.org-tree > ul > li::before,
+.org-tree > ul > li::after { display: none; }
+
+/* node card */
+.org-node {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  min-width: 150px;
+  max-width: 220px;
+  white-space: normal;
+  text-align: left;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--blood);
+  border-radius: 2px;
+  padding: 0.7rem 0.9rem 0.8rem;
+}
+.org-node.tier-1 { border-top-color: var(--blood); }
+.org-node.tier-2 { border-top-color: var(--gold); }
+.org-node.tier-3 { border-top-color: var(--gold-dim); }
+.org-node.tier-4 { border-top-color: var(--border-hot); }
+
+.org-rank {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blood);
+  margin-bottom: 0.2rem;
+}
+.org-node.tier-2 .org-rank { color: var(--gold); }
+.org-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.1;
+  color: var(--text-bright);
+}
+.org-link {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-top: 0.35rem;
+}
+.org-notes {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-dim);
+  margin-top: 0.35rem;
+}
+
+.org-actions {
+  position: absolute;
+  top: 0.3rem; right: 0.3rem;
+  display: flex;
+  gap: 0.15rem;
+}
+.org-actions button {
+  width: 1.4rem; height: 1.4rem;
+  padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.org-actions button:hover { border-color: var(--border-hot); color: var(--text-bright); }
+
 /* ── Responsive: Tablet & phone (drawer nav kicks in here) ── */
 @media (max-width: 768px) {
   body { font-size: 16px; }
