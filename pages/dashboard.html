@@ -481,6 +481,15 @@
         <div id="membersList"></div>
       </div>
 
+      <!-- Page Visibility -->
+      <div class="panel settings-section boss-strictly">
+        <div class="settings-section-title">Page Visibility</div>
+        <p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Tick a box to <b style="color:var(--text)">hide</b> that page from that role's sidebar. 🔒 = always available. — = the role doesn't have that page anyway.</p>
+        <div id="pageVisTable"></div>
+        <div class="form-actions" style="margin-top:1rem"><button class="btn btn-danger" onclick="savePageVis()">Save Visibility</button></div>
+        <div id="pageVisAlert" class="alert hidden"></div>
+      </div>
+
       <!-- Job Types -->
       <div class="panel settings-section">
         <div class="settings-section-title">Job Types</div>
@@ -609,7 +618,23 @@
       <input class="form-control" id="orgRank" placeholder="e.g. Underboss, Captain, Enforcer"/>
     </div>
     <div class="form-group" style="margin-bottom:0.8rem">
-      <label class="form-label">LINK MEMBER <span style="color:var(--text-dim)">(optional)</span></label>
+      <label class="form-label">LINK TO <span style="color:var(--text-dim)">(optional)</span></label>
+      <select class="form-control" id="orgLinkType" onchange="orgLinkTypeChanged()">
+        <option value="">— nothing —</option>
+        <option value="role">A role</option>
+        <option value="person">A specific person</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0.8rem;display:none" id="orgRoleWrap">
+      <label class="form-label">ROLE</label>
+      <select class="form-control" id="orgRole">
+        <option value="boss">Boss</option>
+        <option value="captain">Captain</option>
+        <option value="crew">Crew</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0.8rem;display:none" id="orgMemberWrap">
+      <label class="form-label">PERSON</label>
       <select class="form-control" id="orgMember" onchange="orgMemberPicked()"></select>
     </div>
     <div class="form-group" style="margin-bottom:0.8rem">
@@ -745,6 +770,8 @@ window.closeNav  = () => document.body.classList.remove("nav-open");
 // Cached data
 let gangSettings = { gangCut: 10 };
 let membersList  = [];
+let pageHidden   = { boss:[], captain:[], crew:[] };   // pages hidden per role (Boss-controlled)
+let curSection   = null;
 
 // ── Sidebar ──
 const BOSS_NAV = [
@@ -773,17 +800,35 @@ const CREW_NAV = [
 const sidebar = document.getElementById("sidebar");
 sidebar.addEventListener("click", e => { if (e.target.closest(".nav-item")) closeNav(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeNav(); });
-(isBoss ? BOSS_NAV : isCaptain ? CAPTAIN_NAV : CREW_NAV).forEach(item => {
-  if (item.section) {
-    const d = document.createElement("div"); d.className="nav-section"; d.textContent=item.section; sidebar.appendChild(d);
-  } else {
+
+// Which pages each role has by default, derived from the nav arrays
+const _navIds = nav => nav.filter(i => i.id).map(i => i.id);
+const BASE_PAGES = { boss:new Set(_navIds(BOSS_NAV)), captain:new Set(_navIds(CAPTAIN_NAV)), crew:new Set(_navIds(CREW_NAV)) };
+const ALL_PAGES  = BOSS_NAV.filter(i => i.id);   // {id,icon,label} for every page
+const LOCKED = { settings:["boss"] };            // pages that can never be hidden from listed roles
+
+function buildSidebar(){
+  sidebar.innerHTML = "";
+  const nav    = isBoss ? BOSS_NAV : isCaptain ? CAPTAIN_NAV : CREW_NAV;
+  const hidden = new Set(pageHidden[role] || []);
+  let pendingSection = null;
+  nav.forEach(item => {
+    if (item.section) { pendingSection = item.section; return; }
+    if (hidden.has(item.id) && !(LOCKED[item.id]||[]).includes(role)) return;   // hide, unless locked-on for this role
+    if (pendingSection) {
+      const d = document.createElement("div"); d.className="nav-section"; d.textContent=pendingSection; sidebar.appendChild(d);
+      pendingSection = null;
+    }
     const btn = document.createElement("button"); btn.className="nav-item"; btn.dataset.section=item.id;
     btn.innerHTML=`<span class="nav-icon">${item.icon}</span> ${item.label}`;
     btn.onclick=()=>showSection(item.id,btn); sidebar.appendChild(btn);
-  }
-});
+  });
+}
+buildSidebar();
 
 function showSection(id, btn) {
+  if ((pageHidden[role]||[]).includes(id) && !(LOCKED[id]||[]).includes(role)) return;
+  curSection = id;
   document.querySelectorAll(".page-section").forEach(s=>s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
   const sec=document.getElementById("sec-"+id);
@@ -828,7 +873,13 @@ async function bootLoad() {
     if (jtSnap.exists && jtSnap.data().types?.length) jobTypes = jtSnap.data().types;
     const jiSnap = await db.collection("settings").doc("jobitems").get();
     if (jiSnap.exists && jiSnap.data().items?.length) jobItems = jiSnap.data().items;
+    const pvSnap = await db.collection("settings").doc("pagevis").get();
+    if (pvSnap.exists) {
+      const h = pvSnap.data().hidden || {};
+      pageHidden = { boss:h.boss||[], captain:h.captain||[], crew:h.crew||[] };
+    }
   } catch(e) { console.error("Boot load error:", e); }
+  buildSidebar();
   const firstBtn = sidebar.querySelector(".nav-item");
   if (firstBtn) firstBtn.click();
 }
@@ -1544,7 +1595,52 @@ async function loadSettings(){
   loadJobTypesUI();
   loadJobItemsUI();
   updateCutPreview();
+  loadPageVis();
 }
+
+// ── Page Visibility (Boss only) ──
+function loadPageVis(){
+  const wrap = document.getElementById("pageVisTable");
+  if(!wrap) return;
+  const roles = ["boss","captain","crew"];
+  let html = `<table class="data-table"><thead><tr><th>PAGE</th><th>BOSS</th><th>CAPTAIN</th><th>CREW</th></tr></thead><tbody>`;
+  ALL_PAGES.forEach(p => {
+    html += `<tr><td><span style="opacity:.75">${p.icon}</span> ${p.label}</td>`;
+    roles.forEach(r => {
+      const inBase = BASE_PAGES[r].has(p.id);
+      const locked = (LOCKED[p.id]||[]).includes(r);
+      if(!inBase){
+        html += `<td style="text-align:center;color:var(--text-dim)">—</td>`;
+      } else if(locked){
+        html += `<td style="text-align:center" title="Always available to this role">🔒</td>`;
+      } else {
+        const checked = (pageHidden[r]||[]).includes(p.id) ? "checked" : "";
+        html += `<td style="text-align:center"><input type="checkbox" data-role="${r}" data-page="${p.id}" ${checked} style="width:16px;height:16px;cursor:pointer;accent-color:var(--blood)"/></td>`;
+      }
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+window.savePageVis = async function(){
+  if(!isBoss) return;
+  const hidden = { boss:[], captain:[], crew:[] };
+  document.querySelectorAll('#pageVisTable input[type="checkbox"]').forEach(cb => {
+    if(cb.checked) hidden[cb.dataset.role].push(cb.dataset.page);
+  });
+  try{
+    await db.collection("settings").doc("pagevis").set({ hidden, updatedBy:user, updatedAt:new Date().toISOString() });
+    pageHidden = { boss:hidden.boss, captain:hidden.captain, crew:hidden.crew };
+    buildSidebar();
+    // keep the user on their current page if it's still visible, else jump to the first
+    const stay = [...sidebar.querySelectorAll('.nav-item')].find(b => b.dataset.section === curSection);
+    if(stay) stay.classList.add("active");
+    else { const f = sidebar.querySelector(".nav-item"); if(f) f.click(); }
+    showAlert("pageVisAlert","success","Saved. Sidebar updated.");
+  }catch(e){ showAlert("pageVisAlert","error","Couldn't save: "+e.message); }
+};
 
 // Logo
 window.previewLogo=function(){
@@ -2318,7 +2414,6 @@ function renderOrgChart(){
 
 function renderOrgNode(n){
   const kids   = orgChildrenOf(n.id);
-  const linked = n.member ? membersList.find(m => m.id === n.member) : null;
   const tier   = orgTier(n.rank);
   const ctrls  = (isBossOrCap && orgEditMode) ? `
       <div class="org-actions">
@@ -2326,12 +2421,23 @@ function renderOrgNode(n){
         <button title="Edit"        onclick="openOrgModal('${n.id}',null)">✎</button>
         <button title="Delete"      onclick="quickDeleteOrg('${n.id}')">🗑</button>
       </div>` : "";
+
+  let linkHtml = "";
+  if(n.role){
+    const holders = membersList.filter(m => (m.role||"crew") === n.role).map(m => m.displayName || m.id);
+    linkHtml = `<div class="org-link">🛡 ${oEsc(n.role.toUpperCase())}</div>` +
+      (holders.length ? `<div class="org-holders">${holders.map(oEsc).join(", ")}</div>` : "");
+  }else if(n.member){
+    const linked = membersList.find(m => m.id === n.member);
+    if(linked) linkHtml = `<div class="org-link">🔗 ${oEsc(linked.displayName || linked.id)}</div>`;
+  }
+
   return `<li>
     <div class="org-node tier-${tier}">
       ${ctrls}
       <div class="org-rank">${oEsc(n.rank || "—")}</div>
       <div class="org-name">${oEsc(n.name || "—")}</div>
-      ${linked ? `<div class="org-link">🔗 ${oEsc(linked.displayName || linked.id)}</div>` : ""}
+      ${linkHtml}
       ${n.notes ? `<div class="org-notes">${oEsc(n.notes)}</div>` : ""}
     </div>
     ${kids.length ? `<ul>${kids.map(k => renderOrgNode(k)).join("")}</ul>` : ""}
@@ -2361,6 +2467,11 @@ window.openOrgModal = function(nodeId, parentId){
   msel.innerHTML = `<option value="">— none —</option>` +
     membersList.map(m => `<option value="${m.id}">${oEsc(m.displayName || m.id)} (${(m.role||"").toUpperCase()})</option>`).join("");
   msel.value = node?.member || "";
+  document.getElementById("orgRole").value = node?.role || "boss";
+
+  const linkType = node ? (node.role ? "role" : (node.member ? "person" : "")) : "";
+  document.getElementById("orgLinkType").value = linkType;
+  orgLinkTypeChanged();
 
   const banned = nodeId ? orgDescendants(nodeId) : new Set();
   const psel = document.getElementById("orgParent");
@@ -2375,6 +2486,12 @@ window.openOrgModal = function(nodeId, parentId){
 };
 window.closeOrgModal = () => document.getElementById("orgModal").classList.add("hidden");
 
+window.orgLinkTypeChanged = function(){
+  const t = document.getElementById("orgLinkType").value;
+  document.getElementById("orgRoleWrap").style.display   = (t === "role")   ? "" : "none";
+  document.getElementById("orgMemberWrap").style.display = (t === "person") ? "" : "none";
+};
+
 window.orgMemberPicked = function(){
   const id = document.getElementById("orgMember").value;
   if(!id) return;
@@ -2387,15 +2504,17 @@ window.saveOrgNode = async function(){
   const rank  = document.getElementById("orgRank").value.trim();
   const name  = document.getElementById("orgName").value.trim();
   if(!rank && !name){ orgAlert("Give it at least a rank or a name."); return; }
-  const member    = document.getElementById("orgMember").value || "";
+  const linkType  = document.getElementById("orgLinkType").value;
+  const role      = linkType === "role"   ? (document.getElementById("orgRole").value || "") : "";
+  const member    = linkType === "person" ? (document.getElementById("orgMember").value || "") : "";
   const reportsTo = document.getElementById("orgParent").value || null;
   const notes     = document.getElementById("orgNotes").value.trim();
 
   if(orgEditingId){
     const n = orgNodes.find(x => x.id === orgEditingId);
-    if(n) Object.assign(n, { rank, name, member, reportsTo, notes });
+    if(n) Object.assign(n, { rank, name, role, member, reportsTo, notes });
   }else{
-    orgNodes.push({ id: orgId(), rank, name, member, reportsTo, notes });
+    orgNodes.push({ id: orgId(), rank, name, role, member, reportsTo, notes });
   }
   await saveOrg();
   closeOrgModal();
